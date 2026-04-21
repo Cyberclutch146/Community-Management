@@ -1,17 +1,49 @@
 'use client';
 
-import { Needs } from '@/data/mockData';
+import { Needs } from '@/types';
 import { useState } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { updateDonation, addVolunteerSignup } from '@/services/eventService';
 
 interface DonationPanelProps {
+  eventId: string;
   needs: Needs;
 }
 
-export function DonationPanel({ needs }: DonationPanelProps) {
+export function DonationPanel({ eventId, needs }: DonationPanelProps) {
+  const { user, profile } = useAuth();
   const [pledged, setPledged] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState<'funds' | 'volunteers' | 'goods'>(
     needs.funds ? 'funds' : needs.volunteers ? 'volunteers' : 'goods'
   );
+
+  const handleDonate = async () => {
+    if (!user || loading) return;
+    setLoading(true);
+    try {
+      // simulate donating $10
+      await updateDonation(eventId, needs.funds?.current || 0, 10);
+      setPledged(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVolunteer = async () => {
+    if (!user || !profile || loading) return;
+    setLoading(true);
+    try {
+      await addVolunteerSignup(eventId, user.uid, profile.displayName || 'Anonymous', needs.volunteers?.current || 0);
+      setPledged(true);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="bg-surface-bright rounded-2xl p-6 md:p-8 shadow-sm border border-outline-variant/30 sticky top-24">
@@ -51,10 +83,11 @@ export function DonationPanel({ needs }: DonationPanelProps) {
           </p>
           {!pledged ? (
             <button 
-              onClick={() => setPledged(true)}
-              className="w-full bg-primary text-on-primary py-3.5 rounded-xl font-bold shadow hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-[0.98]"
+              onClick={handleDonate}
+              disabled={loading || !user}
+              className="w-full bg-primary text-on-primary py-3.5 rounded-xl font-bold shadow hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-[0.98] disabled:opacity-50"
             >
-              Donate Now
+              {loading ? 'Processing...' : user ? 'Donate $10 Now' : 'Sign in to Donate'}
             </button>
           ) : (
             <div className="bg-primary-fixed text-on-primary-fixed p-4 rounded-xl flex items-center justify-center gap-2 font-semibold">
@@ -72,10 +105,11 @@ export function DonationPanel({ needs }: DonationPanelProps) {
           </p>
           {!pledged ? (
             <button 
-              onClick={() => setPledged(true)}
-              className="w-full bg-tertiary text-on-tertiary py-3.5 rounded-xl font-bold shadow hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors active:scale-[0.98]"
+              onClick={handleVolunteer}
+              disabled={loading || !user}
+              className="w-full bg-tertiary text-on-tertiary py-3.5 rounded-xl font-bold shadow hover:bg-tertiary-container hover:text-on-tertiary-container transition-colors active:scale-[0.98] disabled:opacity-50"
             >
-              Sign Up to Volunteer
+              {loading ? 'Processing...' : user ? 'Sign Up to Volunteer' : 'Sign in to Volunteer'}
             </button>
           ) : (
             <div className="bg-tertiary-fixed text-on-tertiary-fixed p-4 rounded-xl flex items-center justify-center gap-2 font-semibold">

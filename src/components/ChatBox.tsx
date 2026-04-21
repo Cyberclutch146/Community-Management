@@ -1,31 +1,36 @@
 'use client';
 
-import { useState } from 'react';
-import { Message, currentUser } from '@/data/mockData';
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { subscribeToMessages, sendMessage } from '@/services/chatService';
+import { ChatMessage } from '@/types';
 
 interface ChatBoxProps {
-  initialMessages: Message[];
   eventId: string;
 }
 
-export function ChatBox({ initialMessages, eventId }: ChatBoxProps) {
-  const [messages, setMessages] = useState(initialMessages);
+export function ChatBox({ eventId }: ChatBoxProps) {
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
+  const { user, profile } = useAuth();
 
-  const handleSend = (e: React.FormEvent) => {
+  useEffect(() => {
+    const unsubscribe = subscribeToMessages(eventId, (newMessages) => {
+      setMessages(newMessages);
+    });
+    return () => unsubscribe();
+  }, [eventId]);
+
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !user || !profile) return;
 
-    const newMessage: Message = {
-      id: `m${Date.now()}`,
-      eventId,
-      userId: currentUser.id,
-      text: inputText,
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-    };
-
-    setMessages([...messages, newMessage]);
-    setInputText('');
+    try {
+      await sendMessage(eventId, user.uid, profile.displayName || 'Anonymous', inputText);
+      setInputText('');
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   return (
@@ -39,18 +44,19 @@ export function ChatBox({ initialMessages, eventId }: ChatBoxProps) {
       
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map(msg => {
-          const isMe = msg.userId === currentUser.id;
+          const isMe = user && msg.userId === user.uid;
+          const timestampStr = msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
           return (
             <div key={msg.id} className={`flex gap-3 max-w-[85%] ${isMe ? 'ml-auto flex-row-reverse' : ''}`}>
               {!isMe && (
                 <div className="w-8 h-8 rounded-full bg-surface-variant flex-shrink-0 flex items-center justify-center text-sm font-bold text-secondary">
-                  U
+                  {msg.userName.charAt(0).toUpperCase()}
                 </div>
               )}
               <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                 <div className="flex items-baseline gap-2 mb-1 mx-1">
-                  <span className="text-xs font-semibold text-secondary">{isMe ? 'You' : 'Volunteer'}</span>
-                  <span className="text-[10px] text-outline">{msg.timestamp}</span>
+                  <span className="text-xs font-semibold text-secondary">{isMe ? 'You' : msg.userName}</span>
+                  <span className="text-[10px] text-outline">{timestampStr}</span>
                 </div>
                 <div className={`px-4 py-2.5 rounded-2xl text-sm leading-relaxed ${
                   isMe 

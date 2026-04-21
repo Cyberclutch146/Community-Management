@@ -1,20 +1,45 @@
-import { mockEvents, mockMessages } from '@/data/mockData';
+'use client';
+
 import { notFound } from 'next/navigation';
 import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ChatBox';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useState, useEffect, use } from 'react';
+import { getEventById } from '@/services/eventService';
+import { CommunityEvent } from '@/types';
 
-export default async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const event = mockEvents.find(e => e.id === id);
+export default function EventDetails({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = use(params);
+  const id = resolvedParams.id;
+  const [event, setEvent] = useState<CommunityEvent | null>(null);
+  const [loading, setLoading] = useState(true);
 
-  if (!event) {
-    notFound();
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const data = await getEventById(id);
+        if (!data) notFound();
+        setEvent(data);
+      } catch (error) {
+        console.error("Failed to load event:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvent();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10 flex justify-center items-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+      </main>
+    );
   }
 
-  const eventMessages = mockMessages.filter(m => m.eventId === id);
+  if (!event) return null;
 
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
@@ -62,12 +87,12 @@ export default async function EventDetails({ params }: { params: Promise<{ id: s
           )}
 
           <div className="mt-10">
-            <ChatBox initialMessages={eventMessages} eventId={event.id} />
+            <ChatBox eventId={event.id} />
           </div>
         </div>
 
         <div className="w-full lg:w-[400px] flex-shrink-0">
-          <DonationPanel needs={event.needs} />
+          <DonationPanel eventId={event.id} needs={event.needs} />
         </div>
       </div>
     </main>

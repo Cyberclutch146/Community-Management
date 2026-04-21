@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { Literata, Nunito_Sans } from 'next/font/google';
 import '../globals.css';
 import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
+import { AuthProvider } from '@/context/AuthContext';
 
 const literata = Literata({
   variable: '--font-literata',
@@ -36,12 +37,14 @@ export default function RootLayout({
       <body
         className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-row"
       >
-        <SideNav />
-        <div className="flex-1 flex flex-col min-w-0">
-          <MobileHeader />
-          {children}
-        </div>
-        <MobileBottomNav />
+        <AuthProvider>
+          <SideNav />
+          <div className="flex-1 flex flex-col min-w-0">
+            <MobileHeader />
+            {children}
+          </div>
+          <MobileBottomNav />
+        </AuthProvider>
       </body>
     </html>
   );

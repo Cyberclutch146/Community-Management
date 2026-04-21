@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { EventCard } from '@/components/EventCard';
-import { mockEvents } from '@/data/mockData';
+import { getEvents } from '@/services/eventService';
+import { CommunityEvent } from '@/types';
 
 export default function Home() {
   const [filter, setFilter] = useState('All Events');
@@ -15,9 +16,26 @@ export default function Home() {
     { name: 'Volunteers', icon: 'group' },
   ];
 
+  const [events, setEvents] = useState<CommunityEvent[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const data = await getEvents();
+        setEvents(data);
+      } catch (error) {
+        console.error("Failed to fetch events:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+
   const filteredEvents = filter === 'All Events' 
-    ? mockEvents 
-    : mockEvents.filter(e => e.category === filter);
+    ? events 
+    : events.filter(e => e.category === filter);
 
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
@@ -63,13 +81,25 @@ export default function Home() {
         </div>
       </section>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredEvents.map((event, index) => (
-          <EventCard key={event.id} event={event} featured={index === 0} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex justify-center items-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        </div>
+      ) : filteredEvents.length === 0 ? (
+        <div className="bg-surface-container rounded-2xl p-10 text-center text-on-surface-variant border border-outline-variant/30">
+          <span className="material-symbols-outlined text-4xl mb-4 text-primary">event_busy</span>
+          <h3 className="font-headline text-xl font-bold mb-2 text-on-surface">No events found</h3>
+          <p>No events are currently scheduled matching this criteria. Be the first to create one!</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredEvents.map((event, index) => (
+            <EventCard key={event.id} event={event} featured={index === 0} />
+          ))}
+        </div>
+      )}
 
-      {filteredEvents.length > 0 && (
+      {filteredEvents.length > 0 && !loading && (
         <div className="mt-12 flex justify-center">
           <button className="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors">
             Load More Events
