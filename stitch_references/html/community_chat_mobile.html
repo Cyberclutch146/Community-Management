@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Community Chat</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;600;700&amp;family=Nunito+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "tertiary-container": "#c4a66a",
+                    "primary-fixed": "#c8e8d0",
+                    "on-background": "#2e3230",
+                    "tertiary-fixed-dim": "#dcc48e",
+                    "surface-container-lowest": "#ffffff",
+                    "inverse-on-surface": "#f5f0e8",
+                    "background": "#faf6f0",
+                    "surface-container-high": "#eae6de",
+                    "on-surface": "#2e3230",
+                    "outline-variant": "#c4c8bc",
+                    "on-tertiary": "#ffffff",
+                    "secondary-container": "#f0e8db",
+                    "surface-dim": "#dbd7cf",
+                    "secondary-fixed-dim": "#d4ccbf",
+                    "tertiary": "#705c30",
+                    "on-primary-fixed-variant": "#2a6038",
+                    "on-primary": "#ffffff",
+                    "error-container": "#ffdad8",
+                    "primary-container": "#78a886",
+                    "on-tertiary-fixed": "#221a05",
+                    "surface-container-low": "#f5f1ea",
+                    "surface": "#faf6f0",
+                    "primary-fixed-dim": "#8ecf9e",
+                    "on-secondary-container": "#5e5548",
+                    "surface-bright": "#faf6f0",
+                    "secondary": "#6b6358",
+                    "primary": "#4a7c59",
+                    "outline": "#74796e",
+                    "on-secondary": "#ffffff",
+                    "on-primary-container": "#d8f0de",
+                    "surface-tint": "#4a7c59",
+                    "on-primary-fixed": "#002110",
+                    "on-error-container": "#690005",
+                    "surface-container-highest": "#e4e0d8",
+                    "error": "#b83230",
+                    "surface-container": "#f0ece4",
+                    "on-surface-variant": "#4a4e4a",
+                    "on-secondary-fixed-variant": "#4a4538",
+                    "on-error": "#ffffff",
+                    "secondary-fixed": "#f0e8db",
+                    "tertiary-fixed": "#f8e0a8",
+                    "surface-variant": "#e4e0d8",
+                    "on-secondary-fixed": "#1e1a13",
+                    "inverse-surface": "#2e3230",
+                    "on-tertiary-container": "#554020",
+                    "inverse-primary": "#8ecf9e",
+                    "on-tertiary-fixed-variant": "#554020"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "1rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Literata"
+                    ],
+                    "body": [
+                            "Nunito Sans"
+                    ],
+                    "label": [
+                            "Nunito Sans"
+                    ]
+            }
+    },
+        },
+      }
+    </script>
+<style>
+        body { font-family: 'Nunito Sans', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Literata', serif; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 20px); }
+        .pt-safe { padding-top: env(safe-area-inset-top, 0px); }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased flex flex-col h-screen overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex justify-between items-center w-full px-4 h-16 pt-safe docked full-width top-0 border-b border-stone-200/50 shadow-[0_4px_20px_rgba(46,50,48,0.06)] bg-[#faf6f0] text-primary z-50 shrink-0">
+<div class="flex items-center gap-3 active:scale-95 duration-200 cursor-pointer text-[#4a7c59]">
+<span class="material-symbols-outlined text-2xl">location_on</span>
+<h1 class="font-serif text-[#4a7c59] font-bold text-xl tracking-tight">Terra Outreach</h1>
+</div>
+<div class="active:scale-95 duration-200 cursor-pointer">
+<img alt="User profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant" data-alt="Portrait of a young woman with natural makeup looking warmly at the camera, soft natural lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_YdY7wAgYxxm4-kD6eUFEQN7iAzztB3qBVC5mVwrqq30q72mtMOOzt226JLyyta_L1iKHWF1AK9SaD5dZyfmw5vKoCzii03WKkCOKefDmIo2pF8bFaExzKt6Eb5il3StVwl2vFAOWzLCogTq-CbHlT-NvBlSvnlOkLO2I4uc-DIa7hC_coZdYsjLB51K0YOteLFqdLcX69F1pme-c7OV8S54yt8GXAcTC9vwuewXxu2ZmwKefzq910e7VeJCqMHtRTXHPCX-0zoby"/>
+</div>
+</header>
+<!-- Chat Area -->
+<main class="flex-1 overflow-y-auto px-4 py-6 space-y-6 pb-32">
+<!-- Date Header -->
+<div class="flex justify-center">
+<span class="text-xs font-medium text-on-surface-variant bg-surface-container px-3 py-1 rounded-full shadow-sm">Today, October 24</span>
+</div>
+<!-- System Message -->
+<div class="flex justify-center">
+<span class="text-xs text-on-surface-variant italic bg-surface-container-low px-4 py-2 rounded-lg text-center max-w-[80%]">Event 'Community Garden Cleanup' coordinates updated.</span>
+</div>
+<!-- Organizer Message -->
+<div class="flex flex-col items-start gap-1 max-w-[85%]">
+<div class="flex items-end gap-2">
+<img alt="Organizer" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm" data-alt="Portrait of a friendly man with a slight smile, outdoors in natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBh9OyO1QifnuTFdEDbaCj9A-nb5yVO6VoA-qNbx3dDv5WkijDG0ivF9VG4SaoGDnvYfjaKdZtWxr9qsiOe8IEnO0PRf-sh9ru7IUIQqnupcsd-6Xw9qNvJx6jZ2_z3ATieRF1PfrJsN2I2cPvNXb9-z4mW79mpzQwATfcpDgZm-Eeyb3cLU2LhcAhkj-8gRmTkIdktmq52WpQUauRZdYTlWXUSbFL1dabAmoUzvX-w8OIn9Sez0c3006mltSXeN-oYzpU81FF8oVbt"/>
+<div class="bg-primary-container text-on-primary-container px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
+<p class="text-sm leading-relaxed">Hey everyone! Just a reminder that we're meeting at the main gate at 9 AM tomorrow. Don't forget your gloves!</p>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-10">
+<span class="text-[10px] text-on-surface-variant font-medium">David (Organizer)</span>
+<span class="text-[10px] text-on-surface-variant">08:45 AM</span>
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+<!-- User Message -->
+<div class="flex flex-col items-end gap-1 max-w-[85%] self-end ml-auto">
+<div class="bg-primary text-on-primary px-4 py-3 rounded-2xl rounded-br-sm shadow-sm">
+<p class="text-sm leading-relaxed">Got it! I'll bring some extra trash bags just in case.</p>
+</div>
+<span class="text-[10px] text-on-surface-variant mr-1">08:50 AM</span>
+</div>
+<!-- Another Member Message -->
+<div class="flex flex-col items-start gap-1 max-w-[85%]">
+<div class="flex items-end gap-2">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center shrink-0 font-bold text-sm shadow-sm">
+                    S
+                </div>
+<div class="bg-surface-container-high text-on-surface px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
+<p class="text-sm leading-relaxed">Is there parking nearby?</p>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-10">
+<span class="text-[10px] text-on-surface-variant font-medium">Sarah M.</span>
+<span class="text-[10px] text-on-surface-variant">09:12 AM</span>
+</div>
+</div>
+<!-- Organizer Reply -->
+<div class="flex flex-col items-start gap-1 max-w-[85%]">
+<div class="flex items-end gap-2">
+<img alt="Organizer" class="w-8 h-8 rounded-full object-cover shrink-0 shadow-sm" data-alt="Portrait of a friendly man with a slight smile, outdoors in natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5cGq7wdx53_dy11kztXIt9GzD0_X1XMpBY77yd6fegzKqCFj15FD7Y8fiGNtqNr8DfCNRe97hMx-8aaXo0Ww51ZvjX4gWwaON7vTUIWpTfZpsJyCdaNXJQoXwj7yjQDA2ZI6UhxJ6S-Vusxf8S28yLnjbPX4r9-SYP-V4yWF5HG65da7_SuNyuFm9xqACmtdN5mec7Svu8Zh0Il_WYrpwwrKKhdw2xH-A0S6bS2vjwLSS0nRXWB8TOu3Qxla9fAtYetYYayo3hehT"/>
+<div class="bg-primary-container text-on-primary-container px-4 py-3 rounded-2xl rounded-bl-sm shadow-sm">
+<p class="text-sm leading-relaxed">Yes, there's a small lot behind the community center, free on weekends.</p>
+</div>
+</div>
+<div class="flex items-center gap-2 ml-10">
+<span class="text-[10px] text-on-surface-variant font-medium">David (Organizer)</span>
+<span class="text-[10px] text-on-surface-variant">09:15 AM</span>
+<span class="material-symbols-outlined text-[14px] text-tertiary" style="font-variation-settings: 'FILL' 1;">verified</span>
+</div>
+</div>
+</main>
+<!-- Message Input Area -->
+<div class="bg-surface-bright px-4 py-3 border-t border-outline-variant/30 flex items-center gap-3 shrink-0 pb-24 shadow-[0_-4px_20px_rgba(46,50,48,0.04)] z-40 relative">
+<button class="text-secondary hover:text-primary transition-colors p-2 rounded-full hover:bg-surface-container-high active:scale-95">
+<span class="material-symbols-outlined">add_photo_alternate</span>
+</button>
+<div class="flex-1 bg-surface-container rounded-full px-4 py-2.5 flex items-center shadow-inner">
+<input class="bg-transparent border-none w-full text-sm focus:ring-0 text-on-surface placeholder-on-surface-variant p-0" placeholder="Message the group..." type="text"/>
+</div>
+<button class="bg-primary text-on-primary p-2.5 rounded-full shadow-md hover:bg-primary/90 transition-colors active:scale-95 flex items-center justify-center">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">send</span>
+</button>
+</div>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-[#faf6f0]/95 backdrop-blur-md rounded-t-3xl border-t border-stone-200/50 shadow-[0_-4px_20px_rgba(46,50,48,0.08)]">
+<button class="flex flex-col items-center justify-center text-stone-500 px-4 py-1 hover:text-[#4a7c59] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-2xl mb-1">home</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Home</span>
+</button>
+<button class="flex flex-col items-center justify-center text-stone-500 px-4 py-1 hover:text-[#4a7c59] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-2xl mb-1">add_circle</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Create</span>
+</button>
+<button class="flex flex-col items-center justify-center text-[#4a7c59] bg-emerald-100/50 rounded-xl px-4 py-1 hover:text-[#4a7c59] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-2xl mb-1" style="font-variation-settings: 'FILL' 1;">chat_bubble</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Chat</span>
+</button>
+<button class="flex flex-col items-center justify-center text-stone-500 px-4 py-1 hover:text-[#4a7c59] active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined text-2xl mb-1">person</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Profile</span>
+</button>
+</nav>
+</body></html>

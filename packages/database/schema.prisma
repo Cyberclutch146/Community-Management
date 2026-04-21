@@ -1,0 +1,58 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String     @id @default(cuid())
+  name          String
+  email         String     @unique
+  passwordHash  String
+  role          Role       @default(USER)
+  locationLat   Float?
+  locationLng   Float?
+  events        Event[]    @relation("OrganizerEvents")
+  donations     Donation[]
+  createdAt     DateTime   @default(now())
+}
+
+enum Role {
+  USER
+  ORGANIZER
+}
+
+model Event {
+  id                String     @id @default(cuid())
+  title             String
+  description       String
+  locationLat       Float
+  locationLng       Float
+  targetMoney       Float?
+  targetVolunteers  Int?
+  currentMoney      Float      @default(0)
+  currentVolunteers Int        @default(0)
+  organizer         User       @relation("OrganizerEvents", fields: [organizerId], references: [id])
+  organizerId       String
+  donations         Donation[]
+  createdAt         DateTime   @default(now())
+}
+
+model Donation {
+  id        String       @id @default(cuid())
+  user      User         @relation(fields: [userId], references: [id])
+  userId    String
+  event     Event        @relation(fields: [eventId], references: [id])
+  eventId   String
+  type      DonationType
+  amount    Float        @default(0)
+  createdAt DateTime     @default(now())
+}
+
+enum DonationType {
+  MONEY
+  VOLUNTEER
+}

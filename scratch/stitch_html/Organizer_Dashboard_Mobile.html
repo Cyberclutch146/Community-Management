@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Organizer Dashboard</title>
+<!-- Fonts: Literata & Nunito Sans -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,200..900;1,7..72,200..900&amp;family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Tailwind Config -->
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "tertiary-container": "#c4a66a",
+                      "primary-fixed": "#c8e8d0",
+                      "on-background": "#2e3230",
+                      "tertiary-fixed-dim": "#dcc48e",
+                      "surface-container-lowest": "#ffffff",
+                      "inverse-on-surface": "#f5f0e8",
+                      "background": "#faf6f0",
+                      "surface-container-high": "#eae6de",
+                      "on-surface": "#2e3230",
+                      "outline-variant": "#c4c8bc",
+                      "on-tertiary": "#ffffff",
+                      "secondary-container": "#f0e8db",
+                      "surface-dim": "#dbd7cf",
+                      "secondary-fixed-dim": "#d4ccbf",
+                      "tertiary": "#705c30",
+                      "on-primary-fixed-variant": "#2a6038",
+                      "on-primary": "#ffffff",
+                      "error-container": "#ffdad8",
+                      "primary-container": "#78a886",
+                      "on-tertiary-fixed": "#221a05",
+                      "surface-container-low": "#f5f1ea",
+                      "surface": "#faf6f0",
+                      "primary-fixed-dim": "#8ecf9e",
+                      "on-secondary-container": "#5e5548",
+                      "surface-bright": "#faf6f0",
+                      "secondary": "#6b6358",
+                      "primary": "#4a7c59",
+                      "outline": "#74796e",
+                      "on-secondary": "#ffffff",
+                      "on-primary-container": "#d8f0de",
+                      "surface-tint": "#4a7c59",
+                      "on-primary-fixed": "#002110",
+                      "on-error-container": "#690005",
+                      "surface-container-highest": "#e4e0d8",
+                      "error": "#b83230",
+                      "surface-container": "#f0ece4",
+                      "on-surface-variant": "#4a4e4a",
+                      "on-secondary-fixed-variant": "#4a4538",
+                      "on-error": "#ffffff",
+                      "secondary-fixed": "#f0e8db",
+                      "tertiary-fixed": "#f8e0a8",
+                      "surface-variant": "#e4e0d8",
+                      "on-secondary-fixed": "#1e1a13",
+                      "inverse-surface": "#2e3230",
+                      "on-tertiary-container": "#554020",
+                      "inverse-primary": "#8ecf9e",
+                      "on-tertiary-fixed-variant": "#554020"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.5rem",
+                      "lg": "1rem",
+                      "xl": "1.5rem",
+                      "full": "9999px"
+              },
+              "spacing": {},
+              "fontFamily": {
+                      "headline": [
+                              "Literata", "serif"
+                      ],
+                      "body": [
+                              "Nunito Sans", "sans-serif"
+                      ],
+                      "label": [
+                              "Nunito Sans", "sans-serif"
+                      ]
+              }
+            },
+          },
+        }
+      </script>
+<style>
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: theme('colors.background');
+            color: theme('colors.on-background');
+            /* Ensure bottom bar doesn't overlap content */
+            padding-bottom: 6rem;
+        }
+        h1, h2, h3, h4, h5, h6, .font-headline {
+            font-family: 'Literata', serif;
+        }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background antialiased selection:bg-primary/20 selection:text-primary">
+<!-- TopAppBar -->
+<header class="docked full-width top-0 border-b border-stone-200/50 dark:border-stone-800 shadow-[0_4px_20px_rgba(46,50,48,0.06)] bg-[#faf6f0] dark:bg-stone-900 z-40 sticky">
+<div class="flex justify-between items-center w-full px-4 h-16">
+<button aria-label="Location" class="text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors active:scale-95 duration-200 p-2 rounded-full flex items-center justify-center">
+<span class="material-symbols-outlined text-2xl" data-icon="location_on">location_on</span>
+</button>
+<div class="font-serif text-[#4a7c59] dark:text-emerald-400 font-bold text-xl text-center flex-grow">
+                Terra Outreach
+            </div>
+<button aria-label="Profile" class="text-stone-500 dark:text-stone-400 hover:bg-stone-100 dark:hover:bg-stone-800 transition-colors active:scale-95 duration-200 rounded-full w-10 h-10 overflow-hidden bg-surface-variant flex items-center justify-center border border-outline-variant/30">
+<img alt="User profile picture" class="w-full h-full object-cover" data-alt="close up portrait of a young woman with natural warm lighting smiling gently" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_SOUoWQgW8vfW4JtUQq2mcTV58J03bXb3g1WA44nkjAJe0pq5SF2Omb3i6ndkxOthCnD1FikqLNFoTLN5EBWPS1IEqOajgJGVmaCBJggu8_oLw3tVI8_9djguedsEYBYl2fmyeL4PPsrCgXV99wDGVLZ1pIqeq9gk9BkRp20M6wD7haLPUCgK-eYhhYikZvjrq9fCynJuJxLxx1ZZuR1Jvvy0yNqxkHEHWRxAijLLuN34lBo-3S9EqyT84G8gjR8tEMvb8FeSimJQ"/>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="max-w-md mx-auto px-4 py-6 space-y-8">
+<!-- Welcome & Summary -->
+<section class="space-y-2">
+<h1 class="font-headline text-3xl text-on-background">Overview</h1>
+<p class="text-on-surface-variant text-base leading-relaxed">Here's your impact for this month.</p>
+</section>
+<!-- Stats Bento Grid -->
+<section class="grid grid-cols-2 gap-4">
+<!-- Funds Raised Card (Large) -->
+<div class="col-span-2 bg-surface-container-low rounded-xl p-6 flex flex-col justify-between shadow-[0_4px_20px_rgba(46,50,48,0.03)] border border-surface-variant/50 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-4 opacity-10">
+<span class="material-symbols-outlined text-6xl text-primary" data-icon="savings">savings</span>
+</div>
+<div class="z-10">
+<div class="flex items-center gap-2 mb-2 text-primary">
+<span class="material-symbols-outlined text-sm" data-icon="payments">payments</span>
+<h2 class="font-label text-sm font-semibold uppercase tracking-wider text-on-surface-variant">Funds Raised</h2>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-3xl font-headline text-on-background">$12,450</span>
+<span class="text-sm text-outline">/ $15k Goal</span>
+</div>
+<!-- Progress Bar -->
+<div class="w-full bg-surface-container-high rounded-full h-2 mt-4 overflow-hidden">
+<div class="bg-primary h-2 rounded-full" style="width: 83%"></div>
+</div>
+</div>
+</div>
+<!-- Volunteers Card -->
+<div class="col-span-1 bg-surface-container-lowest rounded-xl p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(46,50,48,0.04)] border border-outline-variant/30 relative">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container">
+<span class="material-symbols-outlined text-lg" data-icon="group">group</span>
+</div>
+</div>
+<div>
+<h2 class="font-label text-xs font-semibold uppercase tracking-wider text-outline mb-1">Volunteers</h2>
+<span class="text-2xl font-headline text-on-background block">142</span>
+<div class="flex items-center gap-1 mt-1 text-xs text-primary">
+<span class="material-symbols-outlined" data-icon="trending_up" style="font-size: 14px;">trending_up</span>
+<span>+12 this week</span>
+</div>
+</div>
+</div>
+<!-- Resources Card -->
+<div class="col-span-1 bg-surface-container-lowest rounded-xl p-5 flex flex-col justify-between shadow-[0_4px_20px_rgba(46,50,48,0.04)] border border-outline-variant/30 relative">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-lg" data-icon="inventory_2">inventory_2</span>
+</div>
+</div>
+<div>
+<h2 class="font-label text-xs font-semibold uppercase tracking-wider text-outline mb-1">Resources</h2>
+<span class="text-2xl font-headline text-on-background block">86%</span>
+<div class="w-full bg-surface-variant rounded-full h-1.5 mt-2 overflow-hidden">
+<div class="bg-tertiary h-1.5 rounded-full" style="width: 86%"></div>
+</div>
+</div>
+</div>
+</section>
+<!-- Active Events List -->
+<section class="space-y-4">
+<div class="flex justify-between items-end mb-2">
+<h2 class="font-headline text-xl text-on-background">Active Events</h2>
+<button class="text-sm font-label text-primary font-medium hover:text-primary-container transition-colors">View All</button>
+</div>
+<div class="space-y-3">
+<!-- Event Item 1 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-[0_2px_10px_rgba(46,50,48,0.02)] border border-surface-variant flex items-center gap-4 active:scale-[0.98] transition-transform">
+<div class="w-14 h-14 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+<img alt="Tree planting" class="w-full h-full object-cover" data-alt="close up of hands planting a small green sapling in dark rich soil" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjK84t28Ey0xPfORUFinPEEnB3bbGskroK1OGngzZkNcguXjfrmMQGQjdsrZxFir1_GbZ5Bd4SIsDaoLWuWzF6itSYnTiWoAmaqd5WG-D4LhXaeFpOglh5nyqBZtZ9xKpc0L56i7f2_bHaicHe4bE_nmVAHDDK6suw8NqosYErkCTf0ke_Z428PkedxNFLuxZ8VgUWc5PLpognGwGb1ihnTaxgtsUWiluCjHDCjtT5md8BwIQkAkgVlLRn126QCTBAT7qRdY1Jwtx2"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base text-on-background leading-tight">Urban Reforestation</h3>
+<p class="text-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                            Oct 12 • 24 RSVPs
+                        </p>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-outline hover:text-primary hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+<!-- Event Item 2 -->
+<div class="bg-surface-container-lowest p-4 rounded-xl shadow-[0_2px_10px_rgba(46,50,48,0.02)] border border-surface-variant flex items-center gap-4 active:scale-[0.98] transition-transform">
+<div class="w-14 h-14 rounded-lg bg-surface-container overflow-hidden flex-shrink-0">
+<img alt="River cleanup" class="w-full h-full object-cover" data-alt="volunteers picking up trash along a riverbank on a sunny day" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCtkGoEuNgFGgcVtLqKa2Ir6BytY0vAc2nlLtyUYVukzzKBxbLZVu_Gk9ab1AskiylnOtMYMdUuZK1fXSLqWnKxnk9g7icMq_ZGdjapovHMAFnwlovWzZijpmv-crsbFwnkjpSM-i8xFuXVRGyHWwdIZT_d6ciClm5tMJZj1iH75CxzuriU1bIbWRv_GjbUjtjty-7rZS2abES_eRIa68TK1w6FCfOMsWbDNsX8OZNEKBuw1TwM1APF20G2HzYxQa1CdZ-vbl5vCisf"/>
+</div>
+<div class="flex-grow">
+<h3 class="font-headline text-base text-on-background leading-tight">River Cleanup Drive</h3>
+<p class="text-sm text-on-surface-variant mt-1 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="calendar_today">calendar_today</span>
+                            Oct 18 • 45 RSVPs
+                        </p>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container-low flex items-center justify-center text-outline hover:text-primary hover:bg-primary-container/20 transition-colors">
+<span class="material-symbols-outlined text-sm" data-icon="chevron_right">chevron_right</span>
+</button>
+</div>
+</div>
+</section>
+</main>
+<!-- BottomNavBar -->
+<nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-safe h-20 bg-[#faf6f0]/95 dark:bg-stone-900/95 backdrop-blur-md rounded-t-3xl shadow-[0_-4px_20px_rgba(46,50,48,0.08)] tonal shift with blur">
+<!-- Home (Active) -->
+<button class="flex flex-col items-center justify-center text-[#4a7c59] dark:text-emerald-400 bg-emerald-100/50 dark:bg-emerald-900/30 rounded-xl px-4 py-1 hover:text-[#4a7c59] dark:hover:text-emerald-400 active:scale-90 transition-transform duration-150 group">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform" data-icon="home" data-weight="fill" style="font-variation-settings: 'FILL' 1;">home</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Home</span>
+</button>
+<!-- Create (Inactive) -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-4 py-1 hover:text-[#4a7c59] dark:hover:text-emerald-400 active:scale-90 transition-transform duration-150 group">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform" data-icon="add_circle">add_circle</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Create</span>
+</button>
+<!-- Chat (Inactive) -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-4 py-1 hover:text-[#4a7c59] dark:hover:text-emerald-400 active:scale-90 transition-transform duration-150 group relative">
+<span class="absolute top-1 right-3 w-2 h-2 bg-tertiary rounded-full border border-surface"></span>
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform" data-icon="chat_bubble">chat_bubble</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Chat</span>
+</button>
+<!-- Profile (Inactive) -->
+<button class="flex flex-col items-center justify-center text-stone-500 dark:text-stone-400 px-4 py-1 hover:text-[#4a7c59] dark:hover:text-emerald-400 active:scale-90 transition-transform duration-150 group">
+<span class="material-symbols-outlined text-2xl mb-1 group-hover:scale-110 transition-transform" data-icon="person">person</span>
+<span class="font-sans text-[11px] font-medium tracking-wide">Profile</span>
+</button>
+</nav>
+</body></html>
