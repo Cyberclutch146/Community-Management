@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { createEvent } from '@/services/eventService';
+import { uploadImage } from '@/services/storageService';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -14,6 +15,7 @@ export default function CreateEventPage() {
   const [category, setCategory] = useState('Urgent Needs');
   const [distance, setDistance] = useState('Local');
   const [image, setImage] = useState('https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop');
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   const [needFunds, setNeedFunds] = useState(false);
   const [fundGoal, setFundGoal] = useState(1000);
@@ -34,9 +36,11 @@ export default function CreateEventPage() {
         description,
         organizer: profile.displayName || 'Anonymous',
         organizerId: user.uid,
+        location: profile.location || 'Unknown Location',
         distance,
         category,
-        image,
+        urgency: 'normal',
+        imageUrl: image,
         needs: {
           ...(needFunds ? { funds: { goal: fundGoal, current: 0 } } : {}),
           ...(needVols ? { volunteers: { goal: volGoal, current: 0 } } : {})
@@ -99,13 +103,39 @@ export default function CreateEventPage() {
               </select>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-on-surface mb-2">Image URL</label>
-              <input 
-                type="url" 
-                className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface" 
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              />
+              <label className="block text-sm font-semibold text-on-surface mb-2">Event Image</label>
+              <div className="flex items-center gap-4">
+                <label className="bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface cursor-pointer flex-1 text-center font-medium flex items-center justify-center gap-2">
+                  <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
+                  {uploadingImage ? 'Uploading...' : 'Choose File'}
+                  <input 
+                    type="file" 
+                    accept="image/*"
+                    className="hidden" 
+                    disabled={uploadingImage}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0];
+                      if (!file) return;
+                      setUploadingImage(true);
+                      try {
+                        const url = await uploadImage(file, 'campaigns');
+                        setImage(url);
+                      } catch(err) {
+                        console.error('Failed to upload image', err);
+                        alert('Failed to upload image. Please check permissions / rules.');
+                      } finally {
+                        setUploadingImage(false);
+                      }
+                    }}
+                  />
+                </label>
+                {image && !image.includes('unsplash') && (
+                  <div className="w-12 h-12 rounded-lg relative overflow-hidden flex-shrink-0 border border-outline-variant/30">
+                    <img src={image} alt="Preview" className="w-full h-full object-cover" />
+                  </div>
+                )}
+              </div>
+              <p className="text-xs text-on-surface-variant mt-2">Optional. Leave blank to use a default image.</p>
             </div>
           </div>
 

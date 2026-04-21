@@ -13,6 +13,7 @@ export function ChatBox({ eventId }: ChatBoxProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
   const [isSending, setIsSending] = useState(false);
+  const [debugError, setDebugError] = useState<string | null>(null);
   const { user, profile } = useAuth();
 
   useEffect(() => {
@@ -24,14 +25,29 @@ export function ChatBox({ eventId }: ChatBoxProps) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !user || !profile || isSending) return;
+    setDebugError(null);
+    
+    if (!inputText.trim()) {
+      setDebugError("Input is empty.");
+      return;
+    }
+    if (!user) {
+      setDebugError("User not logged in.");
+      return;
+    }
+    if (isSending) {
+      setDebugError("Already sending...");
+      return;
+    }
 
     setIsSending(true);
     try {
-      await sendMessage(eventId, user.uid, profile.displayName || 'Anonymous', inputText.trim());
+      const senderName = profile?.displayName || user.displayName || user.email?.split('@')[0] || 'Community Member';
+      await sendMessage(eventId, user.uid, senderName, inputText.trim());
       setInputText('');
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error sending message:", err);
+      setDebugError(err.message || "Unknown error sending message");
     } finally {
       setIsSending(false);
     }
@@ -39,13 +55,22 @@ export function ChatBox({ eventId }: ChatBoxProps) {
 
   return (
     <div className="bg-surface-bright rounded-2xl shadow-sm border border-outline-variant/30 flex flex-col h-[500px]">
-      <div className="px-6 py-4 border-b border-outline-variant/30 bg-surface-container-low rounded-t-2xl">
+      <div className="px-6 py-4 border-b border-outline-variant/30 bg-surface-container-low rounded-t-2xl flex justify-between items-center">
         <h3 className="font-headline text-lg font-bold text-on-surface flex items-center gap-2">
           <span className="material-symbols-outlined text-primary">chat</span>
           Community Chat
         </h3>
+        <div className="text-xs text-outline">
+          Debug: {user ? 'Auth OK' : 'No Auth'} | {profile ? 'Profile OK' : 'No Profile'} | {isSending ? 'Sending' : 'Ready'}
+        </div>
       </div>
       
+      {debugError && (
+        <div className="bg-error/10 text-error text-sm p-3 border-b border-error/20 font-medium">
+          Error: {debugError}
+        </div>
+      )}
+
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map(msg => {
           const isMe = user && msg.userId === user.uid;

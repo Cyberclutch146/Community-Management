@@ -34,9 +34,29 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        unsubscribeProfile = subscribeToUserProfile(user.uid, (userProfile) => {
-          setProfile(userProfile);
-          setLoading(false);
+        unsubscribeProfile = subscribeToUserProfile(user.uid, async (userProfile) => {
+          if (!userProfile) {
+            // Hotfix: Auto-create a missing profile if the user account exists
+            // This prevents the app from infinitely spinning on null profiles.
+            const { createUserProfile } = await import('@/services/userService');
+            await createUserProfile(user.uid, {
+              email: user.email || '',
+              displayName: user.displayName || 'Volunteer',
+              bio: '',
+              location: '',
+              phone: '',
+              skills: [],
+              avatarUrl: '',
+              role: 'volunteer',
+              volunteerHours: 0,
+              totalDonated: 0,
+              profileComplete: false
+            });
+            // The missing snapshot will fire again upon creation.
+          } else {
+            setProfile(userProfile);
+            setLoading(false);
+          }
         });
       } else {
         setProfile(null);

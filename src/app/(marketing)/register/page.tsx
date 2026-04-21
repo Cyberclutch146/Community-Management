@@ -34,8 +34,12 @@ export default function RegisterPage() {
         location: location,
         role: 'volunteer',
         skills: [],
-        availability: [],
-        hoursContributed: 0
+        bio: '',
+        phone: '',
+        avatarUrl: '',
+        volunteerHours: 0,
+        totalDonated: 0,
+        profileComplete: false
       });
       router.push('/feed');
     } catch (err: any) {
