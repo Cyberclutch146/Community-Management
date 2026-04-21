@@ -4,6 +4,7 @@ import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ChatBox';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default async function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -18,7 +19,7 @@ export default async function EventDetails({ params }: { params: Promise<{ id: s
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
       <div className="mb-6">
-        <Link href="/" className="inline-flex items-center text-sm font-semibold text-secondary hover:text-primary transition-colors">
+        <Link href="/feed" className="inline-flex items-center text-sm font-semibold text-secondary hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
           Back to Feed
         </Link>
@@ -26,8 +27,8 @@ export default async function EventDetails({ params }: { params: Promise<{ id: s
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
-          <div className="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 shadow-sm">
-            <img src={event.image} alt={event.title} className="w-full h-full object-cover" />
+          <div className="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 shadow-sm relative">
+            <Image src={event.image} alt={event.title} className="w-full h-full object-cover" fill />
           </div>
 
           <div className="mb-8">

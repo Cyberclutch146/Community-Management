@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Event } from '@/data/mockData';
 
 interface EventCardProps {
@@ -11,7 +12,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
     return (
       <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md">
         <div className="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden">
-          <img alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src={event.image} />
+          <Image alt={event.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src={event.image} fill sizes="(max-width: 768px) 100vw, 40vw" />
           {event.urgency === 'high' && (
             <div className="absolute top-4 left-4 bg-tertiary-container text-on-tertiary-container text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px]">local_fire_department</span> High Urgency

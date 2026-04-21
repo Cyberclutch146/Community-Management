@@ -3,12 +3,13 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { currentUser } from '@/data/mockData';
+import Image from 'next/image';
 
 export function SideNav() {
   const pathname = usePathname();
   
   const navItems = [
-    { name: 'Feed', href: '/', icon: 'dashboard' },
+    { name: 'Feed', href: '/feed', icon: 'dashboard' },
     { name: 'Dashboard', href: '/dashboard', icon: 'volunteer_activism' },
     { name: 'Create', href: '/create', icon: 'inventory_2' },
     { name: 'Profile', href: '/profile', icon: 'settings' },
@@ -16,7 +17,7 @@ export function SideNav() {
 
   return (
     <nav className="hidden md:flex flex-col h-screen sticky top-0 py-8 w-64 border-r border-outline-variant bg-surface-bright flex-shrink-0">
-      <div className="px-6 mb-8 flex items-center gap-3">
+      <Link href="/" className="px-6 mb-8 flex items-center gap-3">
         <div aria-label="Organization Logo" className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-headline font-bold text-lg">
           <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>energy_savings_leaf</span>
         </div>
@@ -24,7 +25,7 @@ export function SideNav() {
           <h1 className="font-headline text-lg text-primary font-bold tracking-tight">Kindred Relief</h1>
           <p className="font-body text-xs text-secondary">Local Response Team</p>
         </div>
-      </div>
+      </Link>
       
       <ul className="flex flex-col gap-2 px-4 flex-grow">
         {navItems.map((item) => {
@@ -49,7 +50,7 @@ export function SideNav() {
       
       <div className="px-6 mt-auto">
         <Link href="/profile" className="flex items-center gap-3 pt-4 border-t border-outline-variant/30 hover:opacity-80 transition-opacity">
-          <img alt={currentUser.name} className="w-10 h-10 rounded-full object-cover" src={currentUser.avatar} />
+          <Image alt={currentUser.name} className="w-10 h-10 rounded-full object-cover" src={currentUser.avatar} width={40} height={40} />
           <div>
             <p className="text-sm font-semibold text-on-surface">{currentUser.name}</p>
             <p className="text-xs text-secondary">{currentUser.role}</p>
@@ -80,7 +81,7 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   
   const navItems = [
-    { name: 'Home', href: '/', icon: 'home' },
+    { name: 'Home', href: '/feed', icon: 'home' },
     { name: 'Create', href: '/create', icon: 'add_circle' },
     { name: 'Dash', href: '/dashboard', icon: 'volunteer_activism' },
     { name: 'Profile', href: '/profile', icon: 'person' },

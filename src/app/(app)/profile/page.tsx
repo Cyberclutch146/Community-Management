@@ -1,11 +1,12 @@
 import { currentUser } from '@/data/mockData';
+import Image from 'next/image';
 
 export default function ProfilePage() {
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
       <div className="bg-surface-bright rounded-3xl p-8 md:p-12 border border-outline-variant/30 flex flex-col md:flex-row gap-8 items-center md:items-start text-center md:text-left">
-        <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 border-4 border-surface-container">
-          <img src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" />
+        <div className="w-32 h-32 rounded-full overflow-hidden flex-shrink-0 border-4 border-surface-container relative">
+          <Image src={currentUser.avatar} alt={currentUser.name} className="w-full h-full object-cover" fill />
         </div>
         
         <div className="flex-1">

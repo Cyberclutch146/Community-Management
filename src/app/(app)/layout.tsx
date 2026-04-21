@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { Literata, Nunito_Sans } from 'next/font/google';
-import './globals.css';
+import '../globals.css';
 import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
 
 const literata = Literata({
