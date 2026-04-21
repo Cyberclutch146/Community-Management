@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Home - Outreach &amp; Relief</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Literata:wght@400;500;600;700&amp;family=Nunito+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-surface": "#2e3230",
+                    "surface-container": "#f0ece4",
+                    "primary-container": "#78a886",
+                    "primary": "#4a7c59",
+                    "inverse-surface": "#2e3230",
+                    "tertiary": "#705c30",
+                    "on-error-container": "#690005",
+                    "on-secondary-fixed-variant": "#4a4538",
+                    "on-primary-fixed-variant": "#2a6038",
+                    "outline-variant": "#c4c8bc",
+                    "error": "#b83230",
+                    "surface-dim": "#dbd7cf",
+                    "surface-variant": "#e4e0d8",
+                    "primary-fixed": "#c8e8d0",
+                    "outline": "#74796e",
+                    "secondary-fixed": "#f0e8db",
+                    "surface-bright": "#faf6f0",
+                    "tertiary-container": "#c4a66a",
+                    "surface": "#faf6f0",
+                    "on-tertiary-fixed-variant": "#554020",
+                    "inverse-on-surface": "#f5f0e8",
+                    "secondary": "#6b6358",
+                    "on-secondary": "#ffffff",
+                    "inverse-primary": "#8ecf9e",
+                    "background": "#faf6f0",
+                    "tertiary-fixed-dim": "#dcc48e",
+                    "primary-fixed-dim": "#8ecf9e",
+                    "surface-tint": "#4a7c59",
+                    "surface-container-lowest": "#ffffff",
+                    "on-tertiary-container": "#554020",
+                    "surface-container-low": "#f5f1ea",
+                    "secondary-fixed-dim": "#d4ccbf",
+                    "secondary-container": "#f0e8db",
+                    "surface-container-high": "#eae6de",
+                    "on-primary-container": "#d8f0de",
+                    "on-error": "#ffffff",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#f8e0a8",
+                    "error-container": "#ffdad8",
+                    "surface-container-highest": "#e4e0d8",
+                    "on-tertiary-fixed": "#221a05",
+                    "on-primary-fixed": "#002110",
+                    "on-surface-variant": "#4a4e4a",
+                    "on-secondary-fixed": "#1e1a13",
+                    "on-tertiary": "#ffffff",
+                    "on-background": "#2e3230",
+                    "on-secondary-container": "#5e5548"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.5rem",
+                    "lg": "1rem",
+                    "xl": "1.5rem",
+                    "full": "9999px"
+            },
+            "spacing": {},
+            "fontFamily": {
+                    "headline": [
+                            "Literata"
+                    ],
+                    "body": [
+                            "Nunito Sans"
+                    ],
+                    "label": [
+                            "Nunito Sans"
+                    ]
+            }
+        },
+        },
+      }
+    </script>
+</head>
+<body class="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-row">
+<!-- SideNavBar (Hidden on Mobile, Flex on MD+) -->
+<nav class="hidden md:flex flex-col h-screen sticky top-0 py-8 w-64 border-r border-outline-variant bg-surface-bright flex-shrink-0">
+<div class="px-6 mb-8 flex items-center gap-3">
+<div aria-label="Organization Logo" class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-headline font-bold text-lg">
+<span class="material-symbols-outlined" data-icon="energy_savings_leaf">energy_savings_leaf</span>
+</div>
+<div>
+<h1 class="font-headline text-lg text-primary font-bold tracking-tight">Organizer Portal</h1>
+<p class="font-body text-xs text-secondary">Local Response Team</p>
+</div>
+</div>
+<ul class="flex flex-col gap-2 px-4 flex-grow">
+<!-- Active Tab -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-primary bg-surface-container border-l-4 border-primary font-bold transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label">Dashboard</span>
+</a>
+</li>
+<!-- Inactive Tabs -->
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:pl-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+<span class="font-label">Impact</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:pl-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="inventory_2">inventory_2</span>
+<span class="font-label">Resources</span>
+</a>
+</li>
+<li>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg text-on-surface-variant hover:bg-surface-container-low hover:pl-5 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label">Settings</span>
+</a>
+</li>
+</ul>
+<!-- User Profile Area at bottom of SideNav -->
+<div class="px-6 mt-auto">
+<div class="flex items-center gap-3 pt-4 border-t border-outline-variant/30">
+<img alt="Sarah Jenkins" class="w-10 h-10 rounded-full object-cover" data-alt="close up portrait of a smiling woman with warm lighting and soft background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCwJvjpwYCm3jou4ZiOCnFkHwst3OgeXxfqu7wQl1brd29JEUbQjqMD6Nx1Pcz-oClevWLiH_Iio6ARJ-nM7JfYZyVI-xcwJQ0TbZ75sceGHgaBITdwmESij3ao10Wd8W4S33qtjBPXy1am_La9N6pH91cgTOHrSfApXIeyZ6b5B8tRRqyYQOB9fvfJwA1bfzAYgrrb7Ci9bjGvyLUtGMmTi71neq5DD0Jvq5v1GOH4cx_aQTTQEv2410I6VrUYjvIsChX88wjMYQkd"/>
+<div>
+<p class="text-sm font-semibold text-on-surface">Sarah Jenkins</p>
+<p class="text-xs text-secondary">Community Lead</p>
+</div>
+</div>
+</div>
+</nav>
+<!-- Main Content Area -->
+<div class="flex-1 flex flex-col min-w-0">
+<!-- TopAppBar (Mobile Only) -->
+<header class="md:hidden flex justify-between items-center px-6 h-16 w-full bg-surface-bright text-primary font-body text-sm tracking-tight border-b border-outline-variant/30 shadow-[0_4px_20px_rgba(46,50,48,0.06)] sticky top-0 z-40">
+<div class="font-headline text-xl font-bold text-primary">Outreach &amp; Relief</div>
+<div class="flex gap-4">
+<button class="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
+<span class="material-symbols-outlined" data-icon="location_on">location_on</span>
+</button>
+</div>
+</header>
+<!-- Page Content -->
+<main class="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+<!-- Page Header & Global Actions (Desktop view context) -->
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+<div>
+<p class="text-secondary font-medium mb-1">Local Events Feed</p>
+<h2 class="font-headline text-3xl md:text-4xl text-on-surface font-bold">Discover &amp; Support</h2>
+</div>
+<div class="flex flex-wrap items-center gap-3">
+<div class="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50">
+<span class="material-symbols-outlined text-secondary mr-2 text-sm" data-icon="location_on">location_on</span>
+<select class="bg-transparent border-none text-sm font-medium text-on-surface focus:ring-0 p-0 pr-6">
+<option>Portland Metro Area</option>
+<option>Seattle Area</option>
+<option>Eugene/Springfield</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Filters Area -->
+<section class="mb-8 overflow-x-auto pb-4 no-scrollbar">
+<div class="flex gap-3 min-w-max">
+<button class="flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-semibold shadow-sm transition-transform hover:-translate-y-0.5">
+<span class="material-symbols-outlined text-[18px]" data-icon="tune">tune</span>
+                        All Events
+                    </button>
+<div class="h-10 w-px bg-outline-variant/50 mx-1"></div>
+<button class="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                        Urgent Needs
+                        <span class="material-symbols-outlined text-[16px] text-error" data-icon="emergency">emergency</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                        Within 5 miles
+                        <span class="material-symbols-outlined text-[16px]" data-icon="expand_more">expand_more</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                        Food Drive
+                        <span class="material-symbols-outlined text-[16px]" data-icon="restaurant">restaurant</span>
+</button>
+<button class="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
+                        Volunteers
+                        <span class="material-symbols-outlined text-[16px]" data-icon="group">group</span>
+</button>
+</div>
+</section>
+<!-- Bento Grid Layout for Events -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+<!-- Large Featured Card (Spans 2 columns on lg) -->
+<article class="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md">
+<div class="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden">
+<img alt="Community kitchen" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" data-alt="volunteers serving hot meals in a brightly lit community hall, warm inviting atmosphere" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHZDB862qHB0SiE-ix3mCjw7cni0f6XJl_BAQxc9SFXBVu8DcIUj1s0lbeqBu7YxwxTFIqdY6AWyrlP06Pwiuvad8FcIOMGQKj_JAc656-IemJ4Ugswh_fUiRwxqJ0Fo4bNJq3dGPIulS2vgoEqpn0uM2TTvbEm6YtFOo017swL7PIBCOuskEx-8VzDxi1cdpVILyLDfK2yAudf_cYEqIhFt5itS2mzPcqhuGX2iX6muKocfEVyTPZ-BGt7HfB01IFuesAAS_AKHJ-"/>
+<div class="absolute top-4 left-4 bg-tertiary-container text-on-tertiary-container text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]" data-icon="local_fire_department">local_fire_department</span> High Urgency
+                        </div>
+</div>
+<div class="p-6 md:p-8 flex flex-col justify-between flex-1 bg-gradient-to-br from-surface-bright to-surface-container-low">
+<div>
+<div class="flex items-center gap-2 mb-3">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="verified">verified</span>
+<span class="text-sm font-semibold text-secondary">Rose City Relief</span>
+<span class="text-xs text-outline mx-1">•</span>
+<span class="text-xs text-outline">1.2 mi away</span>
+</div>
+<h3 class="font-headline text-2xl font-bold text-on-surface mb-3 leading-tight">Downtown Winter Shelter Restock</h3>
+<p class="text-on-surface-variant text-base mb-6 line-clamp-3 leading-relaxed">
+                                Preparing for the incoming freeze. We urgently need thermal blankets, warm socks, and volunteers to help sort and distribute items this weekend before temperatures drop below freezing.
+                            </p>
+</div>
+<div class="mt-auto">
+<!-- Needs Icons -->
+<div class="flex gap-4 mb-5">
+<div class="flex flex-col items-center gap-1" title="Goods Needed">
+<div class="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="checkroom">checkroom</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1" title="Volunteers Needed">
+<div class="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+</div>
+<div class="flex flex-col items-center gap-1 opacity-40" title="Funds Goal Met">
+<div class="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</div>
+</div>
+</div>
+<!-- Minimal Progress -->
+<div class="mb-6">
+<div class="flex justify-between text-xs font-semibold text-secondary mb-1.5">
+<span>Goal Progress</span>
+<span>65%</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-primary rounded-full" style="width: 65%"></div>
+</div>
+</div>
+<button class="w-full md:w-auto bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-bright">
+                                View Details
+                            </button>
+</div>
+</div>
+</article>
+<!-- Standard Card 1 -->
+<article class="bg-surface-bright rounded-xl p-6 shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="verified">verified</span>
+<span class="text-sm font-semibold text-secondary">PDX Food Bank</span>
+<span class="text-xs text-outline ml-auto">3.5 mi</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">Weekly Pantry Distribution</h3>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-2 flex-grow">
+                        Assisting with traffic flow, loading boxes into cars, and registering new families for our Tuesday distribution.
+                    </p>
+<div class="flex justify-between items-end mt-auto">
+<div class="flex gap-2">
+<div class="w-8 h-8 rounded-full bg-primary-container/30 flex items-center justify-center text-primary" title="Volunteers Needed">
+<span class="material-symbols-outlined text-[18px]" data-icon="group">group</span>
+</div>
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" title="Food Donations">
+<span class="material-symbols-outlined text-[18px]" data-icon="restaurant">restaurant</span>
+</div>
+</div>
+<button class="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+                            View Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Standard Card 2 -->
+<article class="bg-surface-bright rounded-xl p-6 shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+<div class="flex items-center gap-2 mb-4">
+<div class="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center">
+<span class="material-symbols-outlined text-[12px] text-secondary" data-icon="person">person</span>
+</div>
+<span class="text-sm font-semibold text-secondary">Neighborhood Org</span>
+<span class="text-xs text-outline ml-auto">0.8 mi</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">Park Cleanup &amp; Planting</h3>
+<p class="text-on-surface-variant text-sm mb-6 line-clamp-2 flex-grow">
+                        Spring is here! Help us clear winter debris and plant native shrubs at Mt. Tabor. Tools provided.
+                    </p>
+<div class="flex justify-between items-end mt-auto">
+<div class="flex gap-2">
+<div class="w-8 h-8 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary" title="Volunteers Needed">
+<span class="material-symbols-outlined text-[18px]" data-icon="nature_people">nature_people</span>
+</div>
+</div>
+<button class="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+                            View Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+<!-- Standard Card 3 (Funds focus) -->
+<article class="bg-surface-bright rounded-xl p-6 shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+<div class="flex items-center gap-2 mb-4">
+<span class="material-symbols-outlined text-primary text-[18px]" data-icon="verified">verified</span>
+<span class="text-sm font-semibold text-secondary">Education First</span>
+<span class="text-xs text-outline ml-auto">Online</span>
+</div>
+<h3 class="font-headline text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">School Supply Drive 2024</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">
+                        Raising funds to purchase bulk backpacks and supplies for 500 local students before the fall semester.
+                    </p>
+<!-- Progress bar specific to funds -->
+<div class="mb-5">
+<div class="flex justify-between text-xs font-semibold text-secondary mb-1.5">
+<span>$3,200 raised</span>
+<span>$5k goal</span>
+</div>
+<div class="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
+<div class="h-full bg-tertiary rounded-full" style="width: 64%"></div>
+</div>
+</div>
+<div class="flex justify-between items-end mt-auto">
+<div class="flex gap-2">
+<div class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" title="Funds Needed">
+<span class="material-symbols-outlined text-[18px]" data-icon="payments">payments</span>
+</div>
+</div>
+<button class="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+                            View Details <span class="material-symbols-outlined text-[16px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Load More -->
+<div class="mt-12 flex justify-center">
+<button class="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors">
+                    Load More Events
+                </button>
+</div>
+</main>
+</div>
+<!-- BottomNavBar (Hidden on MD+, Fixed bottom on Mobile) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl border-t bg-[#faf6f0]/95 border-stone-200/40 shadow-[0_-4px_20px_rgba(46,50,48,0.04)] pb-safe">
+<div class="flex justify-around items-center px-4 h-20">
+<!-- Active: Home -->
+<a class="flex flex-col items-center justify-center bg-[#4a7c59]/10 text-[#4a7c59] rounded-xl px-4 py-1.5 transition-all duration-300 ease-out active:scale-95 font-['Nunito_Sans'] text-[11px] font-semibold" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="home" style="font-variation-settings: 'FILL' 1;">home</span>
+<span>Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 px-4 py-1.5 hover:text-[#4a7c59] transition-all duration-300 ease-out active:scale-95 font-['Nunito_Sans'] text-[11px] font-semibold" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="add_circle">add_circle</span>
+<span>Create</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 px-4 py-1.5 hover:text-[#4a7c59] transition-all duration-300 ease-out active:scale-95 font-['Nunito_Sans'] text-[11px] font-semibold" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="chat_bubble">chat_bubble</span>
+<span>Chat</span>
+</a>
+<a class="flex flex-col items-center justify-center text-stone-500 px-4 py-1.5 hover:text-[#4a7c59] transition-all duration-300 ease-out active:scale-95 font-['Nunito_Sans'] text-[11px] font-semibold" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="person">person</span>
+<span>Profile</span>
+</a>
+</div>
+</nav>
+</body></html>
