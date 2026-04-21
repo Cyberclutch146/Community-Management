@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,700&amp;family=Nunito+Sans:wght@400;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-fixed-variant": "#4a4538",
+                        "on-primary-fixed": "#002110",
+                        "error": "#b83230",
+                        "on-secondary-fixed": "#1e1a13",
+                        "primary-fixed": "#c8e8d0",
+                        "on-background": "#2e3230",
+                        "inverse-primary": "#8ecf9e",
+                        "tertiary-container": "#c4a66a",
+                        "tertiary": "#705c30",
+                        "surface-bright": "#faf6f0",
+                        "primary-fixed-dim": "#8ecf9e",
+                        "on-surface-variant": "#4a4e4a",
+                        "inverse-surface": "#2e3230",
+                        "on-surface": "#2e3230",
+                        "outline-variant": "#c4c8bc",
+                        "error-container": "#ffdad8",
+                        "on-primary-fixed-variant": "#2a6038",
+                        "on-tertiary-fixed": "#221a05",
+                        "surface-variant": "#e4e0d8",
+                        "surface-container-low": "#f5f1ea",
+                        "tertiary-fixed-dim": "#dcc48e",
+                        "secondary": "#6b6358",
+                        "background": "#faf6f0",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#f8e0a8",
+                        "primary-container": "#78a886",
+                        "on-primary-container": "#d8f0de",
+                        "on-secondary-container": "#5e5548",
+                        "inverse-on-surface": "#f5f0e8",
+                        "outline": "#74796e",
+                        "secondary-fixed": "#f0e8db",
+                        "on-secondary": "#ffffff",
+                        "secondary-fixed-dim": "#d4ccbf",
+                        "surface": "#faf6f0",
+                        "surface-container-highest": "#e4e0d8",
+                        "surface-container-high": "#eae6de",
+                        "on-tertiary-container": "#554020",
+                        "on-tertiary": "#ffffff",
+                        "on-error": "#ffffff",
+                        "surface-container": "#f0ece4",
+                        "on-error-container": "#690005",
+                        "surface-tint": "#4a7c59",
+                        "on-tertiary-fixed-variant": "#554020",
+                        "secondary-container": "#f0e8db",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-dim": "#dbd7cf",
+                        "primary": "#4a7c59"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Literata", "serif"],
+                        "body": ["Nunito Sans", "sans-serif"],
+                        "label": ["Nunito Sans", "sans-serif"]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background-color: #faf6f0;
+            color: #2e3230;
+        }
+        h1, h2, h3 {
+            font-family: 'Literata', serif;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-background">
+<!-- Shared TopNavBar Structure adapted for the Design System -->
+<div class="relative flex h-auto min-h-screen w-full flex-col bg-background group/design-root overflow-x-hidden">
+<div class="layout-container flex h-full grow flex-col">
+<div class="px-4 md:px-20 lg:px-40 flex flex-1 justify-center py-5">
+<div class="layout-content-container flex flex-col max-w-[1200px] flex-1">
+<header class="flex items-center justify-between whitespace-nowrap border-b border-solid border-outline-variant px-4 py-4">
+<div class="flex items-center gap-4 text-primary">
+<div class="size-8">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"></path>
+</svg>
+</div>
+<h2 class="text-on-background text-xl font-headline font-bold leading-tight tracking-[-0.015em]">Outreach &amp; Relief</h2>
+</div>
+<div class="flex flex-1 justify-end gap-8 items-center">
+<nav class="hidden md:flex items-center gap-9">
+<a class="text-on-surface-variant text-sm font-medium hover:text-primary transition-colors" href="#">Our Impact</a>
+<a class="text-on-surface-variant text-sm font-medium hover:text-primary transition-colors" href="#">Urgent Needs</a>
+<a class="text-on-surface-variant text-sm font-medium hover:text-primary transition-colors" href="#">Ways to Help</a>
+<a class="text-on-surface-variant text-sm font-medium hover:text-primary transition-colors" href="#">About Us</a>
+</nav>
+<button class="flex min-w-[120px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-6 bg-primary text-on-primary text-sm font-bold shadow-sm hover:opacity-90 transition-all">
+<span class="truncate">Donate Now</span>
+</button>
+</div>
+</header>
+<!-- Hero Section -->
+<section class="py-8">
+<div class="@container">
+<div class="relative overflow-hidden rounded-xl shadow-lg">
+<div class="flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center p-8 text-center" data-alt="diverse community of volunteers and neighbors laughing together in a sunlit garden during a warm golden afternoon" style='background-image: linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuC6SsSRVlGYy_mYUBPddi5PP0YThIbaZOjDdbxdceDg1Y6UxF6lR23T8POlRObgpuxvvTDIgemtKHSk6ULAH8zMBeYYhFLPPR6xG3JggHWG8qMeJhf9bP7xWgBa02EDitKYJHAnyhB9qcai7rJAG3Gvw5XuoAnrg9DapfZkm0Q7na_aJgu6Cvx-HWuO24YEv4d25UPMK1HQJT_U6VknyixRH1bCSgVgHwpuQZCp6Zh_9LOBd2EzXwdbY784qMeRhQ88skYX-y_rNIUN");'>
+<div class="flex flex-col gap-4 max-w-2xl">
+<h1 class="text-white text-4xl md:text-6xl font-headline font-bold leading-tight tracking-tight">
+                                            Rooted in community, grown through care.
+                                        </h1>
+<p class="text-white text-lg md:text-xl font-normal leading-relaxed opacity-90">
+                                            Empowering our neighbors through dedicated relief efforts and sustainable community support. Join us in making a difference today.
+                                        </p>
+</div>
+<div class="flex gap-4">
+<button class="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-primary text-on-primary text-base font-bold shadow-md hover:scale-105 transition-transform">
+<span class="truncate">Get Involved</span>
+</button>
+<button class="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-surface-bright text-primary border border-primary text-base font-bold shadow-md hover:scale-105 transition-transform">
+<span class="truncate">Learn More</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Impact Section -->
+<section class="py-12">
+<div class="flex items-center gap-3 px-4 mb-8">
+<span class="material-symbols-outlined text-tertiary" data-icon="volunteer_activism">volunteer_activism</span>
+<h2 class="text-on-background text-3xl font-headline font-bold leading-tight">Our Impact</h2>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+<div class="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined" data-icon="restaurant">restaurant</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-base font-medium mb-1">Meals Served</p>
+<p class="text-primary text-4xl font-headline font-bold">25,000+</p>
+</div>
+<p class="text-on-surface-variant text-sm">Nutritious meals provided to individuals and families facing food insecurity in our local neighborhood.</p>
+</div>
+<div class="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+<span class="material-symbols-outlined" data-icon="family_restroom">family_restroom</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-base font-medium mb-1">Families Supported</p>
+<p class="text-primary text-4xl font-headline font-bold">1,200+</p>
+</div>
+<p class="text-on-surface-variant text-sm">Comprehensive support services ranging from housing assistance to emergency financial relief.</p>
+</div>
+<div class="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+<div class="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed-variant">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+</div>
+<div>
+<p class="text-on-surface-variant text-base font-medium mb-1">Active Volunteers</p>
+<p class="text-primary text-4xl font-headline font-bold">850+</p>
+</div>
+<p class="text-on-surface-variant text-sm">Dedicated community members giving their time and skills to help their neighbors thrive.</p>
+</div>
+</div>
+</section>
+<!-- Urgent Needs Section -->
+<section class="py-12 bg-surface-container rounded-3xl my-8">
+<div class="flex items-center justify-between px-8 mb-8">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-error" data-icon="priority_high">priority_high</span>
+<h2 class="text-on-background text-3xl font-headline font-bold">Urgent Needs</h2>
+</div>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#">
+                                View all needs <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
+<!-- Need Card 1 -->
+<div class="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
+<div class="h-48 overflow-hidden">
+<img alt="Community food pantry" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="organized wooden shelves in a bright food pantry stocked with fresh organic vegetables and artisanal bread" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2DyHDK4PIljaP1_LoTm0iYljfDNOOXL5UQAoM-ZcvXbXYdBWfVUz-VpDzOTvM5P3jfiqSpAb8A9vv5xvbiZAkgBuMD2iKQB-splYez3yxGPX58Y7h2tY_vBsbRbLEbK5UExPhmQ3qr9JzVo6OU5dUzZn69BuqIMoz0QkJkiatYgRcsfZmEreGJXgYVDxW7PxYydGIwkQaYMj8FRw_tKqxCLr2U7l-yBK7FpyBGi3j6xCU2JIe1iVtiVL9jug0mTQ5wPmB9ma0x9tw"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-xs font-bold rounded-full uppercase tracking-wider">Food Bank</span>
+<span class="text-error text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="schedule">schedule</span> 2 days left
+                                        </span>
+</div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-2">Winter Food Stockpile</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">We are running low on non-perishables and fresh protein for our weekly distributions.</p>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2">
+<div class="bg-primary h-2 rounded-full" style="width: 75%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface-variant">$15,400 raised</span>
+<span class="text-xs font-bold text-primary">75% of $20,000</span>
+</div>
+<button class="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Help Fill the Pantry</button>
+</div>
+</div>
+<!-- Need Card 2 -->
+<div class="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
+<div class="h-48 overflow-hidden">
+<img alt="Cozy shelter room" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="a warm, inviting community shelter room with soft blankets, wooden furniture, and warm lamp lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYszS18UATpB9Zid-0qbeUlL5dDWmUK_pG1SDR-GpkGlvU8Lz-wqEUnJS30PNRcXeKAXqYLBviqDECqfyBzsmfs2uy9ntr_SDPSp0gcbEUrvRwqcu06WLCCC_AgOz4fXV5fd0Lg4zqRTHrDgjvqM_R1lgOg4XIkJNTAASHlMb9I2uX0sJJdsaQCnQuJDXNQ1lMXi0SiuA8Rm47cfUYt_AjgXvVq9g8JZ0ax5hlmr8LHEW9LUzRKcf3SXuGR8xz7dCXhANcz-sl9_Uy"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="px-3 py-1 bg-primary-fixed text-on-primary-fixed text-xs font-bold rounded-full uppercase tracking-wider">Housing</span>
+<span class="text-error text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="emergency">emergency</span> Critical
+                                        </span>
+</div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-2">Emergency Shelter Beds</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">Providing safe, warm overnight stays for neighbors during the upcoming cold front.</p>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2">
+<div class="bg-primary h-2 rounded-full" style="width: 40%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface-variant">$3,200 raised</span>
+<span class="text-xs font-bold text-primary">40% of $8,000</span>
+</div>
+<button class="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Provide Shelter</button>
+</div>
+</div>
+<!-- Need Card 3 -->
+<div class="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
+<div class="h-48 overflow-hidden">
+<img alt="Students learning" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" data-alt="diverse group of adults and children in a sun-drenched library classroom learning together with books and tablets" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB59GT3-vcQZBAHjD6uYEZ0YCXvr9iucOAJ7EowMxLN2NoNWC04h9w-L1jykbUWlT0hdsElaLZ-oKUa9LmC_4bcG9L8U9IYJWnvFr-SEoedtSLfbZaqfIX2vd3RuA9cM31SLSEJduBDdGemepa4srGqRfHqF7WloY2f6buH0Ftd2OFnz9OnQZmzprgDW3pQHSJD8gh2wY26Rlhx32xMNWYRUECOumf07rix0bPPFn67AKQX4x-eZXjAOfl8a6Td00fRS3dNj8kYNWs2"/>
+</div>
+<div class="p-6">
+<div class="flex justify-between items-start mb-2">
+<span class="px-3 py-1 bg-on-secondary-container/10 text-on-secondary-container text-xs font-bold rounded-full uppercase tracking-wider">Education</span>
+<span class="text-on-surface-variant text-xs font-bold flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" data-icon="event">event</span> Monthly
+                                        </span>
+</div>
+<h3 class="text-xl font-headline font-bold text-on-background mb-2">After-School Tutoring</h3>
+<p class="text-on-surface-variant text-sm mb-4 line-clamp-2">Funding supplies and volunteer coordinators for our daily literacy program.</p>
+<div class="w-full bg-surface-variant rounded-full h-2 mb-2">
+<div class="bg-primary h-2 rounded-full" style="width: 90%"></div>
+</div>
+<div class="flex justify-between items-center">
+<span class="text-xs font-bold text-on-surface-variant">$4,500 raised</span>
+<span class="text-xs font-bold text-primary">90% of $5,000</span>
+</div>
+<button class="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Support Students</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Ways to Help Section -->
+<section class="py-12">
+<div class="text-center mb-12">
+<h2 class="text-on-background text-4xl font-headline font-bold mb-4">Ways to Help</h2>
+<p class="text-on-surface-variant text-lg max-w-2xl mx-auto">Whether you have time, resources, or skills to share, every contribution helps our community grow stronger.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-4">
+<!-- Volunteer Option -->
+<div class="flex flex-col md:flex-row gap-6 p-8 bg-surface-bright rounded-2xl border border-outline-variant/30 shadow-sm items-center">
+<div class="w-24 h-24 shrink-0 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-5xl" data-icon="pan_tool">pan_tool</span>
+</div>
+<div>
+<h3 class="text-2xl font-headline font-bold text-on-background mb-2">Volunteer Your Time</h3>
+<p class="text-on-surface-variant mb-6">Join our team of over 800 active volunteers. From sorting food to teaching classes, we have a place for you.</p>
+<button class="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
+                                        Browse Opportunities <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Donate Option -->
+<div class="flex flex-col md:flex-row gap-6 p-8 bg-surface-bright rounded-2xl border border-outline-variant/30 shadow-sm items-center">
+<div class="w-24 h-24 shrink-0 rounded-2xl bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined text-5xl" data-icon="volunteer_activism">volunteer_activism</span>
+</div>
+<div>
+<h3 class="text-2xl font-headline font-bold text-on-background mb-2">One-Time or Monthly Giving</h3>
+<p class="text-on-surface-variant mb-6">Your financial support directly funds our relief programs. $50 can provide 10 hot meals for local families.</p>
+<button class="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
+                                        Start Your Donation <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="py-16 px-4">
+<div class="bg-primary rounded-3xl p-12 text-center text-on-primary shadow-xl">
+<h2 class="text-3xl md:text-5xl font-headline font-bold mb-6">Ready to make a difference?</h2>
+<p class="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">Our doors are always open, and our community is waiting for you. Together, we can build a more resilient neighborhood.</p>
+<div class="flex flex-col sm:flex-row justify-center gap-4">
+<button class="h-14 px-10 bg-surface-bright text-primary font-bold rounded-xl shadow-lg hover:bg-white transition-colors">Apply to Volunteer</button>
+<button class="h-14 px-10 bg-on-primary-fixed-variant border border-primary-fixed/30 text-white font-bold rounded-xl shadow-lg hover:bg-primary-fixed-dim/20 transition-colors">Donate Goods</button>
+</div>
+</div>
+</section>
+<!-- Footer -->
+<footer class="mt-12 py-12 border-t border-outline-variant px-4">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-12">
+<div class="col-span-1 md:col-span-1">
+<div class="flex items-center gap-3 text-primary mb-6">
+<div class="size-6">
+<svg fill="currentColor" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<path d="M36.7273 44C33.9891 44 31.6043 39.8386 30.3636 33.69C29.123 39.8386 26.7382 44 24 44C21.2618 44 18.877 39.8386 17.6364 33.69C16.3957 39.8386 14.0109 44 11.2727 44C7.25611 44 4 35.0457 4 24C4 12.9543 7.25611 4 11.2727 4C14.0109 4 16.3957 8.16144 17.6364 14.31C18.877 8.16144 21.2618 4 24 4C26.7382 4 29.123 8.16144 30.3636 14.31C31.6043 8.16144 33.9891 4 36.7273 4C40.7439 4 44 12.9543 44 24C44 35.0457 40.7439 44 36.7273 44Z"></path>
+</svg>
+</div>
+<h2 class="text-on-background text-lg font-headline font-bold">Outreach &amp; Relief</h2>
+</div>
+<p class="text-on-surface-variant text-sm leading-relaxed">Dedicated to serving our community with compassion and sustainable support since 2010.</p>
+</div>
+<div>
+<h4 class="font-bold text-on-background mb-6">Explore</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Our Story</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Annual Reports</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Impact Stories</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Sustainability</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-on-background mb-6">Get Involved</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li><a class="hover:text-primary transition-colors" href="#">Donate</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Volunteer</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Corporate Partners</a></li>
+<li><a class="hover:text-primary transition-colors" href="#">Fundraise</a></li>
+</ul>
+</div>
+<div>
+<h4 class="font-bold text-on-background mb-6">Contact</h4>
+<ul class="space-y-4 text-sm text-on-surface-variant">
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="location_on">location_on</span>
+                                        123 Community Lane, Greenview
+                                    </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="mail">mail</span>
+                                        hello@outreachrelief.org
+                                    </li>
+<li class="flex items-center gap-2">
+<span class="material-symbols-outlined text-sm" data-icon="call">call</span>
+                                        (555) 123-4567
+                                    </li>
+</ul>
+</div>
+</div>
+<div class="mt-12 pt-8 border-t border-outline-variant flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-outline font-medium">
+<p>© 2024 Outreach &amp; Relief. All rights reserved.</p>
+<div class="flex gap-8">
+<a class="hover:text-primary" href="#">Privacy Policy</a>
+<a class="hover:text-primary" href="#">Terms of Service</a>
+<a class="hover:text-primary" href="#">Cookie Policy</a>
+</div>
+</div>
+</footer>
+</div>
+</div>
+</div>
+</div>
+</body></html>

@@ -1,123 +1,214 @@
 import React from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 
 export default function LandingPage() {
   return (
-    <div className="flex-grow">
+    <div className="flex-grow bg-background">
       {/* Hero Section */}
-      <section className="relative w-full min-h-[819px] flex items-center justify-center overflow-hidden bg-surface-container-low">
-        <div className="absolute inset-0 z-0">
-          <Image
-            alt="Hero Background"
-            className="w-full h-full object-cover opacity-80"
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBVw8-V2sAcrNrvwDgax6TV54k85HtKQHeNuti_X7v3pAXJ3vQdcGDSiYDURml1QR3WpgNLp_5mNVUoKfKtXccBhaezEzM9wz7YewCoXBI5v3gpmjV1r3HA3kwG5-PC6dCANpa2o1Wv2k4AHHMiU0UP6SbDXXGc9w58J9M2giWr-mF0KVeEnKI4yH6H-Y78qn-6K4LL-BpOgRBHBLOhBnEc1Akf-TulnHYIs0rHTywqvCf0pTWer0AoZjHy2a6Lrw60-bP8j4D-dy9n"
-            fill
-            sizes="100vw"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent"></div>
-        </div>
-        <div className="relative z-10 max-w-5xl mx-auto px-6 text-center mt-12 md:mt-24">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface/80 backdrop-blur-md border border-outline-variant/30 text-tertiary font-medium mb-8 shadow-[0_4px_20px_rgba(46,50,48,0.06)]">
-            <span className="material-symbols-outlined text-sm" style={{ fontVariationSettings: "'FILL' 1" }}>eco</span>
-            <span>Outreach & Relief</span>
-          </div>
-          <h1 className="text-5xl md:text-7xl font-headline font-bold text-on-surface mb-6 leading-tight">
-            Rooted in community,<br />
-            <span className="text-primary italic font-normal">grown through care.</span>
-          </h1>
-          <p className="text-xl md:text-2xl text-on-surface-variant mb-12 max-w-3xl mx-auto font-body leading-relaxed">
-            We believe in the power of localized, sustainable aid. Together, we can build resilience and restore hope in communities facing adversity.
-          </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/feed" className="w-full sm:w-auto bg-primary text-on-primary px-8 py-4 rounded-xl font-medium text-lg hover:bg-surface-tint active:scale-95 transition-all duration-200 shadow-[0_4px_20px_rgba(46,50,48,0.1)] flex items-center justify-center gap-2">
-              Get Involved
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 0" }}>arrow_forward</span>
-            </Link>
-            <button className="w-full sm:w-auto bg-surface text-primary border-2 border-primary/20 px-8 py-4 rounded-xl font-medium text-lg hover:bg-surface-container active:scale-95 transition-all duration-200 flex items-center justify-center gap-2">
-              Explore Our Impact
-            </button>
+      <section className="py-8">
+        <div className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+          <div className="relative overflow-hidden rounded-xl shadow-lg">
+            <div 
+              className="flex min-h-[520px] flex-col gap-6 bg-cover bg-center bg-no-repeat items-center justify-center p-8 text-center" 
+              style={{ backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.6) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuC6SsSRVlGYy_mYUBPddi5PP0YThIbaZOjDdbxdceDg1Y6UxF6lR23T8POlRObgpuxvvTDIgemtKHSk6ULAH8zMBeYYhFLPPR6xG3JggHWG8qMeJhf9bP7xWgBa02EDitKYJHAnyhB9qcai7rJAG3Gvw5XuoAnrg9DapfZkm0Q7na_aJgu6Cvx-HWuO24YEv4d25UPMK1HQJT_U6VknyixRH1bCSgVgHwpuQZCp6Zh_9LOBd2EzXwdbY784qMeRhQ88skYX-y_rNIUN")' }}
+            >
+              <div className="flex flex-col gap-4 max-w-2xl">
+                <h1 className="text-white text-4xl md:text-6xl font-headline font-bold leading-tight tracking-tight">
+                    Rooted in community, grown through care.
+                </h1>
+                <p className="text-white text-lg md:text-xl font-normal leading-relaxed opacity-90">
+                    Empowering our neighbors through dedicated relief efforts and sustainable community support. Join us in making a difference today.
+                </p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-4 mt-4">
+                <Link href="/register" className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-primary text-on-primary text-base font-bold shadow-md hover:scale-105 transition-transform">
+                  <span className="truncate">Get Involved</span>
+                </Link>
+                <button className="flex min-w-[160px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-14 px-8 bg-surface-bright text-primary border border-primary text-base font-bold shadow-md hover:scale-105 transition-transform">
+                  <span className="truncate">Learn More</span>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      {/* Focus Areas Section */}
-      <section className="py-24 bg-background">
-        <div className="max-w-7xl mx-auto px-6 md:px-12">
-          <div className="mb-16 max-w-2xl">
-            <h2 className="text-sm font-bold tracking-widest text-[#4a7c59] uppercase mb-4">Core Initiatives</h2>
-            <h3 className="text-4xl md:text-5xl font-['Literata'] font-bold text-stone-800 dark:text-stone-100 leading-tight">
-              Where we direct <br/> our energy.
-            </h3>
+      {/* Impact Section */}
+      <section className="py-12 mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+        <div className="flex items-center gap-3 mb-8">
+          <span className="material-symbols-outlined text-tertiary">volunteer_activism</span>
+          <h2 className="text-on-background text-3xl font-headline font-bold leading-tight">Our Impact</h2>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+              <span className="material-symbols-outlined">restaurant</span>
+            </div>
+            <div>
+              <p className="text-on-surface-variant text-base font-medium mb-1">Meals Served</p>
+              <p className="text-primary text-4xl font-headline font-bold">25,000+</p>
+            </div>
+            <p className="text-on-surface-variant text-sm">Nutritious meals provided to individuals and families facing food insecurity in our local neighborhood.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="group rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border border-stone-200/50 shadow-sm hover:shadow-xl transition-all duration-300">
+          <div className="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-tertiary-fixed flex items-center justify-center text-on-tertiary-fixed">
+              <span className="material-symbols-outlined">family_restroom</span>
+            </div>
+            <div>
+              <p className="text-on-surface-variant text-base font-medium mb-1">Families Supported</p>
+              <p className="text-primary text-4xl font-headline font-bold">1,200+</p>
+            </div>
+            <p className="text-on-surface-variant text-sm">Comprehensive support services ranging from housing assistance to emergency financial relief.</p>
+          </div>
+          <div className="flex flex-col gap-4 rounded-xl p-8 bg-surface-container-low border border-outline-variant/30 shadow-sm hover:shadow-md transition-shadow">
+            <div className="w-12 h-12 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed-variant">
+              <span className="material-symbols-outlined">groups</span>
+            </div>
+            <div>
+              <p className="text-on-surface-variant text-base font-medium mb-1">Active Volunteers</p>
+              <p className="text-primary text-4xl font-headline font-bold">850+</p>
+            </div>
+            <p className="text-on-surface-variant text-sm">Dedicated community members giving their time and skills to help their neighbors thrive.</p>
+          </div>
+        </div>
+      </section>
+
+      {/* Urgent Needs Section */}
+      <section className="mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+        <div className="py-12 bg-surface-container rounded-3xl my-8">
+          <div className="flex items-center justify-between px-8 mb-8">
+            <div className="flex items-center gap-3">
+              <span className="material-symbols-outlined text-error">priority_high</span>
+              <h2 className="text-on-background text-3xl font-headline font-bold">Urgent Needs</h2>
+            </div>
+            <Link className="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#">
+                View all needs <span className="material-symbols-outlined text-sm">arrow_forward</span>
+            </Link>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-8">
+            {/* Need Card 1 */}
+            <div className="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
               <div className="h-48 overflow-hidden relative">
-                <Image className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB8_o7mB4kO0_vC6z0tP7W_0Y3J-9M3e99J-N0_k9_w9l8t2O5V-0yX6e9W0_N-_n8V0lK2c4dM5-o2W5F4Y2_I7_V-s8c6-V5tV_vM3R-zO6S4A_T1r5D4j3Y9I5B7_9B_0W_A4G7A4Y8" alt="Clean Water" fill sizes="(max-width: 768px) 100vw, 33vw" />
+                <img alt="Community food pantry" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2DyHDK4PIljaP1_LoTm0iYljfDNOOXL5UQAoM-ZcvXbXYdBWfVUz-VpDzOTvM5P3jfiqSpAb8A9vv5xvbiZAkgBuMD2iKQB-splYez3yxGPX58Y7h2tY_vBsbRbLEbK5UExPhmQ3qr9JzVo6OU5dUzZn69BuqIMoz0QkJkiatYgRcsfZmEreGJXgYVDxW7PxYydGIwkQaYMj8FRw_tKqxCLr2U7l-yBK7FpyBGi3j6xCU2JIe1iVtiVL9jug0mTQ5wPmB9ma0x9tw" />
               </div>
-              <div className="p-8">
-                <div className="w-12 h-12 rounded-full bg-[#4a7c59]/10 flex items-center justify-center text-[#4a7c59] mb-6">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>water_drop</span>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="px-3 py-1 bg-tertiary-fixed text-on-tertiary-fixed text-xs font-bold rounded-full uppercase tracking-wider">Food Bank</span>
+                  <span className="text-error text-xs font-bold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">schedule</span> 2 days left
+                  </span>
                 </div>
-                <h4 className="text-xl font-bold text-stone-800 dark:text-stone-100 mb-3">Clean Water Access</h4>
-                <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
-                  Building sustainable filtration systems and wells in regions affected by drought and contamination.
-                </p>
+                <h3 className="text-xl font-headline font-bold text-on-background mb-2">Winter Food Stockpile</h3>
+                <p className="text-on-surface-variant text-sm mb-4 line-clamp-2">We are running low on non-perishables and fresh protein for our weekly distributions.</p>
+                <div className="w-full bg-surface-variant rounded-full h-2 mb-2">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: '75%' }}></div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-on-surface-variant">$15,400 raised</span>
+                  <span className="text-xs font-bold text-primary">75% of $20,000</span>
+                </div>
+                <button className="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Help Fill the Pantry</button>
               </div>
             </div>
             
-            <div className="group rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border border-stone-200/50 shadow-sm hover:shadow-xl transition-all duration-300 transform md:-translate-y-4">
+            {/* Need Card 2 */}
+            <div className="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
               <div className="h-48 overflow-hidden relative">
-                <Image className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDQeLXXzB0xXYhA_zIqG_U0z6OqX1xI_X8G9W0O2j_A8pE5O7K4D3jK1J1F2O7iZ9jJ7E-Z1i_Q8tP6Z5_S1rX4i7V_w0E4w1R-Z0tJ9_lJ-4jT7U6lK9wU4rY_L4P6vT_tV4" alt="Emergency Relief" fill sizes="(max-width: 768px) 100vw, 33vw" />
+                <img alt="Cozy shelter room" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBYszS18UATpB9Zid-0qbeUlL5dDWmUK_pG1SDR-GpkGlvU8Lz-wqEUnJS30PNRcXeKAXqYLBviqDECqfyBzsmfs2uy9ntr_SDPSp0gcbEUrvRwqcu06WLCCC_AgOz4fXV5fd0Lg4zqRTHrDgjvqM_R1lgOg4XIkJNTAASHlMb9I2uX0sJJdsaQCnQuJDXNQ1lMXi0SiuA8Rm47cfUYt_AjgXvVq9g8JZ0ax5hlmr8LHEW9LUzRKcf3SXuGR8xz7dCXhANcz-sl9_Uy" />
               </div>
-              <div className="p-8">
-                <div className="w-12 h-12 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-6">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>local_shipping</span>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="px-3 py-1 bg-primary-fixed text-on-primary-fixed text-xs font-bold rounded-full uppercase tracking-wider">Housing</span>
+                  <span className="text-error text-xs font-bold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">emergency</span> Critical
+                  </span>
                 </div>
-                <h4 className="text-xl font-bold text-stone-800 dark:text-stone-100 mb-3">Disaster Response</h4>
-                <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
-                  Rapid deployment of essential supplies, medical aid, and temporary shelter to areas hit by natural disasters.
-                </p>
+                <h3 className="text-xl font-headline font-bold text-on-background mb-2">Emergency Shelter Beds</h3>
+                <p className="text-on-surface-variant text-sm mb-4 line-clamp-2">Providing safe, warm overnight stays for neighbors during the upcoming cold front.</p>
+                <div className="w-full bg-surface-variant rounded-full h-2 mb-2">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: '40%' }}></div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-on-surface-variant">$3,200 raised</span>
+                  <span className="text-xs font-bold text-primary">40% of $8,000</span>
+                </div>
+                <button className="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Provide Shelter</button>
               </div>
             </div>
             
-            <div className="group rounded-3xl overflow-hidden bg-white dark:bg-stone-900 border border-stone-200/50 shadow-sm hover:shadow-xl transition-all duration-300">
+            {/* Need Card 3 */}
+            <div className="bg-surface-bright rounded-xl overflow-hidden shadow-sm border border-outline-variant/20 group">
               <div className="h-48 overflow-hidden relative">
-                <Image className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" src="https://lh3.googleusercontent.com/aida-public/AB6AXuD8kQ3F5C_yN9R5q2F3O7O0sO_S9U7tN0I3vH_Lz9v2X-z6S_m_6uF-z5F0_o2X0U-v_2O0vG2C8F3K6gO7p3V0O_Z5U3C4U7O_gO2_M0eJ9Q_hX6mR8G8X0O9eZ5G5jO0f_X9iO-uV3P-V_8J0_C_kP0X3kK5C0v_hT9lQ_d9zM_gN7M0" alt="Sustainable Agriculture" fill sizes="(max-width: 768px) 100vw, 33vw" />
+                <img alt="Students learning" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" src="https://lh3.googleusercontent.com/aida-public/AB6AXuB59GT3-vcQZBAHjD6uYEZ0YCXvr9iucOAJ7EowMxLN2NoNWC04h9w-L1jykbUWlT0hdsElaLZ-oKUa9LmC_4bcG9L8U9IYJWnvFr-SEoedtSLfbZaqfIX2vd3RuA9cM31SLSEJduBDdGemepa4srGqRfHqF7WloY2f6buH0Ftd2OFnz9OnQZmzprgDW3pQHSJD8gh2wY26Rlhx32xMNWYRUECOumf07rix0bPPFn67AKQX4x-eZXjAOfl8a6Td00fRS3dNj8kYNWs2" />
               </div>
-              <div className="p-8">
-                <div className="w-12 h-12 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6">
-                  <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>agriculture</span>
+              <div className="p-6">
+                <div className="flex justify-between items-start mb-2">
+                  <span className="px-3 py-1 bg-on-secondary-container/10 text-on-secondary-container text-xs font-bold rounded-full uppercase tracking-wider">Education</span>
+                  <span className="text-on-surface-variant text-xs font-bold flex items-center gap-1">
+                    <span className="material-symbols-outlined text-sm">event</span> Monthly
+                  </span>
                 </div>
-                <h4 className="text-xl font-bold text-stone-800 dark:text-stone-100 mb-3">Sustainable Agriculture</h4>
-                <p className="text-stone-600 dark:text-stone-400 leading-relaxed">
-                  Empowering local farmers with tools, seeds, and education to build long-term food security.
-                </p>
+                <h3 className="text-xl font-headline font-bold text-on-background mb-2">After-School Tutoring</h3>
+                <p className="text-on-surface-variant text-sm mb-4 line-clamp-2">Funding supplies and volunteer coordinators for our daily literacy program.</p>
+                <div className="w-full bg-surface-variant rounded-full h-2 mb-2">
+                  <div className="bg-primary h-2 rounded-full" style={{ width: '90%' }}></div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-xs font-bold text-on-surface-variant">$4,500 raised</span>
+                  <span className="text-xs font-bold text-primary">90% of $5,000</span>
+                </div>
+                <button className="w-full mt-6 py-3 bg-primary text-on-primary font-bold rounded-lg hover:opacity-90 transition-opacity">Support Students</button>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Ways to Help Section */}
+      <section className="py-12 mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+        <div className="text-center mb-12">
+          <h2 className="text-on-background text-4xl font-headline font-bold mb-4">Ways to Help</h2>
+          <p className="text-on-surface-variant text-lg max-w-2xl mx-auto">Whether you have time, resources, or skills to share, every contribution helps our community grow stronger.</p>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          {/* Volunteer Option */}
+          <div className="flex flex-col md:flex-row gap-6 p-8 bg-surface-bright rounded-2xl border border-outline-variant/30 shadow-sm items-center">
+            <div className="w-24 h-24 shrink-0 rounded-2xl bg-primary-container/20 flex items-center justify-center text-primary">
+              <span className="material-symbols-outlined text-5xl">pan_tool</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-headline font-bold text-on-background mb-2">Volunteer Your Time</h3>
+              <p className="text-on-surface-variant mb-6">Join our team of over 800 active volunteers. From sorting food to teaching classes, we have a place for you.</p>
+              <Link className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all" href="/register">
+                Browse Opportunities <span className="material-symbols-outlined">arrow_forward</span>
+              </Link>
+            </div>
+          </div>
+          
+          {/* Donate Option */}
+          <div className="flex flex-col md:flex-row gap-6 p-8 bg-surface-bright rounded-2xl border border-outline-variant/30 shadow-sm items-center">
+            <div className="w-24 h-24 shrink-0 rounded-2xl bg-tertiary-fixed/30 flex items-center justify-center text-tertiary">
+              <span className="material-symbols-outlined text-5xl">volunteer_activism</span>
+            </div>
+            <div>
+              <h3 className="text-2xl font-headline font-bold text-on-background mb-2">One-Time or Monthly Giving</h3>
+              <p className="text-on-surface-variant mb-6">Your financial support directly funds our relief programs. $50 can provide 10 hot meals for local families.</p>
+              <button className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all">
+                Start Your Donation <span className="material-symbols-outlined">arrow_forward</span>
+              </button>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-24 bg-[#4a7c59] text-[#faf6f0] relative overflow-hidden">
-        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-[#faf6f0] to-transparent"></div>
-        <div className="max-w-4xl mx-auto px-6 text-center relative z-10">
-          <h2 className="text-4xl md:text-6xl font-['Literata'] font-bold mb-8">
-            Your support makes a difference today.
-          </h2>
-          <p className="text-xl md:text-2xl text-emerald-100 mb-12 max-w-2xl mx-auto leading-relaxed">
-            Join thousands of volunteers and donors making a tangible impact in communities around the world.
-          </p>
-          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
-            <Link href="/feed" className="w-full sm:w-auto bg-[#faf6f0] text-[#4a7c59] px-8 py-4 rounded-xl font-bold text-lg hover:bg-white active:scale-95 transition-all shadow-lg flex items-center justify-center gap-2">
-              <span className="material-symbols-outlined" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
-              Donate Now
-            </Link>
-            <Link href="/feed" className="w-full sm:w-auto bg-transparent border-2 border-emerald-300 text-emerald-50 px-8 py-4 rounded-xl font-bold text-lg hover:bg-emerald-800/30 active:scale-95 transition-all flex items-center justify-center gap-2">
-              Become a Volunteer
-            </Link>
+      <section className="py-16 mx-auto px-4 sm:px-6 lg:px-8 max-w-[1200px]">
+        <div className="bg-primary rounded-3xl p-12 text-center text-on-primary shadow-xl">
+          <h2 className="text-3xl md:text-5xl font-headline font-bold mb-6">Ready to make a difference?</h2>
+          <p className="text-lg md:text-xl opacity-90 mb-10 max-w-2xl mx-auto">Our doors are always open, and our community is waiting for you. Together, we can build a more resilient neighborhood.</p>
+          <div className="flex flex-col sm:flex-row justify-center gap-4">
+            <Link href="/register" className="h-14 px-10 bg-surface-bright text-primary font-bold rounded-xl shadow-lg hover:bg-white transition-colors flex items-center justify-center">Apply to Volunteer</Link>
+            <button className="h-14 px-10 bg-on-primary-fixed-variant border border-primary-fixed/30 text-white font-bold rounded-xl shadow-lg hover:bg-primary-fixed-dim/20 transition-colors">Donate Goods</button>
           </div>
         </div>
       </section>
