@@ -1,139 +1,154 @@
-import EventCard from "@/components/EventCard";
-import Link from "next/link";
+"use client";
 
-export default function Home() {
-  const events = [
-    {
-      id: "1",
-      title: "Downtown Winter Shelter Restock",
-      org: "Rose City Relief",
-      description: "Preparing for the incoming freeze. We urgently need thermal blankets, warm socks, and volunteers to help sort and distribute items this weekend.",
-      progress: 65,
-      type: "urgent" as const,
-      currentAmount: 1200,
-      targetAmount: 2000,
-      currentVolunteers: 12,
-      targetVolunteers: 20,
-      distance: "1.2 mi",
-      deadline: "This Friday",
-      verified: true,
-    },
-    {
-      id: "2",
-      title: "Weekly Pantry Distribution",
-      org: "PDX Food Bank",
-      description: "Assisting with traffic flow, loading boxes into cars, and registering new families for our Tuesday distribution.",
-      progress: 42,
-      type: "regular" as const,
-      currentVolunteers: 8,
-      targetVolunteers: 20,
-      distance: "2.5 mi",
-      deadline: "Every Tuesday",
-      verified: true,
-    },
-    {
-      id: "3",
-      title: "Park Cleanup & Planting",
-      org: "Neighborhood Org",
-      description: "Spring is here! Help us clear winter debris and plant native shrubs at Mt. Tabor. Tools provided.",
-      progress: 80,
-      type: "regular" as const,
-      currentVolunteers: 16,
-      targetVolunteers: 20,
-      distance: "0.8 mi",
-      deadline: "This Saturday",
-      verified: false,
-    },
-    {
-      id: "4",
-      title: "School Supply Drive 2024",
-      org: "Education First",
-      description: "Raising funds to purchase bulk backpacks and supplies for 500 local students before the fall semester.",
-      progress: 64,
-      type: "regular" as const,
-      currentAmount: 3200,
-      targetAmount: 5000,
-      distance: "3.1 mi",
-      deadline: "Aug 15",
-      verified: true,
-    }
-  ];
-
-  const urgentCount = events.filter(e => e.type === 'urgent').length;
-
+// Home Feed
+export default function HomePage() {
   return (
     <>
-      {/* TopAppBar (Mobile Only) */}
-      <header className="md:hidden flex justify-between items-center px-6 h-16 w-full bg-surface-bright text-primary font-body text-sm tracking-tight border-b border-outline-variant/30 shadow-[0_4px_20px_rgba(46,50,48,0.06)] sticky top-0 z-40">
-        <div className="font-headline text-xl font-bold text-primary">Outreach & Relief</div>
+      {/* Top Header */}
+      <header className="bg-white px-6 py-4 flex justify-between items-center shadow-sm sticky top-0 z-50">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Kindred</h1>
+          <p className="text-xs text-gray-500">San Francisco, CA</p>
+        </div>
         <div className="flex gap-4">
-          <button className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
-            <span className="material-symbols-outlined">notifications</span>
+          <button className="w-10 h-10 rounded-full bg-surface flex items-center justify-center text-gray-600 hover:bg-gray-200 transition">
+            <i className="fas fa-bell"></i>
           </button>
-          <button className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
-            <span className="material-symbols-outlined">location_on</span>
-          </button>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent to-blue-400 p-[2px]">
+            <img
+              src="https://i.pravatar.cc/150?img=32"
+              alt="Profile"
+              className="w-full h-full rounded-full border-2 border-white object-cover"
+            />
+          </div>
         </div>
       </header>
 
-      <div className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10 flex flex-col gap-6">
-        {/* Page Header & Global Actions */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-4">
-          <div>
-            <p className="text-secondary font-medium mb-1">Local Events Feed</p>
-            <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Discover & Support</h2>
+      <div className="pb-24">
+        {/* Search & Filter */}
+        <div className="px-6 py-4 sticky top-[72px] bg-surface z-40">
+          <div className="relative">
+            <i className="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input
+              type="text"
+              placeholder="Find communities, events, people..."
+              className="w-full bg-white border-none rounded-xl py-3 pl-12 pr-4 shadow-sm focus:ring-2 focus:ring-accent outline-none text-sm"
+            />
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50">
-              <span className="material-symbols-outlined text-secondary mr-2 text-sm">location_on</span>
-              <select className="bg-transparent border-none text-sm font-medium text-on-surface focus:ring-0 p-0 pr-6 cursor-pointer">
-                <option>Portland Metro Area</option>
-                <option>Seattle Area</option>
-                <option>Eugene/Springfield</option>
-              </select>
+
+          {/* Quick Chips */}
+          <div className="flex gap-3 mt-4 overflow-x-auto pb-2 scrollbar-none">
+            <button className="px-4 py-1.5 bg-primary text-white rounded-full text-xs font-medium whitespace-nowrap">
+              For You
+            </button>
+            <button className="px-4 py-1.5 bg-white text-gray-600 border border-gray-200 rounded-full text-xs font-medium whitespace-nowrap hover:bg-gray-50">
+              Local Events
+            </button>
+            <button className="px-4 py-1.5 bg-white text-gray-600 border border-gray-200 rounded-full text-xs font-medium whitespace-nowrap hover:bg-gray-50">
+              Tech Meetups
+            </button>
+            <button className="px-4 py-1.5 bg-white text-gray-600 border border-gray-200 rounded-full text-xs font-medium whitespace-nowrap hover:bg-gray-50">
+              Volunteering
+            </button>
+          </div>
+        </div>
+
+        {/* Featured Carousel */}
+        <div className="px-6 mt-2 mb-8">
+          <h2 className="text-lg font-bold mb-4">Trending Near You</h2>
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-none snap-x">
+            {/* Card 1 */}
+            <div className="min-w-[280px] bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 snap-center">
+              <div className="h-32 bg-gray-200 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?auto=format&fit=crop&q=80&w=600"
+                  alt="Event"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold">
+                  OCT 24
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-base leading-tight mb-1">AI Pitch Night SF</h3>
+                <p className="text-xs text-gray-500 mb-3">
+                  <i className="fas fa-map-marker-alt mr-1"></i> SoMa • 2.4 mi
+                </p>
+                <div className="flex justify-between items-center mt-2">
+                  <div className="flex -space-x-2">
+                    <img src="https://i.pravatar.cc/150?img=1" className="w-6 h-6 rounded-full border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=2" className="w-6 h-6 rounded-full border-2 border-white" />
+                    <img src="https://i.pravatar.cc/150?img=3" className="w-6 h-6 rounded-full border-2 border-white" />
+                  </div>
+                  <button className="w-8 h-8 bg-gray-100 rounded-full text-gray-600 flex items-center justify-center hover:bg-gray-200">
+                    <i className="fas fa-bookmark text-xs"></i>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            {/* Card 2 */}
+            <div className="min-w-[280px] bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 snap-center">
+              <div className="h-32 bg-gray-200 relative">
+                <img
+                  src="https://images.unsplash.com/photo-1593113563332-e147ce100a4d?auto=format&fit=crop&q=80&w=600"
+                  alt="Event"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm px-2 py-1 rounded text-xs font-bold">
+                  OCT 28
+                </div>
+              </div>
+              <div className="p-4">
+                <h3 className="font-bold text-base leading-tight mb-1">Dolores Park Cleanup</h3>
+                <p className="text-xs text-accent font-medium mb-3">Community Service</p>
+                <div className="flex justify-between items-center mt-2">
+                  <div className="text-xs text-gray-500 font-medium">124 attending</div>
+                  <button className="w-8 h-8 bg-black rounded-full text-white flex items-center justify-center hover:bg-gray-800">
+                    <i className="fas fa-arrow-right text-xs"></i>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Filters Area */}
-        <section className="mb-2 overflow-x-auto pb-4 no-scrollbar">
-          <div className="flex gap-3 min-w-max">
-            <button className="flex items-center gap-2 bg-primary text-on-primary px-5 py-2.5 rounded-full text-sm font-semibold shadow-sm transition-transform hover:-translate-y-0.5">
-              <span className="material-symbols-outlined text-[18px]">tune</span>
-              All Events
-            </button>
-            <div className="h-10 w-px bg-outline-variant/50 mx-1"></div>
-            <button className="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
-              Urgent Needs
-              <span className="material-symbols-outlined text-[16px] text-error">emergency</span>
-            </button>
-            <button className="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
-              Within 5 miles
-              <span className="material-symbols-outlined text-[16px]">expand_more</span>
-            </button>
-            <button className="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
-              Food Drive
-              <span className="material-symbols-outlined text-[16px]">restaurant</span>
-            </button>
-            <button className="flex items-center gap-2 bg-surface-container text-on-surface px-5 py-2.5 rounded-full text-sm font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors">
-              Volunteers
-              <span className="material-symbols-outlined text-[16px]">group</span>
-            </button>
+        {/* Community Feed */}
+        <div className="px-0">
+          <h2 className="text-lg font-bold mb-4 px-6">Latest Updates</h2>
+
+          {/* Post 1 */}
+          <div className="bg-white border-t border-b border-gray-100 p-6 mb-2">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <img src="https://i.pravatar.cc/150?img=4" className="w-10 h-10 rounded-full" />
+                <div>
+                  <div className="font-semibold text-sm">Sarah Jenkins</div>
+                  <div className="text-[11px] text-gray-500">Organizer • 2h ago</div>
+                </div>
+              </div>
+              <button className="text-gray-400">
+                <i className="fas fa-ellipsis-h"></i>
+              </button>
+            </div>
+            <p className="text-sm text-gray-800 leading-relaxed mb-4">
+              Hey everyone! Just finalizing the catering for next week's mixer. If you have any dietary restrictions that you haven't added to your RSVP yet, please do so by Friday! 🌮🥗
+            </p>
+            <div className="flex items-center gap-6 text-gray-500">
+              <button className="flex items-center gap-2 text-xs hover:text-accent group">
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition">
+                  <i className="far fa-heart"></i>
+                </div>
+                <span className="font-medium">24</span>
+              </button>
+              <button className="flex items-center gap-2 text-xs hover:text-accent group">
+                <div className="w-8 h-8 rounded-full bg-gray-50 flex items-center justify-center group-hover:bg-blue-50 transition">
+                  <i className="far fa-comment"></i>
+                </div>
+                <span className="font-medium">8</span>
+              </button>
+            </div>
           </div>
-        </section>
-
-        {/* Bento Grid Layout for Events */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {events.map((event) => (
-            <EventCard key={event.id} {...event} />
-          ))}
-        </div>
-
-        {/* Load More */}
-        <div className="mt-8 flex justify-center">
-          <button className="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors">
-            Load More Events
-          </button>
         </div>
       </div>
     </>
