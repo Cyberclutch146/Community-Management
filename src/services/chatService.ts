@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, addDoc, onSnapshot, query, orderBy, Timestamp } from 'firebase/firestore';
+import { collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from 'firebase/firestore';
 import { ChatMessage } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
@@ -24,6 +24,6 @@ export const sendMessage = async (eventId: string, userId: string, userName: str
     userId,
     userName,
     text,
-    createdAt: new Date()
+    createdAt: serverTimestamp()
   });
 };

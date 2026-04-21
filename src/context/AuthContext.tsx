@@ -9,7 +9,7 @@ import {
   signOut as firebaseSignOut 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getUserProfile } from '@/services/userService';
+import { getUserProfile, subscribeToUserProfile } from '@/services/userService';
 import { UserProfile } from '@/types';
 
 interface AuthContextType {
@@ -29,23 +29,30 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    let unsubscribeProfile: (() => void) | undefined;
+
+    const unsubscribeAuth = onAuthStateChanged(auth, async (user) => {
       setUser(user);
       if (user) {
-        try {
-          const userProfile = await getUserProfile(user.uid);
+        unsubscribeProfile = subscribeToUserProfile(user.uid, (userProfile) => {
           setProfile(userProfile);
-        } catch (error) {
-          console.error("Error fetching user profile:", error);
-          setProfile(null);
-        }
+          setLoading(false);
+        });
       } else {
         setProfile(null);
+        if (unsubscribeProfile) {
+          unsubscribeProfile();
+        }
+        setLoading(false);
       }
-      setLoading(false);
     });
 
-    return unsubscribe;
+    return () => {
+      unsubscribeAuth();
+      if (unsubscribeProfile) {
+        unsubscribeProfile();
+      }
+    };
   }, []);
 
   const login = async (email: string, pass: string) => {

@@ -12,6 +12,7 @@ interface ChatBoxProps {
 export function ChatBox({ eventId }: ChatBoxProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [inputText, setInputText] = useState('');
+  const [isSending, setIsSending] = useState(false);
   const { user, profile } = useAuth();
 
   useEffect(() => {
@@ -23,13 +24,16 @@ export function ChatBox({ eventId }: ChatBoxProps) {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inputText.trim() || !user || !profile) return;
+    if (!inputText.trim() || !user || !profile || isSending) return;
 
+    setIsSending(true);
     try {
-      await sendMessage(eventId, user.uid, profile.displayName || 'Anonymous', inputText);
+      await sendMessage(eventId, user.uid, profile.displayName || 'Anonymous', inputText.trim());
       setInputText('');
     } catch (err) {
-      console.error(err);
+      console.error("Error sending message:", err);
+    } finally {
+      setIsSending(false);
     }
   };
 
@@ -45,7 +49,10 @@ export function ChatBox({ eventId }: ChatBoxProps) {
       <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {messages.map(msg => {
           const isMe = user && msg.userId === user.uid;
-          const timestampStr = msg.createdAt ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+          const timestampStr = msg.createdAt?.seconds 
+            ? new Date(msg.createdAt.seconds * 1000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+            : 'Just now';
+            
           return (
             <div key={msg.id} className={`flex gap-3 max-w-[85%] ${isMe ? 'ml-auto flex-row-reverse' : ''}`}>
               {!isMe && (
@@ -77,14 +84,19 @@ export function ChatBox({ eventId }: ChatBoxProps) {
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           placeholder="Ask a question or offer help..." 
-          className="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface placeholder:text-outline"
+          disabled={isSending}
+          className="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-full px-5 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface placeholder:text-outline disabled:opacity-50"
         />
         <button 
           type="submit" 
-          disabled={!inputText.trim()}
+          disabled={!inputText.trim() || isSending}
           className="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center flex-shrink-0 disabled:opacity-50 disabled:cursor-not-allowed transition-colors hover:bg-primary-container hover:text-on-primary-container"
         >
-          <span className="material-symbols-outlined text-[20px]" style={{fontVariationSettings: "'FILL' 1"}}>send</span>
+          {isSending ? (
+            <div className="w-5 h-5 border-2 border-on-primary/30 border-t-on-primary rounded-full animate-spin"></div>
+          ) : (
+            <span className="material-symbols-outlined text-[20px]" style={{fontVariationSettings: "'FILL' 1"}}>send</span>
+          )}
         </button>
       </form>
     </div>

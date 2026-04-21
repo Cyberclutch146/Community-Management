@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, setDoc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { UserProfile, UserProfileCreate } from '@/types';
 
 const USERS_COLLECTION = 'users';
@@ -13,6 +13,17 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
   }
   
   return null;
+};
+
+export const subscribeToUserProfile = (userId: string, callback: (profile: UserProfile | null) => void) => {
+  const userDocRef = doc(db, USERS_COLLECTION, userId);
+  return onSnapshot(userDocRef, (snapshot) => {
+    if (snapshot.exists()) {
+      callback({ id: snapshot.id, ...snapshot.data() } as UserProfile);
+    } else {
+      callback(null);
+    }
+  });
 };
 
 export const createUserProfile = async (userId: string, data: UserProfileCreate): Promise<void> => {
