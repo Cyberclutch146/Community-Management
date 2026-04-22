@@ -4,6 +4,7 @@ import { Lora } from 'next/font/google'
 import { useRouter, usePathname } from 'next/navigation'
 import { Search, Bell } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
+import { useEffect, useState } from 'react'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
@@ -12,8 +13,36 @@ export default function NavbarTop() {
   const pathname = usePathname()
   const { profile } = useAuth()
 
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    let lastScrollY = window.scrollY
+
+    const handleScroll = () => {
+      const currentScrollY = window.scrollY
+
+      // Add hysteresis to prevent flicker
+      if (currentScrollY > 20 && !scrolled) {
+        setScrolled(true)
+      } else if (currentScrollY < 10 && scrolled) {
+        setScrolled(false)
+      }
+
+      lastScrollY = currentScrollY
+    }
+
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [scrolled])
+
   return (
-    <div className="flex items-center justify-between px-10 py-4 bg-[#f0eee9] rounded-full mx-6 mt-4">
+    <div
+      className={`flex items-center justify-between px-10 ${scrolled ? 'py-2' : 'py-4'} transition-all duration-200
+  ${scrolled
+    ? 'bg-[#f0eee9]/80 backdrop-blur-md border-b border-black/5'
+    : 'bg-[#f0eee9] rounded-full mx-6 mt-4'
+  }`}
+    >
       {/* Logo */}
       <div className={`text-xl font-semibold ${lora.className}`}>ReliefConnect</div>
 

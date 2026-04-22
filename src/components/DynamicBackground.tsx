@@ -1,5 +1,3 @@
-
-
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -30,8 +28,10 @@ export default function DynamicBackground({ children }: { children: React.ReactN
 
   return (
     <div
-      className="min-h-screen w-full transition-colors duration-300"
+      className="min-h-screen w-full transition-colors duration-300 overscroll-none overflow-x-hidden"
       style={{
+        overscrollBehavior: 'none',
+        WebkitOverflowScrolling: 'auto',
         background: `
           radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(31,61,43,0.06), transparent 25%),
           radial-gradient(circle at 20% 10%, rgba(31,61,43,0.04), transparent 40%),

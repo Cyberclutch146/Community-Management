@@ -10,10 +10,11 @@ const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 export default function HomePage() {
   const router = useRouter()
   return (
-    <div className="min-h-screen text-[#1f3d2b]">
+    <div className="min-h-screen text-[#1f3d2b] overscroll-none overflow-x-hidden">
+      <div className="max-w-7xl mx-auto">
 
       {/* Header */}
-      <div className="px-10 mt-12 flex justify-between items-start">
+      <div className="px-10 mt-12 flex justify-between items-start border-b border-black/5 pb-8">
         <div>
           <h1 className="text-5xl font-serif tracking-tight">Upcoming Events</h1>
           <p className="mt-3 text-gray-600 leading-relaxed max-w-xl">
@@ -26,7 +27,7 @@ export default function HomePage() {
             <Filter size={16} />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1f3d2b] text-white font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out">
             <Plus size={16} />
             Create Event
           </button>
@@ -37,7 +38,8 @@ export default function HomePage() {
       <div className="px-10 mt-12 grid grid-cols-3 gap-6">
 
         {/* Large Card */}
-        <div className="col-span-2 rounded-xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-6 flex flex-col justify-end h-[410px] hover:-translate-y-[2px] transition-all duration-200">
+        <div className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           <div className="flex gap-2 mb-2">
             <span className="bg-yellow-300 text-black text-xs px-3 py-1 rounded-full">Critical Need</span>
             <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">Supply Sorting</span>
@@ -53,7 +55,7 @@ export default function HomePage() {
         <div className="flex flex-col gap-4">
 
           {/* Main Details */}
-          <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-200">
             <h3 className="text-xl font-serif mb-5">Event Details</h3>
 
             <div className="space-y-5 text-sm">
@@ -98,7 +100,7 @@ export default function HomePage() {
           </div>
 
           {/* Organizer Card */}
-          <div className="bg-[#efede7]/80 backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-black/5 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#1f3d2b]/20"></div>
               <div>
@@ -116,7 +118,7 @@ export default function HomePage() {
       </div>
 
       {/* More Opportunities */}
-      <div className="px-10 mt-16">
+      <div className="px-10 mt-20">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-serif">More Opportunities</h2>
           <button
@@ -130,7 +132,7 @@ export default function HomePage() {
         <div className="grid grid-cols-3 gap-6">
 
           {/* Card 1 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div className="bg-white rounded-xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Medical</span>
             <h3 className="mt-3 font-serif text-lg">First Aid Training Refresher</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -139,7 +141,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div className="bg-white rounded-xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Logistics</span>
             <h3 className="mt-3 font-serif text-lg">Transport Fleet Coordination</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -148,7 +150,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div className="bg-white rounded-xl p-5 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Community</span>
             <h3 className="mt-3 font-serif text-lg">Information Desk Relief</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -159,6 +161,7 @@ export default function HomePage() {
         </div>
       </div>
 
+      </div>
     </div>
   )
 }

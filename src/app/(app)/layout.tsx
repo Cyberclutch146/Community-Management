@@ -37,7 +37,7 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col"
+        className="text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col scroll-smooth overscroll-none"
       >
         <AuthProvider>
           <DynamicBackground>
