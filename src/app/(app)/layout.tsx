@@ -3,6 +3,7 @@ import { Literata, Nunito_Sans } from 'next/font/google';
 import '../globals.css';
 import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
 import { AuthProvider } from '@/context/AuthContext';
+import NavbarTop from '@/components/Navbar_top';
 
 const literata = Literata({
   variable: '--font-literata',
@@ -35,10 +36,10 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-row"
+        className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col"
       >
         <AuthProvider>
-          <SideNav />
+          <NavbarTop/>
           <div className="flex-1 flex flex-col min-w-0">
             <MobileHeader />
             {children}

@@ -51,7 +51,7 @@ export default function RegisterPage() {
 
   return (
     <div className="bg-background text-on-background font-body min-h-[calc(100vh-80px)] flex items-center justify-center p-4 xl:py-12">
-      <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(46,50,48,0.06)] bg-surface-container-lowest min-h-[700px]">
+      <div className="w-full max-w-6xl mx-auto flex flex-col md:flex-row rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(46,50,48,0.06),0_0_60px_10px_rgba(var(--primary),0.35)] bg-surface-container-lowest min-h-[700px]">
         {/* Image Canvas */}
         <div className="hidden md:block md:w-5/12 lg:w-1/2 relative bg-surface-variant">
           <img alt="Planting a sapling" className="absolute inset-0 w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAreKeglV9ZJKv0zGehE1dWVuvZrijPeYA4HQmiOFaMZ5UFVHy1IW_xmFj7ZmVWbkTnEbUm7mi9uEQ7PmFIufwWsH4bZsVoqT7uGgRpLE2rKYui85nDDLq3Te3U3evUqEwira7Ca4IODlVfwWIhRliXqnA0fWrauQ4nRfj7Yw9irLFoSP_jWRarHU2q9nitqm0J98DmRY3QNec-8pYzPPdN73LXN8LnfSYsfSCvgZUotNzZvqvcwImGHu7zz4nhaQIjrdkV8Wn9w7GZ"/>
