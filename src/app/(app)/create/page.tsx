@@ -46,7 +46,7 @@ export default function CreateEventPage() {
           ...(needVols ? { volunteers: { goal: volGoal, current: 0 } } : {})
         }
       });
-      router.push(`/events/${newEventId}`);
+      router.push(`/event/${newEventId}`);
     } catch (err) {
       console.error(err);
       setLoading(false);
