@@ -1,13 +1,13 @@
 'use client';
 
-import { Needs } from '@/types';
+import { EventNeeds } from '@/types';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateDonation, addVolunteerSignup } from '@/services/eventService';
 
 interface DonationPanelProps {
   eventId: string;
-  needs: Needs;
+  needs: EventNeeds;
 }
 
 export function DonationPanel({ eventId, needs }: DonationPanelProps) {

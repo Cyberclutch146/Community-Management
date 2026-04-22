@@ -26,7 +26,7 @@ export default function HomePage() {
             <Filter size={16} />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+          <button onClick={() => router.push('/create')} className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
             <Plus size={16} />
             Create Event
           </button>
@@ -130,7 +130,7 @@ export default function HomePage() {
         <div className="grid grid-cols-3 gap-6">
 
           {/* Card 1 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Medical</span>
             <h3 className="mt-3 font-serif text-lg">First Aid Training Refresher</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -139,7 +139,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Logistics</span>
             <h3 className="mt-3 font-serif text-lg">Transport Fleet Coordination</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -148,7 +148,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3 */}
-          <div className="bg-white rounded-xl p-5 shadow-sm">
+          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Community</span>
             <h3 className="mt-3 font-serif text-lg">Information Desk Relief</h3>
             <p className="text-sm text-gray-600 mt-2">

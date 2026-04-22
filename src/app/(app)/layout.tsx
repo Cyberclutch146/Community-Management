@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Literata, Nunito_Sans } from 'next/font/google';
 import '../globals.css';
-import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
+import { MobileHeader, MobileBottomNav } from '@/components/Navigation';
 import { AuthProvider } from '@/context/AuthContext';
 import NavbarTop from '@/components/Navbar_top';
 
@@ -39,12 +39,18 @@ export default function RootLayout({
         className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col"
       >
         <AuthProvider>
-          <NavbarTop/>
+          <div className="hidden md:block">
+            <NavbarTop/>
+          </div>
           <div className="flex-1 flex flex-col min-w-0">
-            <MobileHeader />
+            <div className="md:hidden">
+              <MobileHeader />
+            </div>
             {children}
           </div>
-          <MobileBottomNav />
+          <div className="md:hidden">
+            <MobileBottomNav />
+          </div>
         </AuthProvider>
       </body>
     </html>
