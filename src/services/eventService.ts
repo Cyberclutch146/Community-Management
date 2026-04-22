@@ -169,6 +169,7 @@ export interface EventVolunteer {
   userName: string;
   userEmail?: string;
   signedUpAt: any;
+  attended?: boolean;
 }
 
 export const getEventVolunteers = async (eventId: string): Promise<EventVolunteer[]> => {
@@ -179,6 +180,14 @@ export const getEventVolunteers = async (eventId: string): Promise<EventVoluntee
     id: doc.id,
     ...doc.data()
   })) as EventVolunteer[];
+};
+
+export const updateVolunteerStatus = async (eventId: string, volunteerId: string, attended: boolean): Promise<void> => {
+  const volunteerRef = doc(db, `${EVENTS_COLLECTION}/${eventId}/volunteers`, volunteerId);
+  await updateDoc(volunteerRef, {
+    attended,
+    updatedAt: new Date()
+  });
 };
 
 export const getRegisteredEvents = async (userId: string): Promise<CommunityEvent[]> => {

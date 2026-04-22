@@ -43,6 +43,7 @@ export interface CommunityEvent {
   status: 'active' | 'completed';
   lat?: number;
   lng?: number;
+  eventDate?: string;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
 }

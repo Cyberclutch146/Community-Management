@@ -18,12 +18,18 @@ export default function CreateEventPage() {
   const [distance, setDistance] = useState('Local');
   const [image, setImage] = useState('https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop');
   const [uploadingImage, setUploadingImage] = useState(false);
+  const [eventDate, setEventDate] = useState('');
+  const [urgency, setUrgency] = useState<'high' | 'normal'>('normal');
   
   const [needFunds, setNeedFunds] = useState(false);
   const [fundGoal, setFundGoal] = useState(1000);
   
   const [needVols, setNeedVols] = useState(false);
   const [volGoal, setVolGoal] = useState(10);
+  
+  const [needGoods, setNeedGoods] = useState(false);
+  const [goodsItem, setGoodsItem] = useState('');
+  const [goodsList, setGoodsList] = useState<string[]>([]);
   
   const [locationName, setLocationName] = useState('');
   const [lat, setLat] = useState<number | undefined>(undefined);
@@ -47,11 +53,13 @@ export default function CreateEventPage() {
         lng,
         distance,
         category,
-        urgency: 'normal',
+        urgency,
         imageUrl: image,
+        eventDate,
         needs: {
           ...(needFunds ? { funds: { goal: fundGoal, current: 0 } } : {}),
-          ...(needVols ? { volunteers: { goal: volGoal, current: 0 } } : {})
+          ...(needVols ? { volunteers: { goal: volGoal, current: 0 } } : {}),
+          ...(needGoods && goodsList.length > 0 ? { goods: goodsList } : {})
         }
       });
       toast.success('Event published successfully!');
@@ -111,6 +119,37 @@ export default function CreateEventPage() {
                 <option>Volunteers</option>
                 <option>Community</option>
               </select>
+            </div>
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-on-surface mb-2">Urgency Level</label>
+              <div className="flex gap-4">
+                <button
+                  type="button"
+                  onClick={() => setUrgency('normal')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${urgency === 'normal' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface border border-outline-variant/50'}`}
+                >
+                  Normal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setUrgency('high')}
+                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${urgency === 'high' ? 'bg-error text-on-error' : 'bg-surface-container-low text-on-surface border border-outline-variant/50'}`}
+                >
+                  High
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-col md:flex-row gap-6">
+            <div className="flex-1">
+              <label className="block text-sm font-semibold text-on-surface mb-2">Event Date & Time</label>
+              <input 
+                type="datetime-local" 
+                className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface" 
+                value={eventDate}
+                onChange={(e) => setEventDate(e.target.value)}
+              />
             </div>
             <div className="flex-1">
               <label className="block text-sm font-semibold text-on-surface mb-2">Event Image</label>
@@ -176,6 +215,62 @@ export default function CreateEventPage() {
                 <label htmlFor="needVols" className="text-sm font-medium">Volunteers</label>
                 {needVols && (
                   <input type="number" value={volGoal} onChange={(e) => setVolGoal(Number(e.target.value))} placeholder="Goal (people)" className="ml-auto w-32 bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-1.5 text-sm" />
+                )}
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center gap-4">
+                  <input type="checkbox" id="needGoods" checked={needGoods} onChange={(e) => setNeedGoods(e.target.checked)} className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" />
+                  <label htmlFor="needGoods" className="text-sm font-medium">Specific Goods</label>
+                </div>
+                {needGoods && (
+                  <div className="pl-9 space-y-3">
+                    <div className="flex gap-2">
+                      <input 
+                        type="text" 
+                        value={goodsItem} 
+                        onChange={(e) => setGoodsItem(e.target.value)} 
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            if (goodsItem.trim()) {
+                              setGoodsList([...goodsList, goodsItem.trim()]);
+                              setGoodsItem('');
+                            }
+                          }
+                        }}
+                        placeholder="Add an item (e.g. Blankets) and press Enter" 
+                        className="flex-1 bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary" 
+                      />
+                      <button 
+                        type="button" 
+                        onClick={() => {
+                          if (goodsItem.trim()) {
+                            setGoodsList([...goodsList, goodsItem.trim()]);
+                            setGoodsItem('');
+                          }
+                        }}
+                        className="bg-primary text-on-primary px-4 py-1.5 rounded-lg text-sm font-bold"
+                      >
+                        Add
+                      </button>
+                    </div>
+                    {goodsList.length > 0 && (
+                      <ul className="space-y-2">
+                        {goodsList.map((item, index) => (
+                          <li key={index} className="flex justify-between items-center bg-surface-container-high px-3 py-2 rounded-lg text-sm">
+                            <span>{item}</span>
+                            <button 
+                              type="button" 
+                              onClick={() => setGoodsList(goodsList.filter((_, i) => i !== index))}
+                              className="text-error hover:bg-error/10 p-1 rounded-md"
+                            >
+                              <span className="material-symbols-outlined text-[16px]">close</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
                 )}
               </div>
             </div>

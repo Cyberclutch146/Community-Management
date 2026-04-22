@@ -106,7 +106,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             eventTitle={event.title}
             eventDescription={event.description}
             eventLocation={event.location}
-            eventTime={event.createdAt?.toDate?.()?.toLocaleString() || 'TBD'}
+            eventTime={event.eventDate ? new Date(event.eventDate).toLocaleString() : (event.createdAt?.toDate?.()?.toLocaleString() || 'TBD')}
             enrolledCount={event.needs?.volunteers?.current || 0}
             needs={event.needs} 
             onActionComplete={refreshEvent} 
