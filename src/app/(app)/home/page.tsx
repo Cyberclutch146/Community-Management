@@ -47,7 +47,7 @@ export default function HomePage() {
   // --------------- Loading State ---------------
   if (loading) {
     return (
-      <div className="min-h-screen bg-[#f5f4f1] flex items-center justify-center">
+      <div className="flex-1 flex flex-col bg-[#f5f4f1] items-center justify-center">
         <Loader2 className="w-8 h-8 animate-spin text-[#1f3d2b]" />
       </div>
     )
@@ -56,7 +56,7 @@ export default function HomePage() {
   // --------------- Empty State ---------------
   if (events.length === 0) {
     return (
-      <div className="min-h-screen bg-[#f5f4f1] text-[#1f3d2b]">
+      <div className="flex-1 flex flex-col bg-[#f5f4f1] text-[#1f3d2b]">
         <div className="px-10 mt-10 flex justify-between items-start">
           <div>
             <h1 className="text-5xl font-serif">Upcoming Events</h1>
@@ -97,8 +97,8 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen text-[#1f3d2b] overscroll-none overflow-x-hidden">
-      <div className="max-w-7xl mx-auto">
+    <main className="flex-1 flex flex-col text-[#1f3d2b] w-full pb-32 md:pb-10">
+      <div className="max-w-7xl mx-auto w-full">
 
       {/* Header */}
       <div className="px-10 mt-12 flex justify-between items-start border-b border-black/5 pb-8">
@@ -259,6 +259,6 @@ export default function HomePage() {
       )}
 
       </div>
-    </div>
+    </main>
   )
 }

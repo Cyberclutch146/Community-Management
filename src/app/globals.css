@@ -54,10 +54,12 @@
   --font-label: 'Nunito Sans', sans-serif;
 }
 
+html,
 body {
   background: var(--color-background);
   color: var(--color-on-background);
   font-family: var(--font-body);
+  overflow-x: hidden;
 }
 
 /* Material Symbols configuration */

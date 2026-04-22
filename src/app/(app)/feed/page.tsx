@@ -12,7 +12,7 @@ const PAGE_SIZE = 12;
 
 export default function FeedPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#f5f4f1] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3d2b]"></div></div>}>
+    <Suspense fallback={<div className="flex-1 flex bg-[#f5f4f1] items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3d2b]"></div></div>}>
       <FeedContent />
     </Suspense>
   );
@@ -85,8 +85,8 @@ function FeedContent() {
   });
 
   return (
-    <div className="min-h-screen text-[#1f3d2b]">
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+    <div className="flex-1 flex flex-col text-[#1f3d2b] w-full">
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
           <p className="text-secondary font-medium mb-1">Local Events Feed</p>

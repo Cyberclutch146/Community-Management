@@ -27,18 +27,18 @@ export default function DynamicBackground({ children }: { children: React.ReactN
   }, [])
 
   return (
-    <div
-      className="min-h-screen w-full transition-colors duration-300 overscroll-none overflow-x-hidden"
-      style={{
-        overscrollBehavior: 'none',
-        WebkitOverflowScrolling: 'auto',
-        background: `
-          radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(31,61,43,0.06), transparent 25%),
-          radial-gradient(circle at 20% 10%, rgba(31,61,43,0.04), transparent 40%),
-          #f5f4f1
-        `
-      }}
-    >
+    <div className="relative min-h-screen flex flex-col w-full">
+      {/* Fixed background layer */}
+      <div
+        className="fixed inset-0 pointer-events-none transition-colors duration-300 z-[-1]"
+        style={{
+          background: `
+            radial-gradient(circle at ${mousePos.x}% ${mousePos.y}%, rgba(31,61,43,0.06), transparent 25%),
+            radial-gradient(circle at 20% 10%, rgba(31,61,43,0.04), transparent 40%),
+            #f5f4f1
+          `
+        }}
+      />
       {children}
     </div>
   )

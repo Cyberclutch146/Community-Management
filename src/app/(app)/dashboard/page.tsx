@@ -49,7 +49,7 @@ export default function DashboardPage() {
 
   if (!user) {
     return (
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10 flex justify-center items-center">
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10 flex justify-center items-center">
         <p className="text-secondary">Please sign in to view your dashboard.</p>
       </main>
     );
@@ -57,14 +57,14 @@ export default function DashboardPage() {
 
   if (loading) {
     return (
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10 flex justify-center items-center">
+      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10 flex justify-center items-center">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
       </main>
     );
   }
 
   return (
-    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
       <div className="mb-10">
         <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Your Impact Dashboard</h2>
         <p className="text-secondary font-medium mt-2">
