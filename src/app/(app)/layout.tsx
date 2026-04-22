@@ -4,6 +4,7 @@ import '../globals.css';
 import { MobileHeader, MobileBottomNav } from '@/components/Navigation';
 import { AuthProvider } from '@/context/AuthContext';
 import NavbarTop from '@/components/Navbar_top';
+import { Toaster } from 'sonner';
 
 const literata = Literata({
   variable: '--font-literata',
@@ -39,6 +40,7 @@ export default function RootLayout({
         className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col"
       >
         <AuthProvider>
+          <Toaster position="top-right" richColors closeButton />
           <div className="hidden md:block">
             <NavbarTop/>
           </div>

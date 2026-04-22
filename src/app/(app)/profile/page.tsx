@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useAuth } from '@/context/AuthContext';
 import { updateUserProfile } from '@/services/userService';
 import { uploadImage } from '@/services/storageService';
+import { toast } from 'sonner';
 
 export default function ProfilePage() {
   const { user, profile } = useAuth();
@@ -53,7 +54,7 @@ export default function ProfilePage() {
       // The profile listener in AuthContext will automatically fetch the new URL.
     } catch (err) {
       console.error("Error uploading image:", err);
-      alert("Failed to upload image. Please check permissions / rules.");
+      toast.error('Failed to upload image. Please check permissions.');
     } finally {
       setUploadingImage(false);
       if (fileInputRef.current) {
@@ -74,9 +75,10 @@ export default function ProfilePage() {
         profileComplete: true
       });
       setIsEditing(false);
+      toast.success('Profile updated!');
     } catch (err) {
       console.error("Error saving profile:", err);
-      alert("Failed to save profile.");
+      toast.error('Failed to save profile. Please try again.');
     } finally {
       setLoading(false);
     }

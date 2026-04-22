@@ -1,12 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
+import { useSearchParams } from 'next/navigation';
 import { EventCard } from '@/components/EventCard';
 import { getEvents } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
+import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
-export default function Home() {
+const PAGE_SIZE = 12;
+
+export default function FeedPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#f5f4f1] flex items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3d2b]"></div></div>}>
+      <FeedContent />
+    </Suspense>
+  );
+}
+
+function FeedContent() {
+  const searchParams = useSearchParams();
+  const urlQuery = searchParams.get('q') || '';
   const [filter, setFilter] = useState('All Events');
+  const [searchQuery, setSearchQuery] = useState(urlQuery);
+
+  // Sync from URL when it changes (e.g. user searches from navbar)
+  useEffect(() => { setSearchQuery(urlQuery) }, [urlQuery]);
 
   const categories = [
     { name: 'All Events', icon: 'tune' },
@@ -18,12 +36,17 @@ export default function Home() {
 
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(false);
+  const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
 
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const data = await getEvents();
-        setEvents(data);
+        const result = await getEvents(PAGE_SIZE);
+        setEvents(result.events);
+        lastDocRef.current = result.lastDoc;
+        setHasMore(result.hasMore);
       } catch (error) {
         console.error("Failed to fetch events:", error);
       } finally {
@@ -33,9 +56,31 @@ export default function Home() {
     fetchEvents();
   }, []);
 
-  const filteredEvents = filter === 'All Events' 
-    ? events 
-    : events.filter(e => e.category === filter);
+  const loadMore = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    try {
+      const result = await getEvents(PAGE_SIZE, lastDocRef.current);
+      setEvents(prev => [...prev, ...result.events]);
+      lastDocRef.current = result.lastDoc;
+      setHasMore(result.hasMore);
+    } catch (error) {
+      console.error("Failed to load more events:", error);
+    } finally {
+      setLoadingMore(false);
+    }
+  };
+
+  const filteredEvents = events.filter(e => {
+    // Category filter
+    if (filter !== 'All Events' && e.category !== filter) return false;
+    // Text search filter
+    if (searchQuery) {
+      const q = searchQuery.toLowerCase();
+      return e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q);
+    }
+    return true;
+  });
 
   return (
     <div className="min-h-screen bg-[#f5f4f1] text-[#1f3d2b]">
@@ -44,6 +89,13 @@ export default function Home() {
         <div>
           <p className="text-secondary font-medium mb-1">Local Events Feed</p>
           <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Discover & Support</h2>
+          {searchQuery && (
+            <div className="mt-3 flex items-center gap-2">
+              <span className="text-sm text-gray-500">Showing results for</span>
+              <span className="bg-[#1f3d2b]/10 text-[#1f3d2b] text-sm font-medium px-3 py-1 rounded-full">&ldquo;{searchQuery}&rdquo;</span>
+              <button onClick={() => setSearchQuery('')} className="text-xs text-gray-400 hover:text-red-500 transition-colors ml-1">✕ Clear</button>
+            </div>
+          )}
         </div>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50">
@@ -59,7 +111,7 @@ export default function Home() {
 
       <section className="mb-8 overflow-x-auto pb-4 no-scrollbar">
         <div className="flex gap-3 min-w-max">
-          {categories.map((cat, index) => {
+          {categories.map((cat) => {
             const isActive = filter === cat.name;
             return (
               <button
@@ -100,10 +152,21 @@ export default function Home() {
         </div>
       )}
 
-      {filteredEvents.length > 0 && !loading && (
+      {hasMore && !loading && (
         <div className="mt-12 flex justify-center">
-          <button className="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors">
-            Load More Events
+          <button 
+            onClick={loadMore}
+            disabled={loadingMore}
+            className="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors disabled:opacity-50 flex items-center gap-2"
+          >
+            {loadingMore ? (
+              <>
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                Loading...
+              </>
+            ) : (
+              'Load More Events'
+            )}
           </button>
         </div>
       )}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { createEvent } from '@/services/eventService';
 import { uploadImage } from '@/services/storageService';
+import { toast } from 'sonner';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -46,9 +47,11 @@ export default function CreateEventPage() {
           ...(needVols ? { volunteers: { goal: volGoal, current: 0 } } : {})
         }
       });
+      toast.success('Event published successfully!');
       router.push(`/event/${newEventId}`);
     } catch (err) {
       console.error(err);
+      toast.error('Failed to create event. Please try again.');
       setLoading(false);
     }
   };
@@ -122,7 +125,7 @@ export default function CreateEventPage() {
                         setImage(url);
                       } catch(err) {
                         console.error('Failed to upload image', err);
-                        alert('Failed to upload image. Please check permissions / rules.');
+                        toast.error('Failed to upload image. Please check permissions.');
                       } finally {
                         setUploadingImage(false);
                       }

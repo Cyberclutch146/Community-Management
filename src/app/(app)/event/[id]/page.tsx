@@ -6,7 +6,7 @@ import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ChatBox';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect, use, useCallback } from 'react';
 import { getEventById } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
 
@@ -29,6 +29,15 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
       }
     };
     fetchEvent();
+  }, [id]);
+
+  const refreshEvent = useCallback(async () => {
+    try {
+      const data = await getEventById(id);
+      if (data) setEvent(data);
+    } catch (err) {
+      console.error('Failed to refresh event:', err);
+    }
   }, [id]);
 
   if (loading) {
@@ -92,7 +101,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="w-full lg:w-[400px] flex-shrink-0">
-          <DonationPanel eventId={event.id} needs={event.needs} />
+          <DonationPanel eventId={event.id} needs={event.needs} onActionComplete={refreshEvent} />
         </div>
       </div>
     </main>

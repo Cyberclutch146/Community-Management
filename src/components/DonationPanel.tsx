@@ -4,13 +4,15 @@ import { EventNeeds } from '@/types';
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateDonation, addVolunteerSignup } from '@/services/eventService';
+import { toast } from 'sonner';
 
 interface DonationPanelProps {
   eventId: string;
   needs: EventNeeds;
+  onActionComplete?: () => void;
 }
 
-export function DonationPanel({ eventId, needs }: DonationPanelProps) {
+export function DonationPanel({ eventId, needs, onActionComplete }: DonationPanelProps) {
   const { user, profile } = useAuth();
   const [pledged, setPledged] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -19,27 +21,34 @@ export function DonationPanel({ eventId, needs }: DonationPanelProps) {
   );
 
   const handleDonate = async () => {
-    if (!user || loading) return;
+    if (!user) { toast.info('Please sign in to donate'); return; }
+    if (loading) return;
     setLoading(true);
     try {
-      // simulate donating $10
-      await updateDonation(eventId, needs.funds?.current || 0, 10);
+      await updateDonation(eventId, 10);
       setPledged(true);
+      toast.success('Thank you for your $10 donation!');
+      onActionComplete?.();
     } catch (err) {
       console.error(err);
+      toast.error('Donation failed. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const handleVolunteer = async () => {
-    if (!user || !profile || loading) return;
+    if (!user || !profile) { toast.info('Please sign in to volunteer'); return; }
+    if (loading) return;
     setLoading(true);
     try {
-      await addVolunteerSignup(eventId, user.uid, profile.displayName || 'Anonymous', needs.volunteers?.current || 0);
+      await addVolunteerSignup(eventId, user.uid, profile.displayName || 'Anonymous');
       setPledged(true);
+      toast.success('You\'re signed up! The organizer will contact you.');
+      onActionComplete?.();
     } catch (err) {
       console.error(err);
+      toast.error('Sign-up failed. Please try again.');
     } finally {
       setLoading(false);
     }
