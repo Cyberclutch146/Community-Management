@@ -10,23 +10,23 @@ const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 export default function HomePage() {
   const router = useRouter()
   return (
-    <div className="min-h-screen bg-[#f5f4f1] text-[#1f3d2b]">
+    <div className="min-h-screen text-[#1f3d2b]">
 
       {/* Header */}
-      <div className="px-10 mt-10 flex justify-between items-start">
+      <div className="px-10 mt-12 flex justify-between items-start">
         <div>
-          <h1 className="text-5xl font-serif">Upcoming Events</h1>
-          <p className="mt-3 text-gray-600 max-w-xl">
+          <h1 className="text-5xl font-serif tracking-tight">Upcoming Events</h1>
+          <p className="mt-3 text-gray-600 leading-relaxed max-w-xl">
             Join local community efforts and coordination meetings. Your participation makes a tangible difference.
           </p>
         </div>
 
         <div className="flex gap-4 mt-6">
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#e7e4de] hover:bg-[#dedbd5] hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#e7e4de] hover:bg-[#dedbd5] hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out font-medium tracking-wide">
             <Filter size={16} />
             Filter
           </button>
-          <button onClick={() => router.push('/create')} className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
             <Plus size={16} />
             Create Event
           </button>
@@ -34,10 +34,10 @@ export default function HomePage() {
       </div>
 
       {/* Main Section */}
-      <div className="px-10 mt-10 grid grid-cols-3 gap-6">
+      <div className="px-10 mt-12 grid grid-cols-3 gap-6">
 
         {/* Large Card */}
-        <div className="col-span-2 rounded-xl overflow-hidden relative bg-gradient-to-r from-teal-600 to-green-700 text-white p-6 flex flex-col justify-end h-[410px]">
+        <div className="col-span-2 rounded-xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-6 flex flex-col justify-end h-[410px] hover:-translate-y-[2px] transition-all duration-200">
           <div className="flex gap-2 mb-2">
             <span className="bg-yellow-300 text-black text-xs px-3 py-1 rounded-full">Critical Need</span>
             <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">Supply Sorting</span>
@@ -53,14 +53,14 @@ export default function HomePage() {
         <div className="flex flex-col gap-4">
 
           {/* Main Details */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5">
             <h3 className="text-xl font-serif mb-5">Event Details</h3>
 
             <div className="space-y-5 text-sm">
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Calendar size={18} className="text-[#1f3d2b]/90" strokeWidth={1.8} />
+                  <Calendar size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">Tomorrow, Oct 24</p>
@@ -70,7 +70,7 @@ export default function HomePage() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <MapPin size={18} className="text-[#1f3d2b]/90" strokeWidth={1.8} />
+                  <MapPin size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">Community Center West</p>
@@ -80,12 +80,12 @@ export default function HomePage() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Users size={18} className="text-[#1f3d2b]/90 translate-x-[1px]" strokeWidth={1.8} />
+                  <Users size={18} className="text-[#1f3d2b]/80 translate-x-[1px]" strokeWidth={1.8} />
                 </div>
                 <div className="w-full">
                   <p className="font-medium">45 / 100 Volunteers Needed</p>
-                  <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                    <div className="w-[45%] h-2 bg-[#1f3d2b] rounded-full"></div>
+                  <div className="w-full h-[6px] bg-gray-200 rounded-full mt-2">
+                    <div className="w-[45%] h-[6px] bg-[#1f3d2b] rounded-full"></div>
                   </div>
                 </div>
               </div>
@@ -98,7 +98,7 @@ export default function HomePage() {
           </div>
 
           {/* Organizer Card */}
-          <div className="bg-[#efede7] rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-[#efede7]/80 backdrop-blur-sm rounded-2xl p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#1f3d2b]/20"></div>
               <div>
@@ -116,7 +116,7 @@ export default function HomePage() {
       </div>
 
       {/* More Opportunities */}
-      <div className="px-10 mt-14">
+      <div className="px-10 mt-16">
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-serif">More Opportunities</h2>
           <button
@@ -130,7 +130,7 @@ export default function HomePage() {
         <div className="grid grid-cols-3 gap-6">
 
           {/* Card 1 */}
-          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div className="bg-white rounded-xl p-5 shadow-sm">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Medical</span>
             <h3 className="mt-3 font-serif text-lg">First Aid Training Refresher</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -139,7 +139,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 2 */}
-          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div className="bg-white rounded-xl p-5 shadow-sm">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Logistics</span>
             <h3 className="mt-3 font-serif text-lg">Transport Fleet Coordination</h3>
             <p className="text-sm text-gray-600 mt-2">
@@ -148,7 +148,7 @@ export default function HomePage() {
           </div>
 
           {/* Card 3 */}
-          <div onClick={() => router.push('/feed')} className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200">
+          <div className="bg-white rounded-xl p-5 shadow-sm">
             <span className="text-xs bg-gray-200 px-3 py-1 rounded-full">Community</span>
             <h3 className="mt-3 font-serif text-lg">Information Desk Relief</h3>
             <p className="text-sm text-gray-600 mt-2">

@@ -38,7 +38,7 @@ export default function Home() {
     : events.filter(e => e.category === filter);
 
   return (
-    <div className="min-h-screen bg-[#f5f4f1] text-[#1f3d2b]">
+    <div className="min-h-screen text-[#1f3d2b]">
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
         <div>
