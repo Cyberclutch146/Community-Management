@@ -101,7 +101,16 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
         </div>
 
         <div className="w-full lg:w-[400px] flex-shrink-0">
-          <DonationPanel eventId={event.id} needs={event.needs} onActionComplete={refreshEvent} />
+          <DonationPanel 
+            eventId={event.id} 
+            eventTitle={event.title}
+            eventDescription={event.description}
+            eventLocation={event.location}
+            eventTime={event.createdAt?.toDate?.()?.toLocaleString() || 'TBD'}
+            enrolledCount={event.needs?.volunteers?.current || 0}
+            needs={event.needs} 
+            onActionComplete={refreshEvent} 
+          />
         </div>
       </div>
     </main>
