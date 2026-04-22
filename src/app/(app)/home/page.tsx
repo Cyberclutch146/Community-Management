@@ -96,23 +96,24 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f5f4f1] text-[#1f3d2b]">
+    <div className="min-h-screen text-[#1f3d2b] overscroll-none overflow-x-hidden">
+      <div className="max-w-7xl mx-auto">
 
       {/* Header */}
-      <div className="px-10 mt-10 flex justify-between items-start">
+      <div className="px-10 mt-12 flex justify-between items-start border-b border-black/5 pb-8">
         <div>
-          <h1 className="text-5xl font-serif">Upcoming Events</h1>
-          <p className="mt-3 text-gray-600 max-w-xl">
+          <h1 className="text-5xl font-serif tracking-tight">Upcoming Events</h1>
+          <p className="mt-3 text-gray-600 leading-relaxed max-w-xl">
             Join local community efforts and coordination meetings. Your participation makes a tangible difference.
           </p>
         </div>
 
         <div className="flex gap-4 mt-6">
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#e7e4de] hover:bg-[#dedbd5] hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#e7e4de] hover:bg-[#dedbd5] hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out font-medium tracking-wide">
             <Filter size={16} />
             Filter
           </button>
-          <button onClick={() => router.push('/create')} className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1f3d2b] text-white font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out">
             <Plus size={16} />
             Create Event
           </button>
@@ -120,12 +121,12 @@ export default function HomePage() {
       </div>
 
       {/* Main Section */}
-      <div className="px-10 mt-10 grid grid-cols-3 gap-6">
+      <div className="px-10 mt-12 grid grid-cols-3 gap-6">
 
         {/* Large Featured Card — links to the event detail page */}
         <div
           onClick={() => router.push(`/event/${featured!.id}`)}
-          className="col-span-2 rounded-xl overflow-hidden relative bg-gradient-to-r from-teal-600 to-green-700 text-white p-6 flex flex-col justify-end h-[410px] cursor-pointer group"
+          className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300 cursor-pointer group"
         >
           {featured!.imageUrl && (
             <img
@@ -134,6 +135,7 @@ export default function HomePage() {
               className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
             />
           )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
           <div className="relative z-10">
             <div className="flex gap-2 mb-2">
               {featured!.urgency === 'high' && (
@@ -151,14 +153,14 @@ export default function HomePage() {
         <div className="flex flex-col gap-4">
 
           {/* Main Details */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm">
+          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-200">
             <h3 className="text-xl font-serif mb-5">Event Details</h3>
 
             <div className="space-y-5 text-sm">
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Calendar size={18} className="text-[#1f3d2b]/90" strokeWidth={1.8} />
+                  <Calendar size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">{formatDate(featured!.createdAt)}</p>
@@ -168,7 +170,7 @@ export default function HomePage() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <MapPin size={18} className="text-[#1f3d2b]/90" strokeWidth={1.8} />
+                  <MapPin size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">{featured!.location}</p>
@@ -178,12 +180,12 @@ export default function HomePage() {
 
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Users size={18} className="text-[#1f3d2b]/90 translate-x-[1px]" strokeWidth={1.8} />
+                  <Users size={18} className="text-[#1f3d2b]/80 translate-x-[1px]" strokeWidth={1.8} />
                 </div>
                 <div className="w-full">
                   <p className="font-medium">{volCurrent} / {volGoal} Volunteers Needed</p>
-                  <div className="w-full h-2 bg-gray-200 rounded-full mt-2">
-                    <div className="h-2 bg-[#1f3d2b] rounded-full transition-all duration-500" style={{ width: `${volPercent}%` }}></div>
+                  <div className="w-full h-[6px] bg-gray-200 rounded-full mt-2">
+                    <div className="h-[6px] bg-[#1f3d2b] rounded-full transition-all duration-500" style={{ width: `${volPercent}%` }}></div>
                   </div>
                 </div>
               </div>
@@ -199,7 +201,7 @@ export default function HomePage() {
           </div>
 
           {/* Organizer Card */}
-          <div className="bg-[#efede7] rounded-2xl p-4 flex items-center justify-between">
+          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-black/5 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-[#1f3d2b]/20"></div>
               <div>
@@ -218,7 +220,7 @@ export default function HomePage() {
 
       {/* More Opportunities */}
       {moreEvents.length > 0 && (
-        <div className="px-10 mt-14 pb-10">
+        <div className="px-10 mt-20 pb-10">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-serif">More Opportunities</h2>
             <button
@@ -234,7 +236,7 @@ export default function HomePage() {
               <div
                 key={evt.id}
                 onClick={() => router.push(`/event/${evt.id}`)}
-                className="bg-white rounded-xl p-5 shadow-sm cursor-pointer hover:-translate-y-1 hover:shadow-md transition-all duration-200"
+                className="bg-white rounded-xl p-5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
               >
                 <span className={`text-xs px-3 py-1 rounded-full ${badgeColor(evt.category)}`}>{evt.category}</span>
                 <h3 className="mt-3 font-serif text-lg">{evt.title}</h3>
@@ -245,6 +247,7 @@ export default function HomePage() {
         </div>
       )}
 
+      </div>
     </div>
   )
 }

@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import { Literata, Nunito_Sans } from 'next/font/google';
 import '../globals.css';
-import { MobileHeader, MobileBottomNav } from '@/components/Navigation';
+import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
 import { AuthProvider } from '@/context/AuthContext';
 import NavbarTop from '@/components/Navbar_top';
 import { Toaster } from 'sonner';
+import DynamicBackground from '@/components/DynamicBackground';
 
 const literata = Literata({
   variable: '--font-literata',
@@ -37,22 +38,22 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="bg-background text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col"
+        className="text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col md:flex-col scroll-smooth overscroll-none"
       >
         <AuthProvider>
           <Toaster position="top-right" richColors closeButton />
-          <div className="hidden md:block">
-            <NavbarTop/>
-          </div>
-          <div className="flex-1 flex flex-col min-w-0">
-            <div className="md:hidden">
-              <MobileHeader />
+          <DynamicBackground>
+            <div className="fixed top-0 left-0 w-full z-50 hidden md:block">
+              <NavbarTop />
             </div>
-            {children}
-          </div>
-          <div className="md:hidden">
+            <div className="flex-1 flex flex-col min-w-0 md:pt-24">
+              <div className="md:hidden">
+                <MobileHeader />
+              </div>
+              {children}
+            </div>
             <MobileBottomNav />
-          </div>
+          </DynamicBackground>
         </AuthProvider>
       </body>
     </html>
