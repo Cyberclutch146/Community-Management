@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
@@ -54,7 +54,7 @@ export const getEventById = async (eventId: string): Promise<CommunityEvent | nu
 // ─── Events by organizer (for Dashboard) ────────────────
 export const getEventsByOrganizer = async (userId: string): Promise<CommunityEvent[]> => {
   const eventsRef = collection(db, EVENTS_COLLECTION);
-  const q = query(eventsRef, where('organizerId', '==', userId), orderBy('createdAt', 'desc'));
+  const q = query(eventsRef, where('organizerId', '==', userId));
   const snapshot = await getDocs(q);
 
   return snapshot.docs.map(doc => ({
@@ -152,6 +152,14 @@ export const addVolunteerSignup = async (eventId: string, userId: string, userNa
     userEmail,
     signedUpAt: new Date()
   });
+
+  // Also track at the user level for easy retrieval in dashboard
+  const userRegistrationRef = doc(db, `users/${userId}/registrations`, eventId);
+  await setDoc(userRegistrationRef, {
+    eventId,
+    signedUpAt: new Date(),
+    status: 'registered'
+  });
 };
 
 // ─── Volunteer Fetching ──────────────────────────────────
@@ -171,6 +179,23 @@ export const getEventVolunteers = async (eventId: string): Promise<EventVoluntee
     id: doc.id,
     ...doc.data()
   })) as EventVolunteer[];
+};
+
+export const getRegisteredEvents = async (userId: string): Promise<CommunityEvent[]> => {
+  const registrationsRef = collection(db, `users/${userId}/registrations`);
+  const snapshot = await getDocs(registrationsRef);
+  const eventIds = snapshot.docs.map(doc => doc.id);
+  
+  if (eventIds.length === 0) return [];
+  
+  // Fetch full event details for each registered event
+  const events: CommunityEvent[] = [];
+  for (const id of eventIds) {
+    const event = await getEventById(id);
+    if (event) events.push(event);
+  }
+  
+  return events;
 };
 
 // ─── Bulk Coordinate Backfill ────────────────────────────
