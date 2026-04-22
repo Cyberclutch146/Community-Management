@@ -88,8 +88,11 @@ export const geocodeLocation = async (address: string): Promise<{lat: number, ln
 export const createEvent = async (data: CommunityEventCreate): Promise<string> => {
   const eventsRef = collection(db, EVENTS_COLLECTION);
   
-  let coords = null;
-  if (data.location) {
+  let coords = (data.lat !== undefined && data.lng !== undefined) 
+    ? { lat: data.lat, lng: data.lng } 
+    : null;
+
+  if (!coords && data.location) {
     coords = await geocodeLocation(data.location);
   }
 

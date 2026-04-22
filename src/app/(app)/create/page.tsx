@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { createEvent } from '@/services/eventService';
 import { uploadImage } from '@/services/storageService';
 import { toast } from 'sonner';
+import LocationPickerWrapper from '@/components/LocationPickerWrapper';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -24,6 +25,10 @@ export default function CreateEventPage() {
   const [needVols, setNeedVols] = useState(false);
   const [volGoal, setVolGoal] = useState(10);
   
+  const [locationName, setLocationName] = useState('');
+  const [lat, setLat] = useState<number | undefined>(undefined);
+  const [lng, setLng] = useState<number | undefined>(undefined);
+  
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -37,7 +42,9 @@ export default function CreateEventPage() {
         description,
         organizer: profile.displayName || 'Anonymous',
         organizerId: user.uid,
-        location: profile.location || 'Unknown Location',
+        location: locationName || profile.location || 'Unknown Location',
+        lat,
+        lng,
         distance,
         category,
         urgency: 'normal',
@@ -140,6 +147,18 @@ export default function CreateEventPage() {
               </div>
               <p className="text-xs text-on-surface-variant mt-2">Optional. Leave blank to use a default image.</p>
             </div>
+          </div>
+
+          <div className="border-t border-outline-variant/30 pt-6">
+            <label className="block text-sm font-semibold text-on-surface mb-2">Event Location</label>
+            <p className="text-xs text-on-surface-variant mb-4">Search for an address or click on the map to set the exact location.</p>
+            <LocationPickerWrapper 
+              onLocationSelect={(loc) => {
+                setLocationName(loc.name);
+                setLat(loc.lat);
+                setLng(loc.lng);
+              }}
+            />
           </div>
 
           <div className="border border-outline-variant/50 rounded-xl p-4 bg-surface-container-lowest">
