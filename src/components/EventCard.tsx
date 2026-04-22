@@ -65,7 +65,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
                 <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${event.progress}%` }}></div>
               </div>
             </div>
-            <Link href={`/events/${event.id}`} className="w-full md:w-auto bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-bright inline-block text-center">
+            <Link href={`/event/${event.id}`} className="w-full md:w-auto bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-bright inline-block text-center">
               View Details
             </Link>
           </div>
@@ -122,7 +122,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
             </div>
           )}
         </div>
-        <Link href={`/events/${event.id}`} className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
+        <Link href={`/event/${event.id}`} className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
           View Details <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
         </Link>
       </div>
