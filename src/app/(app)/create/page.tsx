@@ -7,6 +7,7 @@ import { createEvent } from '@/services/eventService';
 import { uploadImage } from '@/services/storageService';
 import { toast } from 'sonner';
 import LocationPickerWrapper from '@/components/LocationPickerWrapper';
+import DateTimePicker from '@/components/DateTimePicker';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -144,11 +145,9 @@ export default function CreateEventPage() {
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
               <label className="block text-sm font-semibold text-on-surface mb-2">Event Date & Time</label>
-              <input 
-                type="datetime-local" 
-                className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface" 
+              <DateTimePicker 
                 value={eventDate}
-                onChange={(e) => setEventDate(e.target.value)}
+                onChange={(val) => setEventDate(val)}
               />
             </div>
             <div className="flex-1">
