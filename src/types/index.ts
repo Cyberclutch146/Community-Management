@@ -41,6 +41,8 @@ export interface CommunityEvent {
   needs: EventNeeds;
   progress: number;
   status: 'active' | 'completed';
+  lat?: number;
+  lng?: number;
   createdAt: Timestamp | null;
   updatedAt: Timestamp | null;
 }

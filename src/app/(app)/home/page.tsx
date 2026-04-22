@@ -6,6 +6,7 @@ import { Filter, Plus, Calendar, MapPin, Users, Mail, Loader2 } from 'lucide-rea
 import { getEvents } from '@/services/eventService'
 import { useAuth } from '@/context/AuthContext'
 import { CommunityEvent } from '@/types'
+import MapWrapper from '@/components/MapWrapper'
 
 export default function HomePage() {
   const router = useRouter()
@@ -215,6 +216,16 @@ export default function HomePage() {
             </button>
           </div>
 
+        </div>
+      </div>
+
+      {/* Interactive Map Section */}
+      <div className="px-10 mt-16 pb-4">
+        <div className="flex items-center justify-between mb-6">
+          <h2 className="text-2xl font-serif">Explore on Map</h2>
+        </div>
+        <div className="h-[400px] w-full">
+          <MapWrapper events={events} />
         </div>
       </div>
 

@@ -42,7 +42,7 @@ export function DonationPanel({ eventId, needs, onActionComplete }: DonationPane
     if (loading) return;
     setLoading(true);
     try {
-      await addVolunteerSignup(eventId, user.uid, profile.displayName || 'Anonymous');
+      await addVolunteerSignup(eventId, user.uid, profile.displayName || 'Anonymous', user.email || '');
       setPledged(true);
       toast.success('You\'re signed up! The organizer will contact you.');
       onActionComplete?.();

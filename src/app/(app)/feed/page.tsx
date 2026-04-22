@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense, useRef } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { EventCard } from '@/components/EventCard';
 import { getEvents } from '@/services/eventService';
+import MapWrapper from '@/components/MapWrapper';
 import { CommunityEvent } from '@/types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 
@@ -22,6 +23,7 @@ function FeedContent() {
   const urlQuery = searchParams.get('q') || '';
   const [filter, setFilter] = useState('All Events');
   const [searchQuery, setSearchQuery] = useState(urlQuery);
+  const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
 
   // Sync from URL when it changes (e.g. user searches from navbar)
   useEffect(() => { setSearchQuery(urlQuery) }, [urlQuery]);
@@ -98,6 +100,20 @@ function FeedContent() {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <div className="flex bg-white rounded-full p-1 border border-black/5 shadow-sm">
+            <button
+              onClick={() => setViewMode('list')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-[#1f3d2b] text-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
+            >
+              List
+            </button>
+            <button
+              onClick={() => setViewMode('map')}
+              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-[#1f3d2b] text-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
+            >
+              Map
+            </button>
+          </div>
           <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50">
             <span className="material-symbols-outlined text-secondary mr-2 text-sm">location_on</span>
             <select className="bg-transparent border-none text-sm font-medium text-on-surface focus:ring-0 p-0 pr-6 outline-none appearance-none cursor-pointer">
@@ -143,6 +159,10 @@ function FeedContent() {
           <span className="material-symbols-outlined text-4xl mb-4 text-primary">event_busy</span>
           <h3 className="font-headline text-xl font-bold mb-2 text-on-surface">No events found</h3>
           <p>No events are currently scheduled matching this criteria. Be the first to create one!</p>
+        </div>
+      ) : viewMode === 'map' ? (
+        <div className="h-[600px] w-full mt-4">
+          <MapWrapper events={filteredEvents} />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

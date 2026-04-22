@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventsByOrganizer } from '@/services/eventService';
+import { getEventsByOrganizer, backfillEventCoordinates } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
 import Image from 'next/image';
 
@@ -12,6 +12,20 @@ export default function DashboardPage() {
   const { user, profile } = useAuth();
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [loading, setLoading] = useState(true);
+  const [backfilling, setBackfilling] = useState(false);
+
+  const handleBackfill = async () => {
+    if (!confirm('This will sequentially geocode all events missing coordinates. It takes ~1.5s per event. Continue?')) return;
+    setBackfilling(true);
+    try {
+      const res = await backfillEventCoordinates();
+      alert(`Backfill complete: Updated ${res.updated}, Failed ${res.failed} out of ${res.total} total events.`);
+    } catch (err) {
+      alert('Error backfilling: ' + String(err));
+    } finally {
+      setBackfilling(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) { setLoading(false); return; }
@@ -88,13 +102,23 @@ export default function DashboardPage() {
       {/* ── Events Grid ── */}
       <div className="mb-6 flex items-center justify-between">
         <h3 className="font-headline text-xl font-bold text-on-surface">Your Events</h3>
-        <button
-          onClick={() => router.push('/create')}
-          className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center gap-2"
-        >
-          <span className="material-symbols-outlined text-[18px]">add</span>
-          New Event
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleBackfill}
+            disabled={backfilling}
+            className="bg-surface-variant text-on-surface-variant px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-outline-variant transition-colors flex items-center gap-2 disabled:opacity-50"
+          >
+            <span className="material-symbols-outlined text-[18px]">map</span>
+            {backfilling ? 'Backfilling...' : 'Admin: Backfill Coordinates'}
+          </button>
+          <button
+            onClick={() => router.push('/create')}
+            className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            New Event
+          </button>
+        </div>
       </div>
 
       {events.length === 0 ? (
@@ -120,7 +144,7 @@ export default function DashboardPage() {
             return (
               <button
                 key={event.id}
-                onClick={() => router.push(`/event/${event.id}`)}
+                onClick={() => router.push(`/dashboard/event/${event.id}`)}
                 className="bg-surface-bright rounded-2xl border border-outline-variant/30 overflow-hidden text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
               >
                 <div className="relative h-40 w-full overflow-hidden">

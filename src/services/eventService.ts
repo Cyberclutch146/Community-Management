@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, query, orderBy, runTransaction, where, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
@@ -63,11 +63,39 @@ export const getEventsByOrganizer = async (userId: string): Promise<CommunityEve
   })) as CommunityEvent[];
 };
 
+// ─── Geocoding Helper ────────────────────────────────────
+export const geocodeLocation = async (address: string): Promise<{lat: number, lng: number} | null> => {
+  try {
+    const response = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}`, {
+      headers: {
+        'User-Agent': 'CommunityManagementApp/1.0'
+      }
+    });
+    const data = await response.json();
+    if (data && data.length > 0) {
+      return {
+        lat: parseFloat(data[0].lat),
+        lng: parseFloat(data[0].lon) // Nominatim returns 'lon' instead of 'lng'
+      };
+    }
+  } catch (error) {
+    console.error('Geocoding error:', error);
+  }
+  return null;
+};
+
 // ─── Create ─────────────────────────────────────────────
 export const createEvent = async (data: CommunityEventCreate): Promise<string> => {
   const eventsRef = collection(db, EVENTS_COLLECTION);
+  
+  let coords = null;
+  if (data.location) {
+    coords = await geocodeLocation(data.location);
+  }
+
   const docRef = await addDoc(eventsRef, {
     ...data,
+    ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
     progress: 0,
     status: 'active',
     createdAt: new Date(),
@@ -96,7 +124,7 @@ export const updateDonation = async (eventId: string, amount: number): Promise<v
 };
 
 // ─── Volunteer signup (transactional) ───────────────────
-export const addVolunteerSignup = async (eventId: string, userId: string, userName: string): Promise<void> => {
+export const addVolunteerSignup = async (eventId: string, userId: string, userName: string, userEmail: string = ''): Promise<void> => {
   const eventRef = doc(db, EVENTS_COLLECTION, eventId);
 
   await runTransaction(db, async (transaction) => {
@@ -118,6 +146,53 @@ export const addVolunteerSignup = async (eventId: string, userId: string, userNa
   await addDoc(volunteerRef, {
     userId,
     userName,
+    userEmail,
     signedUpAt: new Date()
   });
+};
+
+// ─── Volunteer Fetching ──────────────────────────────────
+export interface EventVolunteer {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail?: string;
+  signedUpAt: any;
+}
+
+export const getEventVolunteers = async (eventId: string): Promise<EventVolunteer[]> => {
+  const volunteerRef = collection(db, `${EVENTS_COLLECTION}/${eventId}/volunteers`);
+  const snapshot = await getDocs(query(volunteerRef, orderBy('signedUpAt', 'desc')));
+  
+  return snapshot.docs.map(doc => ({
+    id: doc.id,
+    ...doc.data()
+  })) as EventVolunteer[];
+};
+
+// ─── Bulk Coordinate Backfill ────────────────────────────
+export const backfillEventCoordinates = async (): Promise<{ total: number, updated: number, failed: number }> => {
+  const eventsRef = collection(db, EVENTS_COLLECTION);
+  const snapshot = await getDocs(eventsRef);
+  let updated = 0;
+  let failed = 0;
+  
+  for (const docSnap of snapshot.docs) {
+    const data = docSnap.data();
+    if (data.lat === undefined || data.lng === undefined) {
+      if (data.location) {
+        // Respect Nominatim limits by waiting ~1.5s per request
+        await new Promise(resolve => setTimeout(resolve, 1500));
+        const coords = await geocodeLocation(data.location);
+        if (coords) {
+          await updateDoc(docSnap.ref, { lat: coords.lat, lng: coords.lng });
+          updated++;
+        } else {
+          failed++;
+        }
+      }
+    }
+  }
+  
+  return { total: snapshot.docs.length, updated, failed };
 };
