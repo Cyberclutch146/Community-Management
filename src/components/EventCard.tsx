@@ -146,6 +146,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
           View Details <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
         </Link>
       </div>
+      </div>
     </article>
   );
 }

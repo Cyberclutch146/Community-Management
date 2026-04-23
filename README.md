@@ -2,7 +2,7 @@
 
 **Kindred Relief Network** is a community-driven platform designed to coordinate disaster relief efforts, manage volunteer activities, and facilitate community mutual aid. Built with speed and compassion in mind, KRN empowers local communities to organize quickly during times of need.
 
-![Kindred Relief Network](public/banner.png)
+<img src="./public/banner.png" alt="Kindred Relief Network" width="100%" />
 
 ## 🌟 Key Features
 
