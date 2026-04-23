@@ -60,7 +60,7 @@ export default function AIChatWidget() {
       console.error('Chat error:', error);
       setMessages(prev => [...prev, { 
         role: 'assistant', 
-        content: 'Sorry, I am having trouble connecting right now. Please try again later.' 
+        content: error.message || 'Sorry, I am having trouble connecting right now. Please try again later.' 
       }]);
     } finally {
       setIsLoading(false);
