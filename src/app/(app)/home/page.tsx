@@ -250,7 +250,7 @@ export default function HomePage() {
                 className="bg-surface-container rounded-xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-outline-variant/20 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
               >
                 <div className="h-32 w-full relative">
-                  <img src={evt.imageUrl || evt.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} alt={evt.title} className="w-full h-full object-cover" />
+                  <img src={evt.imageUrl || evt.image || '/logo.svg'} alt={evt.title} className="w-full h-full object-cover" />
                   <div className="absolute top-2 left-2">
                     <span className={`text-[10px] px-2 py-0.5 rounded-full ${badgeColor(evt.category)}`}>{evt.category}</span>
                   </div>

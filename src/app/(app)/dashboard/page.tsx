@@ -178,7 +178,7 @@ function EventCard({ event, onClick }: { event: CommunityEvent, onClick: () => v
     >
       <div className="relative h-40 w-full overflow-hidden">
         <Image
-          src={event.imageUrl || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=800&auto=format&fit=crop'}
+          src={event.imageUrl || '/logo.svg'}
           alt={event.title}
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"

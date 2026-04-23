@@ -106,6 +106,21 @@ export const mockEvents: Event[] = [
     },
     progress: 64,
     category: 'Urgent Needs',
+  },
+  {
+    id: 'e5',
+    title: 'Community Mental Health Workshop',
+    organizer: 'Kindred Minds',
+    location: 'Community Center',
+    distance: '2.1 mi away',
+    description: 'A free workshop on managing stress and supporting neighbors during difficult times. No image provided, should show fallback logo.',
+    urgency: 'normal',
+    image: '',
+    needs: {
+      volunteers: { current: 2, goal: 10 },
+    },
+    progress: 20,
+    category: 'Community',
   }
 ];
 

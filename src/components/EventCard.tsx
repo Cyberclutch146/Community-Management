@@ -15,7 +15,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
           <Image 
             alt={event.title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-            src={event.imageUrl || event.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} 
+            src={event.imageUrl || event.image || '/logo.svg'} 
             fill 
             sizes="(max-width: 768px) 100vw, 40vw" 
           />
@@ -84,7 +84,7 @@ export function EventCard({ event, featured = false }: EventCardProps) {
     <article className="bg-surface-bright rounded-xl shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col group transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden">
       <div className="h-40 w-full relative overflow-hidden">
         <Image 
-          src={event.imageUrl || event.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} 
+          src={event.imageUrl || event.image || '/logo.svg'} 
           alt={event.title} 
           fill 
           className="object-cover group-hover:scale-110 transition-transform duration-500"

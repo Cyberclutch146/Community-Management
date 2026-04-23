@@ -17,7 +17,7 @@ export default function CreateEventPage() {
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Urgent Needs');
   const [distance, setDistance] = useState('Local');
-  const [image, setImage] = useState('https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop');
+  const [image, setImage] = useState('');
   const [uploadingImage, setUploadingImage] = useState(false);
   const [eventDate, setEventDate] = useState('');
   const [urgency, setUrgency] = useState<'high' | 'normal'>('normal');
@@ -177,7 +177,7 @@ export default function CreateEventPage() {
                     }}
                   />
                 </label>
-                {image && !image.includes('unsplash') && (
+                {image && (
                   <div className="w-12 h-12 rounded-lg relative overflow-hidden flex-shrink-0 border border-outline-variant/30">
                     <img src={image} alt="Preview" className="w-full h-full object-cover" />
                   </div>
