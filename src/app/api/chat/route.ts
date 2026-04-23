@@ -1,73 +1,110 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+import { NextResponse } from "next/server";
+import {
+  getAllEvents,
+  getDonationGuidance,
+  getGeneralHelp,
+  getOrganizeGuidance,
+  getUnknownReply,
+  getVolunteerGuidance,
+  formatEventList,
+} from "@/services/aiTools";
 
-// Initialize Gemini with the API key from environment variables
-const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
-
-if (!apiKey) {
-  console.error("CRITICAL: GEMINI_API_KEY_AI_CHAT_BOT is not defined in the environment variables.");
+function includesAny(text: string, words: string[]) {
+  return words.some((word) => text.includes(word));
 }
 
-const genAI = new GoogleGenerativeAI(apiKey as string);
-
-export async function POST(req: NextRequest) {
+export async function POST(req: Request) {
   try {
-    if (!apiKey) {
-      return NextResponse.json(
-        { success: false, error: 'Gemini API key is not configured on the server.' },
-        { status: 500 }
-      );
-    }
-
     const body = await req.json();
-    const { messages } = body;
+    const messages = body.messages || [];
+    const latestMessage =
+      messages[messages.length - 1]?.content?.toLowerCase?.().trim() || "";
 
-    if (!messages || !Array.isArray(messages) || messages.length === 0) {
-      return NextResponse.json(
-        { success: false, error: 'Messages are required and must be an array.' },
-        { status: 400 }
-      );
+    let reply = getGeneralHelp();
+
+    const events = await getAllEvents();
+
+    const wantsEvents = includesAny(latestMessage, [
+      "event",
+      "events",
+      "show me events",
+      "upcoming",
+      "discover",
+      "find events",
+      "nearby events",
+    ]);
+
+    const wantsVolunteer = includesAny(latestMessage, [
+      "volunteer",
+      "help out",
+      "join",
+      "join event",
+      "i want to help",
+      "support physically",
+    ]);
+
+    const wantsDonate = includesAny(latestMessage, [
+      "donate",
+      "donation",
+      "fund",
+      "contribute",
+      "give money",
+      "support financially",
+    ]);
+
+    const wantsOrganize = includesAny(latestMessage, [
+      "organize",
+      "create event",
+      "host event",
+      "start event",
+      "make event",
+      "plan event",
+      "set up event",
+    ]);
+
+    const wantsHow = includesAny(latestMessage, [
+      "how",
+      "how do i",
+      "what can i do",
+      "help me",
+      "guide me",
+    ]);
+
+    if (wantsOrganize) {
+      reply = getOrganizeGuidance();
+    } else if (wantsDonate && wantsHow) {
+      reply = getDonationGuidance(events);
+    } else if (wantsVolunteer && wantsHow) {
+      reply = getVolunteerGuidance(events);
+    } else if (wantsDonate) {
+      reply = [
+        "These are some events you may be able to support:",
+        formatEventList(events, 3),
+        "To donate, open an event and use the donation panel on its details page."
+      ].join("\n");
+    } else if (wantsVolunteer) {
+      reply = [
+        "Here are some events where you can potentially volunteer:",
+        formatEventList(events, 3),
+        "Open any event to view details and check how you can support it."
+      ].join("\n");
+    } else if (wantsEvents) {
+      reply = [
+        "Here are some current events on the platform:",
+        formatEventList(events, 3),
+        "You can open any of them to view details, donate, or join."
+      ].join("\n");
+    } else if (wantsHow) {
+      reply = getGeneralHelp();
+    } else {
+      reply = getUnknownReply();
     }
 
-    const model = genAI.getGenerativeModel({
-      model: 'gemini-3.5-flash', // Updating to a more stable modern model if preview is unreliable, but I'll stick to 3-flash-preview as they were using it, or 1.5-flash.
-      // Wait, let's use what they had: 'gemini-3-flash-preview'
-    });
-
-    // Let's instantiate it with the exact model they were using
-    const activeModel = genAI.getGenerativeModel({
-      model: "gemini-1.5-flash",
-      systemInstruction: "You are the official AI assistant for the Kindred Relief Network platform. Kindred Relief Network is a community-driven disaster relief and volunteer coordination platform. Users can create campaigns (events), volunteer for them, and coordinate community management. You are here to help users navigate the platform, provide general information about volunteering and community support, and encourage positive engagement. Your primary goals: 1. Provide accurate information about how community platforms like this generally work. 2. Be helpful, encouraging, and guide the user toward donating or volunteering on the platform. 3. You do not have access to real-time campaign data, so if asked about specific active campaigns, kindly advise the user to check the 'Events' or 'Feed' pages on the platform. Tone: Professional, compassionate, and community-focused."
-    });
-
-    // Convert chat history to Gemini format (user/model roles)
-    // IMPORTANT: Gemini history must alternate and start with a 'user' role.
-    let history: any[] = [];
-    let historyMessages = messages.slice(0, -1);
-    
-    // Find the first 'user' message to start history correctly for Gemini
-    const firstUserIndex = historyMessages.findIndex((msg: any) => msg.role === "user");
-    if (firstUserIndex !== -1) {
-      history = historyMessages.slice(firstUserIndex).map((msg: any) => ({
-        role: msg.role === "assistant" ? "model" : "user",
-        parts: [{ text: msg.content }]
-      }));
-    }
-
-    const chat = activeModel.startChat({
-      history: history
-    });
-
-    const lastMessage = messages[messages.length - 1].content;
-    const result = await chat.sendMessage(lastMessage);
-    const response = await result.response;
-    
-    return NextResponse.json({ success: true, reply: response.text() });
-
-  } catch (error: any) {
-    console.error("Gemini AI Integration Error Detail:", error);
+    return NextResponse.json({ reply });
+  } catch (error) {
+    console.error("Chat API error:", error);
     return NextResponse.json(
-      { success: false, error: error.message || "Gemini AI failed to process the request. Please try again later." },
+      { reply: "Something went wrong while generating a response." },
       { status: 500 }
     );
   }
