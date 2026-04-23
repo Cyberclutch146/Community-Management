@@ -30,6 +30,11 @@ export const getEvents = async (
 ): Promise<PaginatedEvents> => {
   try {
     const response = await fetch(`${BACKEND_URL}/campaigns?limit=${pageSize}&skip=${skip}`);
+    
+    if (!response.ok) {
+       throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
     const result = await response.json();
 
     if (!result.success) throw new Error(result.error);
@@ -46,9 +51,28 @@ export const getEvents = async (
       hasMore: events.length === pageSize
     };
   } catch (error) {
-    console.error('Failed to fetch events from backend:', error);
-    // Fallback to Firebase if needed, but per plan we are migrating
-    throw error;
+    console.error('Failed to fetch events from backend, falling back to Firebase:', error);
+    
+    // Fallback to Firebase
+    try {
+      const eventsRef = collection(db, EVENTS_COLLECTION);
+      const q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
+      const snapshot = await getDocs(q);
+      
+      const events = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data()
+      })) as CommunityEvent[];
+
+      return {
+        events,
+        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+        hasMore: snapshot.docs.length === pageSize
+      };
+    } catch (fbError) {
+      console.error('Firebase fallback also failed:', fbError);
+      throw error; // Re-throw the original backend error if fallback also fails
+    }
   }
 };
 
