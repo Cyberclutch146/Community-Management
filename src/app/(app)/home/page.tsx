@@ -47,8 +47,8 @@ export default function HomePage() {
   // --------------- Loading State ---------------
   if (loading) {
     return (
-      <div className="flex-1 flex flex-col bg-[#f5f4f1] items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-[#1f3d2b]" />
+      <div className="flex-1 flex flex-col bg-background items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-primary" />
       </div>
     )
   }
@@ -56,16 +56,16 @@ export default function HomePage() {
   // --------------- Empty State ---------------
   if (events.length === 0) {
     return (
-      <div className="flex-1 flex flex-col bg-[#f5f4f1] text-[#1f3d2b]">
+      <div className="flex-1 flex flex-col bg-background text-on-surface">
         <div className="px-10 mt-10 flex justify-between items-start">
           <div>
             <h1 className="text-5xl font-serif">Upcoming Events</h1>
-            <p className="mt-3 text-gray-600 max-w-xl">
+            <p className="mt-3 text-on-surface-variant max-w-xl">
               Join local community efforts and coordination meetings. Your participation makes a tangible difference.
             </p>
           </div>
           <div className="flex gap-4 mt-6">
-            <button onClick={() => router.push('/create')} className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#1f3d2b] text-white hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+            <button onClick={() => router.push('/create')} className="flex items-center gap-2 px-5 py-2 rounded-lg bg-primary text-on-primary hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
               <Plus size={16} />
               Create Event
             </button>
@@ -75,7 +75,7 @@ export default function HomePage() {
         <div className="px-10 mt-20 flex flex-col items-center justify-center text-center gap-4 opacity-60">
           <Calendar size={48} strokeWidth={1.2} />
           <p className="text-xl font-serif">No events yet</p>
-          <p className="text-gray-500 max-w-sm">Be the first to create an event and rally your community.</p>
+          <p className="text-on-surface-variant max-w-sm">Be the first to create an event and rally your community.</p>
         </div>
       </div>
     )
@@ -89,32 +89,32 @@ export default function HomePage() {
   // Category badge color map
   const badgeColor = (category: string) => {
     const lower = category?.toLowerCase() ?? ''
-    if (lower.includes('medical')) return 'bg-red-100 text-red-800'
-    if (lower.includes('logistics')) return 'bg-blue-100 text-blue-800'
-    if (lower.includes('community')) return 'bg-emerald-100 text-emerald-800'
-    if (lower.includes('supply') || lower.includes('sorting')) return 'bg-amber-100 text-amber-800'
-    return 'bg-gray-200 text-gray-700'
+    if (lower.includes('medical')) return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
+    if (lower.includes('logistics')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+    if (lower.includes('community')) return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
+    if (lower.includes('supply') || lower.includes('sorting')) return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
+    return 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
   }
 
   return (
-    <main className="flex-1 flex flex-col text-[#1f3d2b] w-full pb-32 md:pb-10">
+    <main className="flex-1 flex flex-col text-on-surface w-full pb-32 md:pb-10">
       <div className="max-w-7xl mx-auto w-full">
 
       {/* Header */}
-      <div className="px-10 mt-12 flex justify-between items-start border-b border-black/5 pb-8">
+      <div className="px-10 mt-12 flex justify-between items-start border-b border-outline-variant/20 pb-8">
         <div>
           <h1 className="text-5xl font-serif tracking-tight">Upcoming Events</h1>
-          <p className="mt-3 text-gray-600 leading-relaxed max-w-xl">
+          <p className="mt-3 text-on-surface-variant leading-relaxed max-w-xl">
             Join local community efforts and coordination meetings. Your participation makes a tangible difference.
           </p>
         </div>
 
         <div className="flex gap-4 mt-6">
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#e7e4de] hover:bg-[#dedbd5] hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out font-medium tracking-wide">
+          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-surface-variant hover:bg-surface-dim hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out font-medium tracking-wide">
             <Filter size={16} />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-[#1f3d2b] text-white font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out">
+          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out">
             <Plus size={16} />
             Create Event
           </button>
@@ -127,7 +127,7 @@ export default function HomePage() {
         {/* Large Featured Card — links to the event detail page */}
         <div
           onClick={() => router.push(`/event/${featured!.id}`)}
-          className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300 cursor-pointer group"
+          className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary to-primary/80 text-on-primary p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300 cursor-pointer group"
         >
           {(featured!.imageUrl || featured!.image) && (
             <img
@@ -136,13 +136,13 @@ export default function HomePage() {
               className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
           <div className="relative z-10">
             <div className="flex gap-2 mb-2">
               {featured!.urgency === 'high' && (
                 <span className="bg-yellow-300 text-black text-xs px-3 py-1 rounded-full font-medium">Critical Need</span>
               )}
-              <span className="bg-white/20 text-white text-xs px-3 py-1 rounded-full">{featured!.category}</span>
+              <span className="bg-on-primary/20 text-on-primary text-xs px-3 py-1 rounded-full">{featured!.category}</span>
             </div>
 
             <h2 className="text-3xl font-serif">{featured!.title}</h2>
@@ -154,39 +154,39 @@ export default function HomePage() {
         <div className="flex flex-col gap-4">
 
           {/* Main Details */}
-          <div className="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/5 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-200">
+          <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-outline-variant/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-200">
             <h3 className="text-xl font-serif mb-5">Event Details</h3>
 
             <div className="space-y-5 text-sm">
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Calendar size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Calendar size={18} className="text-primary/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">{formatDate(featured!.createdAt)}</p>
-                  <p className="text-gray-500">{featured!.location}</p>
+                  <p className="text-on-surface-variant">{featured!.location}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <MapPin size={18} className="text-[#1f3d2b]/80" strokeWidth={1.8} />
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <MapPin size={18} className="text-primary/80" strokeWidth={1.8} />
                 </div>
                 <div>
                   <p className="font-medium">{featured!.location}</p>
-                  <p className="text-gray-500">{featured!.distance || 'Nearby'}</p>
+                  <p className="text-on-surface-variant">{featured!.distance || 'Nearby'}</p>
                 </div>
               </div>
 
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 shrink-0 rounded-full bg-[#1f3d2b]/10 flex items-center justify-center">
-                  <Users size={18} className="text-[#1f3d2b]/80 translate-x-[1px]" strokeWidth={1.8} />
+                <div className="w-10 h-10 shrink-0 rounded-full bg-primary/10 flex items-center justify-center">
+                  <Users size={18} className="text-primary/80 translate-x-[1px]" strokeWidth={1.8} />
                 </div>
                 <div className="w-full">
                   <p className="font-medium">{volCurrent} / {volGoal} Volunteers Needed</p>
-                  <div className="w-full h-[6px] bg-gray-200 rounded-full mt-2">
-                    <div className="h-[6px] bg-[#1f3d2b] rounded-full transition-all duration-500" style={{ width: `${volPercent}%` }}></div>
+                  <div className="w-full h-[6px] bg-surface-variant rounded-full mt-2">
+                    <div className="h-[6px] bg-primary rounded-full transition-all duration-500" style={{ width: `${volPercent}%` }}></div>
                   </div>
                 </div>
               </div>
@@ -195,23 +195,23 @@ export default function HomePage() {
 
             <button
               onClick={() => router.push(`/event/${featured!.id}`)}
-              className="mt-6 w-full bg-[#1f3d2b] text-white py-2.5 rounded-lg hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out"
+              className="mt-6 w-full bg-primary text-on-primary py-2.5 rounded-lg hover:opacity-90 hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out"
             >
               Sign Up to Help
             </button>
           </div>
 
           {/* Organizer Card */}
-          <div className="bg-white/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-black/5 hover:shadow-md transition-all duration-200">
+          <div className="bg-surface/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-outline-variant/20 hover:shadow-md transition-all duration-200">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-[#1f3d2b]/20"></div>
+              <div className="w-10 h-10 rounded-full bg-primary/20"></div>
               <div>
-                <p className="text-xs text-gray-500">Organized by</p>
+                <p className="text-xs text-on-surface-variant">Organized by</p>
                 <p className="font-medium">{featured!.organizer || 'Community Organizer'}</p>
               </div>
             </div>
 
-            <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-[#1f3d2b] text-white hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
+            <button className="w-9 h-9 flex items-center justify-center rounded-lg bg-primary text-on-primary hover:-translate-y-[1px] hover:shadow-md active:scale-95 transition-all duration-200 ease-out">
               <Mail size={18} />
             </button>
           </div>
@@ -236,7 +236,7 @@ export default function HomePage() {
             <h2 className="text-2xl font-serif">More Opportunities</h2>
             <button
               onClick={() => router.push('/feed')}
-              className="text-sm font-medium text-[#1f3d2b] hover:underline active:scale-95 transition-all duration-200 ease-out"
+              className="text-sm font-medium text-primary hover:underline active:scale-95 transition-all duration-200 ease-out"
             >
               View All →
             </button>
@@ -247,7 +247,7 @@ export default function HomePage() {
               <div
                 key={evt.id}
                 onClick={() => router.push(`/event/${evt.id}`)}
-                className="bg-white rounded-xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
+                className="bg-surface-container rounded-xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-outline-variant/20 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
               >
                 <div className="h-32 w-full relative">
                   <img src={evt.imageUrl || evt.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} alt={evt.title} className="w-full h-full object-cover" />
@@ -257,7 +257,7 @@ export default function HomePage() {
                 </div>
                 <div className="p-4">
                 <h3 className="mt-3 font-serif text-lg">{evt.title}</h3>
-                <p className="text-sm text-gray-600 mt-2 line-clamp-2">{evt.description}</p>
+                <p className="text-sm text-on-surface-variant mt-2 line-clamp-2">{evt.description}</p>
                 </div>
               </div>
             ))}

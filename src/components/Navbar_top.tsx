@@ -5,6 +5,7 @@ import { useRouter, usePathname } from 'next/navigation'
 import { Search, Bell, X } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
+import { ThemeToggle } from '@/components/ThemeToggle'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
@@ -54,49 +55,49 @@ export default function NavbarTop() {
     <div
       className={`flex items-center justify-between px-10 ${scrolled ? 'py-2' : 'py-4'} transition-all duration-200
   ${scrolled
-    ? 'bg-[#f0eee9]/80 backdrop-blur-md border-b border-black/5'
-    : 'bg-[#f0eee9] rounded-full mx-6 mt-4'
+    ? 'bg-surface-container/80 backdrop-blur-md border-b border-outline-variant/30'
+    : 'bg-surface-container rounded-full mx-6 mt-4'
   }`}
     >
       {/* Logo */}
-      <div className={`text-xl font-semibold ${lora.className}`}>ReliefConnect</div>
+      <div className={`text-xl font-semibold ${lora.className} text-on-surface`}>ReliefConnect</div>
 
       {/* Nav Links */}
-      <div className="flex gap-8 text-sm">
+      <div className="flex gap-8 text-sm text-on-surface">
         <button
           onClick={() => router.push('/home')}
-          className={`pb-1 border-b-2 ${pathname.startsWith('/home') ? 'border-[#1f3d2b]' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+          className={`pb-1 border-b-2 ${pathname.startsWith('/home') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
           Home
         </button>
 
         <button
           onClick={() => router.push('/feed')}
-          className={`pb-1 border-b-2 ${pathname.startsWith('/feed') ? 'border-[#1f3d2b]' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+          className={`pb-1 border-b-2 ${pathname.startsWith('/feed') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
           Events
         </button>
 
         <button
           onClick={() => router.push('/create')}
-          className={`pb-1 border-b-2 ${pathname.startsWith('/create') ? 'border-[#1f3d2b]' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+          className={`pb-1 border-b-2 ${pathname.startsWith('/create') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
           Organize
         </button>
 
         <button
           onClick={() => router.push('/dashboard')}
-          className={`pb-1 border-b-2 ${pathname.startsWith('/dashboard') ? 'border-[#1f3d2b]' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+          className={`pb-1 border-b-2 ${pathname.startsWith('/dashboard') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
           Dashboard
         </button>
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-5">
+      <div className="flex items-center gap-5 text-on-surface">
         {searchOpen ? (
-          <div className="flex items-center gap-2 bg-white rounded-full px-3 py-1.5 shadow-sm border border-gray-200 animate-in fade-in duration-200">
-            <Search size={16} className="text-gray-400" />
+          <div className="flex items-center gap-2 bg-surface rounded-full px-3 py-1.5 shadow-sm border border-outline-variant animate-in fade-in duration-200">
+            <Search size={16} className="text-on-surface-variant" />
             <input
               ref={inputRef}
               type="text"
@@ -104,10 +105,10 @@ export default function NavbarTop() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="bg-transparent outline-none text-sm w-44 text-[#1f3d2b] placeholder:text-gray-400"
+              className="bg-transparent outline-none text-sm w-44 text-on-surface placeholder:text-on-surface-variant"
             />
             <button onClick={() => { setSearchOpen(false); setSearchQuery('') }} className="hover:scale-110 active:scale-95 transition-all">
-              <X size={14} className="text-gray-400" />
+              <X size={14} className="text-on-surface-variant" />
             </button>
           </div>
         ) : (
@@ -119,6 +120,8 @@ export default function NavbarTop() {
         <button className="hover:scale-110 active:scale-95 transition-all duration-200 ease-out">
           <Bell size={18} />
         </button>
+        
+        <ThemeToggle />
 
         <button
           onClick={() => router.push('/profile')}
@@ -133,4 +136,5 @@ export default function NavbarTop() {
       </div>
     </div>
   )
+
 }

@@ -3,6 +3,7 @@ import { Literata, Nunito_Sans } from 'next/font/google';
 import '../globals.css';
 import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
 import { AuthProvider } from '@/context/AuthContext';
+import { ThemeProvider } from '@/context/ThemeProvider';
 import NavbarTop from '@/components/Navbar_top';
 import { Toaster } from 'sonner';
 import DynamicBackground from '@/components/DynamicBackground';
@@ -31,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${literata.variable} ${nunitoSans.variable}`}>
+    <html lang="en" className={`${literata.variable} ${nunitoSans.variable}`} suppressHydrationWarning>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,0..1,20..48&display=swap"
@@ -39,24 +40,26 @@ export default function RootLayout({
         />
       </head>
       <body
-        className="text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col scroll-smooth"
+        className="text-on-background font-body antialiased selection:bg-primary-container selection:text-on-primary-container min-h-screen flex flex-col scroll-smooth bg-background"
       >
-        <AuthProvider>
-          <Toaster position="top-right" richColors closeButton />
-          <DynamicBackground>
-            <div className="fixed top-0 left-0 w-full z-50 hidden md:block">
-              <NavbarTop />
-            </div>
-            <div className="flex-1 flex flex-col min-w-0 md:pt-24">
-              <div className="md:hidden">
-                <MobileHeader />
+        <ThemeProvider>
+          <AuthProvider>
+            <Toaster position="top-right" richColors closeButton />
+            <DynamicBackground>
+              <div className="fixed top-0 left-0 w-full z-50 hidden md:block">
+                <NavbarTop />
               </div>
-              {children}
-            </div>
-            <AIChatWidget />
-            <MobileBottomNav />
-          </DynamicBackground>
-        </AuthProvider>
+              <div className="flex-1 flex flex-col min-w-0 md:pt-24">
+                <div className="md:hidden">
+                  <MobileHeader />
+                </div>
+                {children}
+              </div>
+              <AIChatWidget />
+              <MobileBottomNav />
+            </DynamicBackground>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
