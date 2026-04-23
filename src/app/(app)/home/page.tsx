@@ -129,9 +129,9 @@ export default function HomePage() {
           onClick={() => router.push(`/event/${featured!.id}`)}
           className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-[#1f3d2b] to-[#2f5d46] text-white p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300 cursor-pointer group"
         >
-          {featured!.imageUrl && (
+          {(featured!.imageUrl || featured!.image) && (
             <img
-              src={featured!.imageUrl}
+              src={featured!.imageUrl || featured!.image}
               alt={featured!.title}
               className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
             />
@@ -247,11 +247,18 @@ export default function HomePage() {
               <div
                 key={evt.id}
                 onClick={() => router.push(`/event/${evt.id}`)}
-                className="bg-white rounded-xl p-5 cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
+                className="bg-white rounded-xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-black/5 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
               >
-                <span className={`text-xs px-3 py-1 rounded-full ${badgeColor(evt.category)}`}>{evt.category}</span>
+                <div className="h-32 w-full relative">
+                  <img src={evt.imageUrl || evt.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} alt={evt.title} className="w-full h-full object-cover" />
+                  <div className="absolute top-2 left-2">
+                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${badgeColor(evt.category)}`}>{evt.category}</span>
+                  </div>
+                </div>
+                <div className="p-4">
                 <h3 className="mt-3 font-serif text-lg">{evt.title}</h3>
                 <p className="text-sm text-gray-600 mt-2 line-clamp-2">{evt.description}</p>
+                </div>
               </div>
             ))}
           </div>

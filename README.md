@@ -2,7 +2,7 @@
 
 **Kindred Relief Network** is a community-driven platform designed to coordinate disaster relief efforts, manage volunteer activities, and facilitate community mutual aid. Built with speed and compassion in mind, KRN empowers local communities to organize quickly during times of need.
 
-![Kindred Relief Network](https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop)
+![Kindred Relief Network](public/banner.png)
 
 ## 🌟 Key Features
 
@@ -90,9 +90,6 @@ npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) to see the application in action.
-
-## 📜 License
-This project is licensed under the MIT License - see the LICENSE file for details.
 
 ---
 Built with ❤️ for community resilience.

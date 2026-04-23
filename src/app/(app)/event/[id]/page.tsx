@@ -63,7 +63,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
           <div className="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 shadow-sm relative">
-            <Image src={event.imageUrl || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} alt={event.title || 'Event'} className="w-full h-full object-cover" fill />
+            <Image src={event.imageUrl || event.image || 'https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop'} alt={event.title || 'Event'} className="w-full h-full object-cover" fill />
           </div>
 
           <div className="mb-8">

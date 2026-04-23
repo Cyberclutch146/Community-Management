@@ -38,6 +38,7 @@ export interface CommunityEvent {
   category: string;
   urgency: 'high' | 'normal';
   imageUrl: string;
+  image?: string; // Fallback for inconsistent field naming in Firestore
   needs: EventNeeds;
   progress: number;
   status: 'active' | 'completed';
