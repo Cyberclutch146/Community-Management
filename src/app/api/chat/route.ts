@@ -100,11 +100,11 @@ export async function POST(req: Request) {
       reply = getUnknownReply();
     }
 
-    return NextResponse.json({ reply });
+    return NextResponse.json({ success: true, reply });
   } catch (error) {
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { reply: "Something went wrong while generating a response." },
+      { success: false, error: "Something went wrong while generating a response." },
       { status: 500 }
     );
   }
