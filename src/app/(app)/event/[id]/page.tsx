@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation';
 import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ChatBox';
+import { VolunteerLeaderboard } from '@/components/VolunteerLeaderboard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, use, useCallback } from 'react';
@@ -96,7 +97,10 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
           )}
 
           <div className="mt-10">
-            <ChatBox eventId={event.id} />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <ChatBox eventId={event.id} />
+              <VolunteerLeaderboard eventId={event.id} />
+            </div>
           </div>
         </div>
 

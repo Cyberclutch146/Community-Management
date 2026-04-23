@@ -12,11 +12,14 @@ export interface PaginatedEvents {
 
 export const getEvents = async (
   pageSize: number = 50,
-  skip: number = 0 // Note: Firestore pagination uses cursors (startAfter), skip is not directly supported without a cursor. For simple implementation, we might just limit.
+  lastDoc: QueryDocumentSnapshot<DocumentData> | null = null
 ): Promise<PaginatedEvents> => {
   try {
     const eventsRef = collection(db, EVENTS_COLLECTION);
-    const q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
+    let q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
+    if (lastDoc) {
+      q = query(eventsRef, orderBy('createdAt', 'desc'), startAfter(lastDoc), limit(pageSize));
+    }
     const snapshot = await getDocs(q);
     
     const events = snapshot.docs.map(doc => ({
