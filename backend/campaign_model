@@ -1,0 +1,85 @@
+const mongoose = require('mongoose');
+
+const CampaignSchema = new mongoose.Schema({
+  title: {
+    type: String,
+    required: true,
+    trim: true,
+  },
+  description: {
+    type: String,
+    required: true,
+  },
+  organizer: {
+    type: String, // String to match frontend "displayName"
+    required: true,
+  },
+  organizerId: {
+    type: String, // Firebase UID
+    required: true,
+  },
+  location: {
+    type: String, // String to match frontend location name
+    required: true,
+  },
+  lat: {
+    type: Number,
+  },
+  lng: {
+    type: Number,
+  },
+  distance: {
+    type: String,
+    default: "Local",
+  },
+  category: {
+    type: String,
+    default: "Urgent Needs",
+  },
+  urgency: {
+    type: String,
+    enum: ["high", "normal"],
+    default: "normal",
+  },
+  imageUrl: {
+    type: String,
+  },
+  eventDate: {
+    type: String,
+  },
+  needs: {
+    funds: {
+      goal: { type: Number, default: 0 },
+      current: { type: Number, default: 0 }
+    },
+    volunteers: {
+      goal: { type: Number, default: 0 },
+      current: { type: Number, default: 0 }
+    },
+    goods: {
+      type: [String],
+      default: []
+    }
+  },
+  progress: {
+    type: Number,
+    default: 0,
+  },
+  status: {
+    type: String,
+    enum: ["active", "completed"],
+    default: "active",
+  },
+}, {
+  timestamps: true,
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
+      return ret;
+    }
+  }
+});
+
+module.exports = mongoose.model('Campaign', CampaignSchema);

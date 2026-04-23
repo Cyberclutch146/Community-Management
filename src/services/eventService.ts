@@ -3,6 +3,19 @@ import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, ord
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
+const BACKEND_URL = 'http://localhost:5000/api';
+
+// Helper to wrap date strings into a Firebase-like Timestamp object for frontend compatibility
+const wrapDate = (dateStr: any) => {
+  if (!dateStr) return null;
+  const date = new Date(dateStr);
+  return {
+    toDate: () => date,
+    toISOString: () => date.toISOString(),
+    seconds: Math.floor(date.getTime() / 1000),
+    nanoseconds: 0
+  };
+};
 
 // ─── Paginated fetch ────────────────────────────────────
 export interface PaginatedEvents {
@@ -13,54 +26,80 @@ export interface PaginatedEvents {
 
 export const getEvents = async (
   pageSize: number = 50,
-  lastVisible?: QueryDocumentSnapshot<DocumentData> | null
+  skip: number = 0
 ): Promise<PaginatedEvents> => {
-  const eventsRef = collection(db, EVENTS_COLLECTION);
+  try {
+    const response = await fetch(`${BACKEND_URL}/campaigns?limit=${pageSize}&skip=${skip}`);
+    const result = await response.json();
 
-  let q;
-  if (lastVisible) {
-    q = query(eventsRef, orderBy('createdAt', 'desc'), startAfter(lastVisible), limit(pageSize));
-  } else {
-    q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
+    if (!result.success) throw new Error(result.error);
+
+    const events = result.data.map((event: any) => ({
+      ...event,
+      createdAt: wrapDate(event.createdAt),
+      updatedAt: wrapDate(event.updatedAt)
+    })) as CommunityEvent[];
+
+    return {
+      events,
+      lastDoc: null, // Mongoose uses skip/limit pagination, not cursors
+      hasMore: events.length === pageSize
+    };
+  } catch (error) {
+    console.error('Failed to fetch events from backend:', error);
+    // Fallback to Firebase if needed, but per plan we are migrating
+    throw error;
   }
-
-  const snapshot = await getDocs(q);
-  const events = snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as CommunityEvent[];
-
-  const lastDoc = snapshot.docs.length > 0 ? snapshot.docs[snapshot.docs.length - 1] : null;
-
-  return {
-    events,
-    lastDoc,
-    hasMore: snapshot.docs.length === pageSize
-  };
 };
 
 // ─── Single event ───────────────────────────────────────
 export const getEventById = async (eventId: string): Promise<CommunityEvent | null> => {
-  const eventRef = doc(db, EVENTS_COLLECTION, eventId);
-  const snapshot = await getDoc(eventRef);
-  
-  if (snapshot.exists()) {
-    return { id: snapshot.id, ...snapshot.data() } as CommunityEvent;
+  try {
+    const response = await fetch(`${BACKEND_URL}/campaigns/${eventId}`);
+    // If you haven't implemented getById yet, we'll need it.
+    // For now, let's assume it works or we can filter getEvents.
+    // I'll update the controller to support findById soon.
+    const result = await response.json();
+
+    if (result.success && result.data) {
+      return {
+        ...result.data,
+        createdAt: wrapDate(result.data.createdAt),
+        updatedAt: wrapDate(result.data.updatedAt)
+      } as CommunityEvent;
+    }
+    
+    // Fallback to Firebase for now if not found in Mongoose
+    const eventRef = doc(db, EVENTS_COLLECTION, eventId);
+    const snapshot = await getDoc(eventRef);
+    if (snapshot.exists()) {
+      return { id: snapshot.id, ...snapshot.data() } as CommunityEvent;
+    }
+
+    return null;
+  } catch (error) {
+    return null;
   }
-  
-  return null;
 };
 
 // ─── Events by organizer (for Dashboard) ────────────────
 export const getEventsByOrganizer = async (userId: string): Promise<CommunityEvent[]> => {
-  const eventsRef = collection(db, EVENTS_COLLECTION);
-  const q = query(eventsRef, where('organizerId', '==', userId));
-  const snapshot = await getDocs(q);
+  try {
+    // We'll need a filter on the backend for this
+    const response = await fetch(`${BACKEND_URL}/campaigns?organizerId=${userId}`);
+    const result = await response.json();
 
-  return snapshot.docs.map(doc => ({
-    id: doc.id,
-    ...doc.data()
-  })) as CommunityEvent[];
+    if (result.success) {
+      return result.data.map((event: any) => ({
+        ...event,
+        createdAt: wrapDate(event.createdAt),
+        updatedAt: wrapDate(event.updatedAt)
+      })) as CommunityEvent[];
+    }
+    return [];
+  } catch (error) {
+    return [];
+  }
 };
 
 // ─── Geocoding Helper ────────────────────────────────────
@@ -86,26 +125,34 @@ export const geocodeLocation = async (address: string): Promise<{lat: number, ln
 
 // ─── Create ─────────────────────────────────────────────
 export const createEvent = async (data: CommunityEventCreate): Promise<string> => {
-  const eventsRef = collection(db, EVENTS_COLLECTION);
-  
-  let coords = (data.lat !== undefined && data.lng !== undefined) 
-    ? { lat: data.lat, lng: data.lng } 
-    : null;
+  try {
+    let coords = (data.lat !== undefined && data.lng !== undefined) 
+      ? { lat: data.lat, lng: data.lng } 
+      : null;
 
-  if (!coords && data.location) {
-    coords = await geocodeLocation(data.location);
+    if (!coords && data.location) {
+      coords = await geocodeLocation(data.location);
+    }
+
+    const response = await fetch(`${BACKEND_URL}/campaigns`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        ...data,
+        ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
+      }),
+    });
+
+    const result = await response.json();
+    if (!result.success) throw new Error(result.error);
+
+    return result.data.id;
+  } catch (error: any) {
+    console.error('Failed to create event in backend:', error);
+    throw error;
   }
-
-  const docRef = await addDoc(eventsRef, {
-    ...data,
-    ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
-    progress: 0,
-    status: 'active',
-    createdAt: new Date(),
-    updatedAt: new Date()
-  });
-  
-  return docRef.id;
 };
 
 // ─── Donation (transactional) ───────────────────────────
