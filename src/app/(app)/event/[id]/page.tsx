@@ -3,7 +3,7 @@
 import { notFound } from 'next/navigation';
 import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
-import { ChatBox } from '@/components/ChatBox';
+import { ChatBox } from '@/components/ai/ChatBox';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, use, useCallback } from 'react';
