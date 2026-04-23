@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
@@ -219,11 +219,16 @@ export const getRegisteredEvents = async (userId: string): Promise<CommunityEven
   
   if (eventIds.length === 0) return [];
   
-  // Fetch full event details for each registered event
+  // Fetch in batches of 30 (Firestore 'in' query limit)
   const events: CommunityEvent[] = [];
-  for (const id of eventIds) {
-    const event = await getEventById(id);
-    if (event) events.push(event);
+  for (let i = 0; i < eventIds.length; i += 30) {
+    const chunk = eventIds.slice(i, i + 30);
+    const eventsRef = collection(db, EVENTS_COLLECTION);
+    const q = query(eventsRef, where(documentId(), 'in', chunk));
+    const eventsSnapshot = await getDocs(q);
+    eventsSnapshot.docs.forEach(doc => {
+      events.push({ id: doc.id, ...doc.data() } as CommunityEvent);
+    });
   }
   
   return events;

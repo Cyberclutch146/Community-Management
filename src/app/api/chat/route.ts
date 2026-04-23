@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini with the API key from environment variables
-const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT || process.env.NEXT_PUBLIC_GEMINI_API_KEY_AI_CHAT_BOT;
+const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
 
 if (!apiKey) {
-  console.warn("WARNING: GEMINI_API_KEY_AI_CHAT_BOT is not defined in the environment variables.");
+  console.error("CRITICAL: GEMINI_API_KEY_AI_CHAT_BOT is not defined in the environment variables.");
 }
 
 const genAI = new GoogleGenerativeAI(apiKey as string);
