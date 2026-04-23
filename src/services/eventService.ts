@@ -3,20 +3,6 @@ import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, ord
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
-const BACKEND_URL = 'http://localhost:5000/api';
-
-// Helper to wrap date strings into a Firebase-like Timestamp object for frontend compatibility
-const wrapDate = (dateStr: any) => {
-  if (!dateStr) return null;
-  const date = new Date(dateStr);
-  return {
-    toDate: () => date,
-    toISOString: () => date.toISOString(),
-    seconds: Math.floor(date.getTime() / 1000),
-    nanoseconds: 0
-  };
-};
-
 // ─── Paginated fetch ────────────────────────────────────
 export interface PaginatedEvents {
   events: CommunityEvent[];
@@ -26,82 +12,40 @@ export interface PaginatedEvents {
 
 export const getEvents = async (
   pageSize: number = 50,
-  skip: number = 0
+  skip: number = 0 // Note: Firestore pagination uses cursors (startAfter), skip is not directly supported without a cursor. For simple implementation, we might just limit.
 ): Promise<PaginatedEvents> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/campaigns?limit=${pageSize}&skip=${skip}`);
+    const eventsRef = collection(db, EVENTS_COLLECTION);
+    const q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
+    const snapshot = await getDocs(q);
     
-    if (!response.ok) {
-       throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    
-    const result = await response.json();
-
-    if (!result.success) throw new Error(result.error);
-
-    const events = result.data.map((event: any) => ({
-      ...event,
-      createdAt: wrapDate(event.createdAt),
-      updatedAt: wrapDate(event.updatedAt)
+    const events = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
     })) as CommunityEvent[];
 
     return {
       events,
-      lastDoc: null, // Mongoose uses skip/limit pagination, not cursors
-      hasMore: events.length === pageSize
+      lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
+      hasMore: snapshot.docs.length === pageSize
     };
   } catch (error) {
-    console.error('Failed to fetch events from backend, falling back to Firebase:', error);
-    
-    // Fallback to Firebase
-    try {
-      const eventsRef = collection(db, EVENTS_COLLECTION);
-      const q = query(eventsRef, orderBy('createdAt', 'desc'), limit(pageSize));
-      const snapshot = await getDocs(q);
-      
-      const events = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data()
-      })) as CommunityEvent[];
-
-      return {
-        events,
-        lastDoc: snapshot.docs[snapshot.docs.length - 1] || null,
-        hasMore: snapshot.docs.length === pageSize
-      };
-    } catch (fbError) {
-      console.error('Firebase fallback also failed:', fbError);
-      throw error; // Re-throw the original backend error if fallback also fails
-    }
+    console.error('Failed to fetch events from Firebase:', error);
+    throw error;
   }
 };
 
 // ─── Single event ───────────────────────────────────────
 export const getEventById = async (eventId: string): Promise<CommunityEvent | null> => {
   try {
-    const response = await fetch(`${BACKEND_URL}/campaigns/${eventId}`);
-    // If you haven't implemented getById yet, we'll need it.
-    // For now, let's assume it works or we can filter getEvents.
-    // I'll update the controller to support findById soon.
-    const result = await response.json();
-
-    if (result.success && result.data) {
-      return {
-        ...result.data,
-        createdAt: wrapDate(result.data.createdAt),
-        updatedAt: wrapDate(result.data.updatedAt)
-      } as CommunityEvent;
-    }
-    
-    // Fallback to Firebase for now if not found in Mongoose
     const eventRef = doc(db, EVENTS_COLLECTION, eventId);
     const snapshot = await getDoc(eventRef);
     if (snapshot.exists()) {
       return { id: snapshot.id, ...snapshot.data() } as CommunityEvent;
     }
-
     return null;
   } catch (error) {
+    console.error('Failed to fetch event by id:', error);
     return null;
   }
 };
@@ -109,19 +53,16 @@ export const getEventById = async (eventId: string): Promise<CommunityEvent | nu
 // ─── Events by organizer (for Dashboard) ────────────────
 export const getEventsByOrganizer = async (userId: string): Promise<CommunityEvent[]> => {
   try {
-    // We'll need a filter on the backend for this
-    const response = await fetch(`${BACKEND_URL}/campaigns?organizerId=${userId}`);
-    const result = await response.json();
-
-    if (result.success) {
-      return result.data.map((event: any) => ({
-        ...event,
-        createdAt: wrapDate(event.createdAt),
-        updatedAt: wrapDate(event.updatedAt)
-      })) as CommunityEvent[];
-    }
-    return [];
+    const eventsRef = collection(db, EVENTS_COLLECTION);
+    const q = query(eventsRef, where('organizerId', '==', userId), orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    
+    return snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    })) as CommunityEvent[];
   } catch (error) {
+    console.error('Failed to fetch events by organizer:', error);
     return [];
   }
 };
@@ -158,23 +99,30 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
       coords = await geocodeLocation(data.location);
     }
 
-    const response = await fetch(`${BACKEND_URL}/campaigns`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        ...data,
-        ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
-      }),
-    });
+    const eventData = {
+      ...data,
+      ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      status: 'active',
+      progress: 0,
+      needs: {
+        ...data.needs,
+        funds: {
+          goal: data.needs?.funds?.goal || 0,
+          current: 0
+        },
+        volunteers: {
+          goal: data.needs?.volunteers?.goal || 0,
+          current: 0
+        }
+      }
+    };
 
-    const result = await response.json();
-    if (!result.success) throw new Error(result.error);
-
-    return result.data.id;
+    const docRef = await addDoc(collection(db, EVENTS_COLLECTION), eventData);
+    return docRef.id;
   } catch (error: any) {
-    console.error('Failed to create event in backend:', error);
+    console.error('Failed to create event in Firebase:', error);
     throw error;
   }
 };

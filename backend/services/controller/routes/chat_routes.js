@@ -3,10 +3,10 @@ const router = express.Router();
 const { chatWithAI } = require("../Chat_controller");
 
 /**
- * @route   POST /api/chat/:campaignId
- * @desc    Chat with Gemini AI about a specific campaign
+ * @route   POST /api/chat
+ * @desc    Chat with global Gemini AI assistant
  * @access  Public
  */
-router.post("/:campaignId", chatWithAI);
+router.post("/", chatWithAI);
 
 module.exports = router;

@@ -9,12 +9,11 @@ if (!apiKey) {
 const genAI = new GoogleGenerativeAI(apiKey);
 
 /**
- * @desc    Ask Gemini AI a question about a specific campaign
+ * @desc    Ask Gemini AI a question
  * @param   {Array} messages - Chat history
- * @param   {Object} campaign - Campaign details
  * @returns {Promise<string>} - AI response text
  */
-exports.askGemini = async (messages, campaign) => {
+exports.askGemini = async (messages) => {
   try {
     const model = genAI.getGenerativeModel({
       model: "gemini-1.5-flash"
@@ -23,18 +22,17 @@ exports.askGemini = async (messages, campaign) => {
     // 🔥 SYSTEM CONTEXT (VERY IMPORTANT)
     // This defines the persona and constraints for the AI
     const systemPrompt = `
-You are a dedicated assistant for the social campaign: "${campaign.title}".
+You are the official AI assistant for the Kindred Relief Network platform.
 
-Campaign Information:
-- Title: ${campaign.title}
-- Description: ${campaign.description}
-- Location: ${campaign.location.name}
-- Needs: ${campaign.needs.join(", ")}
+Platform Information:
+- Kindred Relief Network is a community-driven disaster relief and volunteer coordination platform.
+- Users can create campaigns (events), volunteer for them, and coordinate community management.
+- You are here to help users navigate the platform, provide general information about volunteering and community support, and encourage positive engagement.
 
 Your Primary Goals:
-1. Provide accurate information ONLY about this specific campaign.
-2. Be helpful, encouraging, and guide the user toward donating or volunteering.
-3. If the user asks for information that is not provided in the campaign details above, politely explain that you do not have that specific information.
+1. Provide accurate information about how community platforms like this generally work.
+2. Be helpful, encouraging, and guide the user toward donating or volunteering on the platform.
+3. You do not have access to real-time campaign data, so if asked about specific active campaigns, kindly advise the user to check the "Events" or "Feed" pages on the platform.
 
 Tone: Professional, compassionate, and community-focused.
 `;
@@ -51,6 +49,10 @@ Tone: Professional, compassionate, and community-focused.
         {
           role: "user",
           parts: [{ text: systemPrompt }]
+        },
+        {
+          role: "model",
+          parts: [{ text: "Understood! I am ready to help users with the Kindred Relief Network." }]
         },
         ...history
       ]

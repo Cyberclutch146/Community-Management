@@ -6,6 +6,7 @@ import { AuthProvider } from '@/context/AuthContext';
 import NavbarTop from '@/components/Navbar_top';
 import { Toaster } from 'sonner';
 import DynamicBackground from '@/components/DynamicBackground';
+import AIChatWidget from '@/components/AIChatWidget';
 
 const literata = Literata({
   variable: '--font-literata',
@@ -52,6 +53,7 @@ export default function RootLayout({
               </div>
               {children}
             </div>
+            <AIChatWidget />
             <MobileBottomNav />
           </DynamicBackground>
         </AuthProvider>
