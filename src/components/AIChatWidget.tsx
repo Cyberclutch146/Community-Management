@@ -104,13 +104,13 @@ export default function AIChatWidget() {
               {messages.map((msg, idx) => (
                 <div 
                   key={idx} 
-                  className={\`flex \${msg.role === 'user' ? 'justify-end' : 'justify-start'}\`}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={\`max-w-[80%] rounded-2xl p-3 \${
+                  <div className={`max-w-[80%] rounded-2xl p-3 ${
                     msg.role === 'user' 
                       ? 'bg-primary text-on-primary rounded-tr-sm' 
                       : 'bg-surface-container text-on-surface rounded-tl-sm'
-                  }\`}>
+                  }`}>
                     <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
                   </div>
                 </div>
