@@ -1,36 +1,98 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Kindred Relief Network (KRN) 🤝
 
-## Getting Started
+**Kindred Relief Network** is a community-driven platform designed to coordinate disaster relief efforts, manage volunteer activities, and facilitate community mutual aid. Built with speed and compassion in mind, KRN empowers local communities to organize quickly during times of need.
 
-First, run the development server:
+![Kindred Relief Network](https://images.unsplash.com/photo-1593113565694-c6ccdd8dcb15?q=80&w=2669&auto=format&fit=crop)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## 🌟 Key Features
+
+### 📢 Event & Campaign Management
+- **Create Events**: Easily set up relief campaigns with titles, descriptions, and specific needs.
+- **Resource Tracking**: Real-time progress bars for both funding goals and volunteer counts.
+- **Location-Aware**: Integrated maps showing the proximity of events to the user.
+
+### 💬 Real-Time Coordination
+- **Community Chat**: Each event has a dedicated Firestore-backed chatroom for volunteers to coordinate.
+- **AI Assistant**: A globally available AI chatbot powered by Google Gemini to help users navigate the platform and provide volunteering guidance.
+
+### 🏆 Gamified Impact
+- **Volunteer Leaderboard**: Highlighting "Community Heroes" who have stepped up to support specific causes.
+- **Organizer Dashboard**: Tools for organizers to track volunteer check-ins and manage logistics.
+
+### 🔐 Secure & Seamless Access
+- **Firebase Auth**: Secure login and registration flows.
+- **Social Integration**: Ready for Google and GitHub authentication.
+
+## 🛠 Tech Stack
+
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router, Turbopack)
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **Backend/Database**: [Firebase](https://firebase.google.com/) (Firestore, Auth)
+- **AI Engine**: [Google Generative AI (Gemini 1.5 Flash)](https://ai.google.dev/)
+- **Animations**: [Framer Motion](https://www.framer.com/motion/)
+- **Mapping**: [Leaflet](https://leafletjs.com/) with OpenStreetMap & Nominatim Geocoding
+- **Icons**: [Lucide React](https://lucide.dev/) & Google Material Symbols
+
+## 📁 Project Structure
+
+```text
+├── src/
+│   ├── app/            # Next.js App Router (Pages & API Routes)
+│   │   ├── (app)/      # Authenticated application routes
+│   │   ├── (auth)/     # Authentication flows
+│   │   └── api/        # Serverless functions (AI Chat)
+│   ├── components/     # Reusable UI components
+│   ├── context/        # React Context providers (Auth)
+│   ├── lib/            # Shared libraries (Firebase config)
+│   ├── services/       # Business logic & API calls (Firestore services)
+│   ├── types/          # TypeScript definitions
+│   └── styles/         # Global CSS and Tailwind configuration
+├── public/             # Static assets
+└── firebase.json       # Firebase configuration & Security Rules
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🚀 Getting Started
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 1. Clone the repository
+```bash
+git clone <your-repo-url>
+cd Community-Management
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 2. Install dependencies
+```bash
+npm install
+```
 
-## Learn More
+### 3. Environment Setup
+Create a `.env.local` file in the root directory and add your credentials:
 
-To learn more about Next.js, take a look at the following resources:
+```env
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# AI Chatbot
+GEMINI_API_KEY_AI_CHAT_BOT=your_gemini_api_key
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+# Optional: Cloudinary for Image Uploads
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
+NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_preset
+```
 
-## Deploy on Vercel
+### 4. Run the development server
+```bash
+npm run dev
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Open [http://localhost:3000](http://localhost:3000) to see the application in action.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📜 License
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+Built with ❤️ for community resilience.
