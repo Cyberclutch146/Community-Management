@@ -29,114 +29,315 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="bg-background text-on-background min-h-[calc(100vh-80px)] flex items-center justify-center p-4">
-      <main className="w-full max-w-5xl bg-surface-container-low rounded-xl shadow-[0_4px_20px_rgba(46,50,48,0.06)] overflow-hidden flex flex-col md:flex-row min-h-[600px]">
-        {/* Image Side */}
-        <div className="hidden md:block md:w-1/2 relative bg-surface-variant">
-          <img 
-            alt="Warm organic hands holding soil with a small plant" 
-            className="absolute inset-0 w-full h-full object-cover" 
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBF1yobusCoIcuVF0EtfpSB8WR59SuB2LtaOsDTiOv5Ie9cgeMsTy7RozrFagQflFJUUqvfnfIyVcQG5JqDvumiMbw0Q34C_886vO_S5LbiuxYFUR4_SYXMCRWZvmPLV41-wJVJD6a_mRnASkWkMGubCq3D5F3MCKY-DTO-g4MHwZSm6ienqT01RyttYGTBFwBhLaQ2KFzO3rqxr7hieu7PWOsUXr6T7N5yilCoRVIJFgje6AEwYCTaqtxqZDdNY0SsXXEljE_0dmUj"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-          <div className="absolute bottom-8 left-8 right-8 text-white">
-            <div className="font-headline text-3xl font-bold mb-2">Rooted in community.</div>
-            <p className="font-body text-sm text-white/90 leading-relaxed">Join us in making a difference, one action at a time.</p>
-          </div>
-        </div>
-        
-        {/* Form Side */}
-        <div className="w-full md:w-1/2 p-8 md:p-12 flex flex-col justify-center">
-          <div className="mb-10 text-center md:text-left">
-            <div className="font-headline text-primary text-3xl font-bold tracking-tight mb-2">Terra Relief</div>
-            <h1 className="font-headline text-2xl font-semibold text-on-surface mb-2">Welcome Back</h1>
-            <p className="font-body text-on-surface-variant text-sm leading-relaxed">Sign in to continue your impact journey.</p>
-          </div>
-          
-          {error && (
-            <div className="mb-6 p-4 bg-error-container text-on-error-container rounded-lg text-sm border border-error/20 flex flex-col gap-2">
-              <p className="font-bold">Login Failed</p>
-              <p>{error}</p>
-            </div>
-          )}
+    <>
+      <style>{`
+        :root {
+          --cream: #F5F0E8;
+          --warm-white: #FAF8F4;
+          --ink: #1A1713;
+          --olive: #3D4A2E;
+          --terracotta: #C4622D;
+          --stone: #9A8F82;
+          --mist: #E8E2D9;
+        }
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            {/* Email Field */}
-            <div>
-              <label className="block font-label text-sm font-medium text-on-surface mb-2" htmlFor="email">Email Address</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[20px]">mail</span>
-                </div>
-                <input 
-                  className="w-full pl-10 pr-4 py-3 bg-surface rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-body text-base placeholder:text-on-surface-variant/50 transition-colors" 
-                  id="email" 
-                  name="email" 
-                  placeholder="you@example.com" 
-                  required 
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  disabled={loading}
-                />
-              </div>
-            </div>
-            
-            {/* Password Field */}
-            <div>
-              <div className="flex justify-between items-center mb-2">
-                <label className="block font-label text-sm font-medium text-on-surface" htmlFor="password">Password</label>
-                <Link className="font-label text-sm font-medium text-primary hover:text-primary-container transition-colors underline underline-offset-2" href="#">Forgot password?</Link>
-              </div>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
-                  <span className="material-symbols-outlined text-[20px]">lock</span>
-                </div>
-                <input 
-                  className="w-full pl-10 pr-10 py-3 bg-surface rounded-DEFAULT border border-outline-variant focus:border-primary focus:ring-1 focus:ring-primary text-on-surface font-body text-base placeholder:text-on-surface-variant/50 transition-colors" 
-                  id="password" 
-                  name="password" 
-                  placeholder="••••••••" 
-                  required 
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  disabled={loading}
-                />
-                <button className="absolute inset-y-0 right-0 pr-3 flex items-center text-on-surface-variant hover:text-primary transition-colors focus:outline-none" type="button">
-                  <span className="material-symbols-outlined text-[20px]">visibility</span>
-                </button>
-              </div>
-            </div>
-            
-            {/* Remember Me */}
-            <div className="flex items-center">
-              <input className="h-4 w-4 rounded border-outline-variant text-primary focus:ring-primary bg-surface cursor-pointer" id="remember-me" name="remember-me" type="checkbox"/>
-              <label className="ml-2 block font-body text-sm text-on-surface-variant cursor-pointer" htmlFor="remember-me">
-                Remember me
-              </label>
-            </div>
-            
-            {/* Submit Button */}
-            <div className="pt-2">
-              <button 
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-base font-medium text-on-primary bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary transition-all duration-200 active:scale-[0.98] disabled:opacity-50" 
-                type="submit"
+        .login-root {
+          min-height: calc(100vh - 80px);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 40px 24px;
+          box-sizing: border-box;
+        }
+
+        .login-card {
+          width: 100%;
+          max-width: 1000px;
+          height: auto;
+          background: var(--warm-white);
+          border: 1px solid var(--mist);
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          border-radius: 20px;
+          overflow: hidden;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
+          margin: 0 auto;
+          transform: translateY(0);
+          transition: box-shadow 0.5s ease, border-color 0.3s ease;
+        }
+        .login-card:hover {
+          box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+        }
+
+        .login-left {
+          padding: 100px 64px;
+          display: flex;
+          flex-direction: column;
+          justify-content: flex-start;
+        }
+
+        .login-title {
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 48px;
+          font-weight: 300;
+          line-height: 1.1;
+          margin-bottom: 12px;
+        }
+
+        .login-sub {
+          color: var(--stone);
+          font-size: 15px;
+          margin-bottom: 48px;
+          max-width: 380px;
+        }
+
+        .input {
+          width: 100%;
+          padding: 18px 0 10px;
+          border: none;
+          border-bottom: 1px solid var(--mist);
+          background: transparent;
+          font-size: 14px;
+          outline: none;
+          margin-bottom: 28px;
+          border-radius: 4px;
+          transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .input:focus {
+          border-color: var(--olive);
+          box-shadow: 0 2px 0 0 var(--olive);
+        }
+
+        .btn {
+          width: 100%;
+          padding: 16px;
+          background: var(--ink);
+          color: var(--cream);
+          border: none;
+          font-size: 13px;
+          letter-spacing: 0.14em;
+          text-transform: uppercase;
+          cursor: pointer;
+          transition: background 0.3s ease, box-shadow 0.25s ease;
+          border-radius: 6px;
+        }
+
+        .btn:hover {
+          background: var(--olive);
+          box-shadow: 0 6px 18px rgba(0,0,0,0.10);
+        }
+
+        .btn:active {
+          box-shadow: 0 2px 8px rgba(0,0,0,0.08) inset;
+        }
+
+        .login-footer {
+          margin-top: 32px;
+          font-size: 13px;
+          color: var(--stone);
+        }
+
+        .login-footer a {
+          color: var(--ink);
+          text-decoration: underline;
+        }
+
+        .login-right {
+          position: relative;
+          overflow: hidden;
+        }
+
+        .login-right img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+          filter: brightness(0.9);
+          border-radius: 0 20px 20px 0;
+          transition: filter 0.6s ease;
+        }
+        .login-right:hover img {
+          filter: brightness(1);
+        }
+
+        .login-overlay {
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(to top, rgba(26,23,19,0.55), rgba(26,23,19,0.15));
+        }
+
+        .login-quote {
+          position: absolute;
+          bottom: 60px;
+          left: 60px;
+          right: 60px;
+          color: var(--cream);
+          font-family: 'Cormorant Garamond', serif;
+          font-size: 36px;
+          font-weight: 300;
+          line-height: 1.3;
+        }
+
+        .or-divider {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          margin: 36px 0 24px;
+          color: var(--stone);
+          font-size: 12px;
+          letter-spacing: 0.1em;
+          text-transform: uppercase;
+        }
+
+        .or-divider::before,
+        .or-divider::after {
+          content: '';
+          flex: 1;
+          height: 1px;
+          background: var(--mist);
+        }
+
+        .social-row {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 12px;
+          margin-bottom: 12px;
+        }
+
+        .social-btn {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 10px;
+          padding: 14px;
+          border: 1px solid var(--mist);
+          background: transparent;
+          cursor: pointer;
+          font-size: 12px;
+          font-weight: 500;
+          letter-spacing: 0.06em;
+          text-transform: uppercase;
+          transition: border-color 0.2s ease, background 0.2s ease;
+          border-radius: 8px;
+        }
+
+        .social-btn:hover {
+          border-color: var(--ink);
+          background: var(--mist);
+        }
+
+        .social-icon {
+          width: 16px;
+          height: 16px;
+        }
+
+        .error-toast {
+          position: fixed;
+          bottom: 32px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(26,23,19,0.95);
+          color: var(--cream);
+          padding: 14px 20px;
+          font-size: 13px;
+          letter-spacing: 0.04em;
+          border-radius: 8px;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+          z-index: 999;
+          animation: fadeInUp 0.3s ease;
+        }
+
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translate(-50%, 10px);
+          }
+          to {
+            opacity: 1;
+            transform: translate(-50%, 0);
+          }
+        }
+
+        @media (max-width: 900px) {
+          .login-card {
+            grid-template-columns: 1fr;
+          }
+          .login-left {
+            padding: 48px 32px;
+          }
+          .login-right {
+            height: 300px;
+          }
+        }
+      `}</style>
+
+      <div className="login-root">
+        <div className="login-card">
+
+          <div className="login-left">
+            <h1 className="login-title">Welcome back.</h1>
+            <p style={{ fontFamily: 'Cormorant Garamond', fontSize: '34px', fontStyle: 'italic', marginBottom: '24px', color: 'var(--olive)' }}>
+              We're glad you're here.
+            </p>
+            <p className="login-sub">Continue your journey of impact.</p>
+
+            <form onSubmit={handleLogin}>
+              <input
+                className="input"
+                type="email"
+                placeholder="Email address"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 disabled={loading}
-              >
+              />
+
+              <input
+                className="input"
+                type="password"
+                placeholder="Password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                disabled={loading}
+              />
+
+              <button className="btn" type="submit" disabled={loading}>
                 {loading ? 'Signing in...' : 'Sign In'}
               </button>
+
+              <div className="or-divider">or</div>
+
+              <div className="social-row">
+                <button className="social-btn">
+                  <img className="social-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" />
+                  Google
+                </button>
+                <button className="social-btn">
+                  <img className="social-icon" src="https://www.svgrepo.com/show/475647/facebook-color.svg" />
+                  Facebook
+                </button>
+                <button className="social-btn">
+                  <img className="social-icon" src="https://www.svgrepo.com/show/475689/twitter-color.svg" />
+                  X
+                </button>
+              </div>
+            </form>
+
+            <div className="login-footer">
+              New here? <Link href="/register">Create an account</Link>
             </div>
-          </form>
-          
-          <div className="mt-8 pt-6 border-t border-outline-variant/30 text-center">
-            <p className="font-body text-sm text-on-surface-variant">
-              New to Terra Relief?{' '}
-              <Link className="font-medium text-primary hover:text-primary-container transition-colors underline underline-offset-2" href="/register">Create an account</Link>
-            </p>
           </div>
+
+          <div className="login-right">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6SsSRVlGYy_mYUBPddi5PP0YThIbaZOjDdbxdceDg1Y6UxF6lR23T8POlRObgpuxvvTDIgemtKHSk6ULAH8zMBeYYhFLPPR6xG3JggHWG8qMeJhf9bP7xWgBa02EDitKYJHAnyhB9qcai7rJAG3Gvw5XuoAnrg9DapfZkm0Q7na_aJgu6Cvx-HWuO24YEv4d25UPMK1HQJT_U6VknyixRH1bCSgVgHwpuQZCp6Zh_9LOBd2EzXwdbY784qMeRhQ88skYX-y_rNIUN" />
+            <div className="login-overlay" />
+            <div className="login-quote">
+              Rooted in community,<br/>grown through care.
+            </div>
+          </div>
+
         </div>
-      </main>
-    </div>
+        {error && <div className="error-toast">{error}</div>}
+      </div>
+    </>
   );
 }

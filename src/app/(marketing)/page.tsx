@@ -5,7 +5,7 @@ export default function LandingPage() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500&family=Italianno&display=swap');
 
         :root {
           --cream: #F5F0E8;
@@ -257,7 +257,7 @@ export default function LandingPage() {
         }
 
         .impact-number {
-          font-family: 'Cormorant Garamond', Georgia, serif;
+          font-family: 'Italianno', Georgia, serif;
           font-size: 72px;
           font-weight: 300;
           line-height: 1;
