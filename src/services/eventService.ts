@@ -1,8 +1,10 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
+export const ADMIN_EMAIL = 'ece2024033@rcciit.org.in';
+
 // ─── Paginated fetch ────────────────────────────────────
 export interface PaginatedEvents {
   events: CommunityEvent[];
@@ -126,6 +128,19 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
     return docRef.id;
   } catch (error: any) {
     console.error('Failed to create event in Firebase:', error);
+    throw error;
+  }
+};
+
+// ─── Delete ─────────────────────────────────────────────
+export const deleteEvent = async (eventId: string): Promise<void> => {
+  try {
+    const eventRef = doc(db, EVENTS_COLLECTION, eventId);
+    // Note: This doesn't delete subcollections. 
+    // In a production environment, you might want to use a Cloud Function for recursive deletion.
+    await deleteDoc(eventRef);
+  } catch (error) {
+    console.error('Failed to delete event:', error);
     throw error;
   }
 };

@@ -3,9 +3,9 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function OrganizerEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,7 +33,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           getEventVolunteers(eventId)
         ]);
 
-        if (eventData?.organizerId !== user.uid) {
+        if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
           toast.error('You do not have permission to view this event.');
           router.push('/dashboard');
           return;
@@ -63,6 +63,19 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
     } catch (error) {
       console.error('Failed to update attendance:', error);
       toast.error('Failed to update attendance.');
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
+    
+    try {
+      await deleteEvent(eventId);
+      toast.success('Event deleted successfully.');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      toast.error('Failed to delete event.');
     }
   };
 
@@ -151,6 +164,13 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           >
             <Download size={18} />
             Export CSV
+          </button>
+          <button 
+            onClick={handleDeleteEvent}
+            className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm border border-red-100"
+          >
+            <Trash2 size={18} />
+            Delete Event
           </button>
         </div>
       </div>

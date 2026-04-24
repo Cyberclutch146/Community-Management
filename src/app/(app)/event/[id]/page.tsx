@@ -1,6 +1,6 @@
 'use client';
 
-import { notFound } from 'next/navigation';
+import { notFound, useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ChatBox';
@@ -8,12 +8,17 @@ import { VolunteerLeaderboard } from '@/components/VolunteerLeaderboard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, use, useCallback } from 'react';
-import { getEventById } from '@/services/eventService';
+import { getEventById, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
+import { useAuth } from '@/context/AuthContext';
+import { toast } from 'sonner';
+import { Trash2 } from 'lucide-react';
 import { CommunityEvent } from '@/types';
 
 export default function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
   const id = resolvedParams.id;
+  const router = useRouter();
+  const { user } = useAuth();
   const [event, setEvent] = useState<CommunityEvent | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -40,6 +45,21 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
       console.error('Failed to refresh event:', err);
     }
   }, [id]);
+
+  const handleDeleteEvent = async () => {
+    if (!confirm('ADMIN: Are you sure you want to delete this event? This action cannot be undone.')) return;
+    
+    try {
+      await deleteEvent(id);
+      toast.success('Event deleted successfully.');
+      router.push('/feed');
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      toast.error('Failed to delete event.');
+    }
+  };
+
+  const isAdmin = user?.email === ADMIN_EMAIL;
 
   if (loading) {
     return (
@@ -80,6 +100,22 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-6 leading-tight">
               {event.title}
             </h1>
+
+            {isAdmin && (
+              <div className="mb-6 p-4 bg-red-50 rounded-2xl border border-red-100 flex items-center justify-between">
+                <div>
+                  <p className="text-red-800 font-bold text-sm uppercase tracking-wider">Admin Controls</p>
+                  <p className="text-red-600 text-sm">You have administrative privileges to manage this event.</p>
+                </div>
+                <button 
+                  onClick={handleDeleteEvent}
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+                >
+                  <Trash2 size={18} />
+                  Delete Event
+                </button>
+              </div>
+            )}
             
             <p className="text-on-surface-variant text-lg leading-relaxed mb-10">
               {event.description}
