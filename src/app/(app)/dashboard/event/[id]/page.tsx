@@ -86,18 +86,18 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
       return;
     }
     
-    try {
-      await navigator.clipboard.writeText(emails.join(', '));
-      toast.success('Emails copied to clipboard! Opening mail client...');
-    } catch (err) {
-      toast.success('Opening mail client...');
-    }
-
     const subject = encodeURIComponent(`Update regarding ${event?.title || 'Community Event'}`);
     const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
     
-    // Fallback to simple location assignment
+    // Trigger the mail client IMMEDIATELY so the browser doesn't block it due to async delay
     window.location.href = mailtoLink;
+
+    try {
+      await navigator.clipboard.writeText(emails.join(', '));
+      toast.success('Opening mail client (and copied emails to clipboard just in case!)');
+    } catch (err) {
+      // ignore clipboard errors
+    }
   };
 
   const handleExportCSV = () => {
