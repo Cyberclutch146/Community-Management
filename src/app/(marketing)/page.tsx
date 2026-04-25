@@ -1,5 +1,6 @@
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function LandingPage() {
   return (
@@ -34,10 +35,12 @@ export default function LandingPage() {
           </div>
         </div>
         <div className="relative h-[60vh] lg:h-full overflow-hidden">
-          <img
-            src="https://images.unsplash.com/photo-1593113514676-54523e11765c?auto=format&fit=crop&q=80"
+          <Image
+            src="https://images.unsplash.com/photo-1531206715517-5c0ba140b2b8?auto=format&fit=crop&q=80"
             alt="Community hands"
-            className="w-full h-full object-cover saturate-[0.85] brightness-90 dark:brightness-75 hover:scale-105 transition-transform duration-[8s] ease-out"
+            fill
+            className="object-cover saturate-[0.85] brightness-90 dark:brightness-75 hover:scale-105 transition-transform duration-[8s] ease-out"
+            priority
           />
           <div className="absolute inset-0 bg-gradient-to-br from-background/30 dark:from-background/60 to-transparent pointer-events-none" />
         </div>
