@@ -50,41 +50,40 @@ export default function SentinelDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] min-h-[600px] md:min-h-[700px] px-2 md:px-0">
       {/* Header section shrink to fit */}
-      <div className="shrink-0 bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/20 border border-emerald-100/50 rounded-[2rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
-        <div className="relative z-10">
-          <h1 className="text-2xl md:text-4xl font-serif font-bold flex items-center gap-3 text-slate-800 tracking-tight">
-            <ShieldAlert className="h-8 w-8 text-emerald-500 shrink-0" />
-            Community Sentinel
-          </h1>
-          <p className="text-slate-500 mt-2 max-w-2xl text-sm md:text-base font-medium leading-relaxed">
-            Real-time public data synchronization for environmental and social awareness.
-          </p>
-        </div>
-        <div className="absolute right-0 top-0 w-64 h-full opacity-[0.03] pointer-events-none text-emerald-900">
-           <Activity className="w-full h-full transform translate-x-1/4 scale-150" />
+      <div className="shrink-0 bg-white dark:bg-zinc-900/50 border border-slate-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 shadow-sm relative overflow-hidden">
+        <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-xl md:text-2xl font-serif font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100 tracking-tight">
+              <ShieldAlert className="h-5 w-5 text-emerald-800 dark:text-emerald-500 shrink-0" />
+              Community Sentinel
+            </h1>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-2xl text-xs md:text-sm font-medium leading-relaxed">
+              Real-time public data synchronization for environmental and social awareness.
+            </p>
+          </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="shrink-0 flex bg-white/80 backdrop-blur-md border border-slate-200/60 p-1.5 rounded-2xl w-full max-w-sm mx-auto shadow-sm">
+      <div className="shrink-0 flex bg-slate-50/80 dark:bg-zinc-900/80 backdrop-blur-md border border-slate-200/60 dark:border-zinc-800 p-1 rounded-xl w-full max-w-xs mx-auto shadow-sm">
          <button 
            onClick={() => setActiveTab('map')} 
-           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'map' ? 'bg-white shadow-sm text-emerald-700 ring-1 ring-emerald-100/50' : 'text-slate-500 hover:text-emerald-600 hover:bg-white/50'}`}
+           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'map' ? 'bg-white dark:bg-zinc-800 shadow-sm text-emerald-800 dark:text-emerald-400 ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
          >
            <MapIcon className="h-4 w-4" /> Threat Map
          </button>
          <button 
            onClick={() => setActiveTab('feed')} 
-           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'feed' ? 'bg-white shadow-sm text-emerald-700 ring-1 ring-emerald-100/50' : 'text-slate-500 hover:text-emerald-600 hover:bg-white/50'}`}
+           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'feed' ? 'bg-white dark:bg-zinc-800 shadow-sm text-emerald-800 dark:text-emerald-400 ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
          >
            <Activity className="h-4 w-4" /> Live Feed
          </button>
       </div>
 
       {/* Content Area flexes to fill available space */}
-      <div className="flex-1 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-sm border border-slate-200/60 p-2 md:p-4 overflow-hidden flex flex-col relative min-h-[500px] md:min-h-0">
+      <div className="flex-1 bg-white dark:bg-zinc-900 rounded-2xl md:rounded-[1.5rem] shadow-sm border border-slate-200/60 dark:border-zinc-800/60 p-2 md:p-3 overflow-hidden flex flex-col relative min-h-[500px] md:min-h-0">
         {activeTab === 'map' && (
-          <div className="flex-1 rounded-2xl md:rounded-[1.5rem] overflow-hidden z-0 bg-slate-50 shadow-inner h-full w-full relative">
+          <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden z-0 bg-slate-50 dark:bg-zinc-950 shadow-inner h-full w-full relative">
              <MapContainer 
                 center={[39.8283, -98.5795]} 
                 zoom={4} 
@@ -100,11 +99,11 @@ export default function SentinelDashboardPage() {
         )}
 
         {activeTab === 'feed' && (
-          <div className="h-full overflow-hidden rounded-2xl md:rounded-[1.5rem] border border-slate-200/60 bg-white">
+          <div className="h-full overflow-hidden rounded-xl md:rounded-2xl bg-transparent">
             {loading ? (
-               <div className="bg-slate-50/50 h-full flex flex-col items-center justify-center">
-                  <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mb-4" />
-                  <p className="text-slate-500 font-medium text-sm">Synchronizing data streams...</p>
+               <div className="bg-slate-50/50 dark:bg-zinc-900/50 h-full flex flex-col items-center justify-center">
+                  <Loader2 className="h-8 w-8 text-emerald-800 dark:text-emerald-500 animate-spin mb-4" />
+                  <p className="text-slate-500 dark:text-slate-400 font-medium text-sm">Synchronizing data streams...</p>
                </div>
             ) : (
                <SentinelAlertFeed alerts={alerts} />

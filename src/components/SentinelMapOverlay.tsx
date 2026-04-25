@@ -75,11 +75,11 @@ export default function SentinelMapOverlay({ alerts }: { alerts: SentinelAlert[]
           <Popup>
             <div className="p-1 min-w-[200px]">
                <div className="flex items-center gap-2 mb-1">
-                 <span className="text-xs bg-blue-100 text-blue-800 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{alert.source}</span>
-                 <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${alert.severity === 'Extreme' || alert.severity === 'Severe' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>{alert.severity}</span>
+                 <span className="text-xs bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{alert.source}</span>
+                 <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${alert.severity === 'Extreme' || alert.severity === 'Severe' ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300'}`}>{alert.severity}</span>
                </div>
-               <h3 className="font-bold text-sm mb-1">{alert.title}</h3>
-               <p className="text-xs text-gray-700">{alert.locationName}</p>
+               <h3 className="font-bold text-sm mb-1 dark:text-zinc-100">{alert.title}</h3>
+               <p className="text-xs text-gray-700 dark:text-zinc-400">{alert.locationName}</p>
             </div>
           </Popup>
         </Polygon>
@@ -95,14 +95,14 @@ export default function SentinelMapOverlay({ alerts }: { alerts: SentinelAlert[]
           <Popup>
              <div className="p-1 min-w-[200px]">
                <div className="flex items-center gap-2 mb-1">
-                 <span className="text-xs bg-gray-100 text-gray-800 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{alert.source}</span>
-                 <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${alert.severity === 'Extreme' || alert.severity === 'Severe' ? 'bg-red-100 text-red-800' : alert.severity === 'Unknown' ? 'bg-gray-100 text-gray-800' : 'bg-yellow-100 text-yellow-800'}`}>{alert.severity}</span>
+                 <span className="text-xs bg-gray-100 dark:bg-zinc-800/60 text-gray-800 dark:text-zinc-300 px-2 py-0.5 rounded font-bold uppercase tracking-wider">{alert.source}</span>
+                 <span className={`text-xs px-2 py-0.5 rounded font-bold uppercase ${alert.severity === 'Extreme' || alert.severity === 'Severe' ? 'bg-red-100 dark:bg-red-900/40 text-red-800 dark:text-red-300' : alert.severity === 'Unknown' ? 'bg-gray-100 dark:bg-zinc-800/60 text-gray-800 dark:text-zinc-300' : 'bg-yellow-100 dark:bg-yellow-900/40 text-yellow-800 dark:text-yellow-300'}`}>{alert.severity}</span>
                </div>
-               <h3 className="font-bold text-sm mb-1">{alert.title}</h3>
+               <h3 className="font-bold text-sm mb-1 dark:text-zinc-100">{alert.title}</h3>
                {alert.url ? (
-                 <a href={alert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:underline">View Source</a>
+                 <a href={alert.url} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 dark:text-blue-400 hover:underline">View Source</a>
                ) : (
-                 <p className="text-xs text-gray-700">{alert.locationName}</p>
+                 <p className="text-xs text-gray-700 dark:text-zinc-400">{alert.locationName}</p>
                )}
             </div>
           </Popup>
