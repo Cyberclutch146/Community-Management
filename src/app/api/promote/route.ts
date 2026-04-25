@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
-import Papa from "papaparse";
+import csv from "csv-parser";
+import * as XLSX from "xlsx";
+import { Readable } from "stream";
 import { sendEmail } from "@/services/emailService";
+import { sendSMS } from "@/services/smsService";
 // @ts-ignore
-import db from "../../../../config/firebase";
+const db: any = require("../../../../config/firebase").default || require("../../../../config/firebase");
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -15,86 +18,122 @@ export async function POST(req: NextRequest) {
     const file = formData.get("file") as File;
 
     if (!file) {
-      return NextResponse.json({ error: "CSV file required" }, { status: 400 });
+      return NextResponse.json({ error: "File is required" }, { status: 400 });
+    }
+
+    const fileName = file.name.toLowerCase();
+    if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
+      return NextResponse.json({ error: "Invalid file type. Please upload a .csv or .xlsx file." }, { status: 400 });
     }
 
     if (!message) {
       return NextResponse.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // 🚀 Robust CSV Parsing with PapaParse (Handles BOM, Encoding, Delimiters automatically)
-    const text = await file.text();
-    const emails: string[] = [];
-    
+    // 🚀 Robust CSV/Excel Parsing
     console.log('API: Processing file:', file.name, 'Size:', file.size);
 
-    const parsedData = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: (header) => header.toLowerCase().trim()
-    });
-
-    console.log("API: PapaParse Output Metadata:", parsedData.meta);
-    console.log("API: First Row Parsed:", parsedData.data[0]);
-
-    if (parsedData.errors.length > 0) {
-      console.warn("API: PapaParse found issues:", parsedData.errors);
+    let buffer = Buffer.from(await file.arrayBuffer());
+    
+    if (fileName.endsWith('.xlsx')) {
+      console.log('API: Converting XLSX to CSV format');
+      const workbook = XLSX.read(buffer, { type: 'buffer' });
+      const sheetName = workbook.SheetNames[0];
+      const sheet = workbook.Sheets[sheetName];
+      const csvData = XLSX.utils.sheet_to_csv(sheet);
+      buffer = Buffer.from(csvData);
     }
 
-    parsedData.data.forEach((row: any) => {
-      // 🔍 Find the email column no matter what it's called
-      const emailValue = row.email || row['email address'] || row.address || row['email_address'] || row.contact;
-      
-      if (emailValue) {
-        const trimmedEmail = String(emailValue).trim();
-        if (isValidEmail(trimmedEmail)) {
-          emails.push(trimmedEmail);
-        } else {
-          console.log("API: Skipped invalid email format:", trimmedEmail);
-        }
-      }
+    const contacts: { email?: string, phone?: string }[] = [];
+    const parsedData: any[] = [];
+
+    await new Promise((resolve, reject) => {
+      Readable.from(buffer)
+        .pipe(csv({
+          mapHeaders: ({ header }) => header.toLowerCase().trim()
+        }))
+        .on("data", (row: any) => {
+          parsedData.push(row);
+          // 🔍 Find the email and phone columns no matter what they are called
+          const emailValue = row.email || row['email address'] || row.address || row['email_address'] || row.contact;
+          const phoneValue = row.phone || row['phone number'] || row.mobile || row.contact;
+          
+          const contact: { email?: string, phone?: string } = {};
+
+          if (emailValue) {
+            const trimmedEmail = String(emailValue).trim();
+            if (isValidEmail(trimmedEmail)) {
+              contact.email = trimmedEmail;
+            } else {
+              console.log("API: Skipped invalid email format:", trimmedEmail);
+            }
+          }
+
+          if (phoneValue) {
+            const trimmedPhone = String(phoneValue).replace(/\D/g, ''); // Extract digits
+            if (trimmedPhone.length >= 10) { // Basic validation
+              // Assuming India format requires 10 digits
+              contact.phone = trimmedPhone.slice(-10); 
+            } else {
+              console.log("API: Skipped invalid phone format:", trimmedPhone);
+            }
+          }
+
+          if (contact.email || contact.phone) {
+            contacts.push(contact);
+          }
+        })
+        .on("end", resolve)
+        .on("error", reject);
     });
 
-    if (emails.length === 0) {
+    console.log("API: First Row Parsed:", parsedData[0]);
+
+    if (contacts.length === 0) {
       return NextResponse.json({ 
-        error: "No valid emails found in CSV",
+        error: "No valid emails or phone numbers found in CSV",
         debug: {
-          headersSeen: parsedData.meta.fields,
-          firstRowSeen: parsedData.data[0],
-          errors: parsedData.errors
+          firstRowSeen: parsedData[0] || null
         }
       }, { status: 400 });
     }
 
-    // 🚀 Send emails in parallel and log each one individually
+    // 🚀 Send emails and SMS in parallel and log each one individually
     const results = await Promise.allSettled(
-      emails.map(async (email) => {
+      contacts.map(async (contact) => {
         try {
-          await sendEmail(email, message);
+          const tasks = [];
+          if (contact.email) {
+            tasks.push(sendEmail(contact.email, message));
+          }
+          if (contact.phone) {
+            tasks.push(sendSMS(contact.phone, message));
+          }
+          await Promise.all(tasks);
           
           try {
             await db.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
-              email,
+              contact,
               status: "sent",
               createdAt: new Date()
             });
           } catch (logErr) {
-            console.error(`Failed to log success for ${email}:`, logErr);
+            console.error(`Failed to log success for`, contact, `:`, logErr);
           }
           
-          return email;
+          return contact;
         } catch (error: any) {
           try {
             await db.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
-              email,
+              contact,
               status: "failed",
               error: error.message || "Unknown error",
               createdAt: new Date()
             });
           } catch (logErr) {
-            console.error(`Failed to log error for ${email}:`, logErr);
+            console.error(`Failed to log error for`, contact, `:`, logErr);
           }
           throw error;
         }
@@ -108,7 +147,7 @@ export async function POST(req: NextRequest) {
     try {
       await db.collection("promotions").add({
         campaignId: campaignId || "unknown",
-        total: emails.length,
+        total: contacts.length,
         success,
         failed,
         message,
@@ -120,7 +159,7 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json({
-      total: emails.length,
+      total: contacts.length,
       success,
       failed
     });
