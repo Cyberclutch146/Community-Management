@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -73,341 +73,117 @@ export default function RegisterPage() {
   };
 
   return (
-    <>
-      <style>{`
-        :root {
-          --cream: #F5F0E8;
-          --warm-white: #FAF8F4;
-          --ink: #1A1713;
-          --olive: #3D4A2E;
-          --terracotta: #C4622D;
-          --stone: #9A8F82;
-          --mist: #E8E2D9;
-        }
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 bg-background text-on-background selection:bg-primary/20">
+      <div className="w-full max-w-5xl bg-surface border border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 rounded-[20px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.08)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.12)] dark:shadow-none transition-shadow duration-500">
+        
+        {/* Left Side */}
+        <div className="flex flex-col justify-start p-10 md:p-14 lg:p-20">
+          <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3 text-on-surface">Join Kindred.</h1>
+          <p className="text-on-surface-variant text-[15px] mb-10 max-w-[380px]">
+            Create your volunteer account and start making an impact in your community.
+          </p>
 
-        .login-root {
-          min-height: calc(100vh - 80px);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 40px 24px;
-          box-sizing: border-box;
-        }
+          <form onSubmit={handleRegister} className="flex flex-col">
+            <input
+              className="w-full pt-[14px] pb-2 border-b border-outline-variant/50 bg-transparent text-[14px] outline-none mb-6 transition-colors focus:border-primary focus:shadow-[0_2px_0_0_var(--color-primary)] placeholder:text-outline"
+              type="text"
+              placeholder="Full Name"
+              value={fullName}
+              onChange={(e) => setFullName(e.target.value)}
+              disabled={loading}
+              required
+            />
 
-        .login-card {
-          width: 100%;
-          max-width: 1000px;
-          height: auto;
-          background: var(--warm-white);
-          border: 1px solid var(--mist);
-          display: grid;
-          grid-template-columns: 1fr 1fr;
-          border-radius: 20px;
-          overflow: hidden;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-          margin: 0 auto;
-          transform: translateY(0);
-          transition: box-shadow 0.5s ease, border-color 0.3s ease;
-        }
-        .login-card:hover {
-          box-shadow: 0 30px 80px rgba(0,0,0,0.12);
-        }
+            <input
+              className="w-full pt-[14px] pb-2 border-b border-outline-variant/50 bg-transparent text-[14px] outline-none mb-6 transition-colors focus:border-primary focus:shadow-[0_2px_0_0_var(--color-primary)] placeholder:text-outline"
+              type="email"
+              placeholder="Email Address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={loading}
+              required
+            />
 
-        .login-left {
-          padding: 60px 64px;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-        }
+            <input
+              className="w-full pt-[14px] pb-2 border-b border-outline-variant/50 bg-transparent text-[14px] outline-none mb-6 transition-colors focus:border-primary focus:shadow-[0_2px_0_0_var(--color-primary)] placeholder:text-outline"
+              type="text"
+              placeholder="Primary Location (City, Country)"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              disabled={loading}
+              required
+            />
 
-        .login-title {
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 48px;
-          font-weight: 300;
-          line-height: 1.1;
-          margin-bottom: 12px;
-        }
+            <input
+              className="w-full pt-[14px] pb-2 border-b border-outline-variant/50 bg-transparent text-[14px] outline-none mb-8 transition-colors focus:border-primary focus:shadow-[0_2px_0_0_var(--color-primary)] placeholder:text-outline"
+              type="password"
+              placeholder="Password (at least 8 characters)"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={loading}
+              required
+              minLength={8}
+            />
 
-        .login-sub {
-          color: var(--stone);
-          font-size: 15px;
-          margin-bottom: 48px;
-          max-width: 380px;
-        }
-
-        .input {
-          width: 100%;
-          padding: 18px 0 10px;
-          border: none;
-          border-bottom: 1px solid var(--mist);
-          background: transparent;
-          font-size: 14px;
-          outline: none;
-          margin-bottom: 24px;
-          border-radius: 4px;
-          transition: border-color 0.25s ease, box-shadow 0.25s ease;
-        }
-
-        .input:focus {
-          border-color: var(--olive);
-          box-shadow: 0 2px 0 0 var(--olive);
-        }
-
-        .btn {
-          width: 100%;
-          padding: 16px;
-          background: var(--ink);
-          color: var(--cream);
-          border: none;
-          font-size: 13px;
-          letter-spacing: 0.14em;
-          text-transform: uppercase;
-          cursor: pointer;
-          transition: background 0.3s ease, box-shadow 0.25s ease;
-          border-radius: 6px;
-        }
-
-        .btn:hover {
-          background: var(--olive);
-          box-shadow: 0 6px 18px rgba(0,0,0,0.10);
-        }
-
-        .btn:active {
-          box-shadow: 0 2px 8px rgba(0,0,0,0.08) inset;
-        }
-
-        .login-footer {
-          margin-top: 32px;
-          font-size: 13px;
-          color: var(--stone);
-        }
-
-        .login-footer a {
-          color: var(--ink);
-          text-decoration: underline;
-        }
-
-        .login-right {
-          position: relative;
-          overflow: hidden;
-        }
-
-        .login-right img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-          filter: brightness(0.9);
-          transition: filter 0.6s ease;
-        }
-        .login-right:hover img {
-          filter: brightness(1);
-        }
-
-        .login-overlay {
-          position: absolute;
-          inset: 0;
-          background: linear-gradient(to top, rgba(26,23,19,0.55), rgba(26,23,19,0.15));
-        }
-
-        .login-quote {
-          position: absolute;
-          bottom: 60px;
-          left: 60px;
-          right: 60px;
-          color: var(--cream);
-          font-family: 'Cormorant Garamond', serif;
-          font-size: 36px;
-          font-weight: 300;
-          line-height: 1.3;
-        }
-
-        .or-divider {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          margin: 30px 0 20px;
-          color: var(--stone);
-          font-size: 12px;
-          letter-spacing: 0.1em;
-          text-transform: uppercase;
-        }
-
-        .or-divider::before,
-        .or-divider::after {
-          content: '';
-          flex: 1;
-          height: 1px;
-          background: var(--mist);
-        }
-
-        .social-row {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 12px;
-          margin-bottom: 12px;
-        }
-
-        .social-btn {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 10px;
-          padding: 14px;
-          border: 1px solid var(--mist);
-          background: transparent;
-          cursor: pointer;
-          font-size: 12px;
-          font-weight: 500;
-          letter-spacing: 0.06em;
-          text-transform: uppercase;
-          transition: border-color 0.2s ease, background 0.2s ease;
-          border-radius: 8px;
-        }
-
-        .social-btn:hover {
-          border-color: var(--ink);
-          background: var(--mist);
-        }
-
-        .social-icon {
-          width: 16px;
-          height: 16px;
-        }
-
-        .error-toast {
-          position: fixed;
-          bottom: 32px;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(26,23,19,0.95);
-          color: var(--cream);
-          padding: 14px 20px;
-          font-size: 13px;
-          letter-spacing: 0.04em;
-          border-radius: 8px;
-          box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-          z-index: 999;
-          animation: fadeInUp 0.3s ease;
-        }
-
-        @keyframes fadeInUp {
-          from {
-            opacity: 0;
-            transform: translate(-50%, 10px);
-          }
-          to {
-            opacity: 1;
-            transform: translate(-50%, 0);
-          }
-        }
-
-        @media (max-width: 900px) {
-          .login-card {
-            grid-template-columns: 1fr;
-          }
-          .login-left {
-            padding: 48px 32px;
-          }
-          .login-right {
-            display: none;
-          }
-        }
-      `}</style>
-
-      <div className="login-root">
-        <div className="login-card">
-
-          <div className="login-left">
-            <h1 className="login-title">Join Terra Relief.</h1>
-            <p className="login-sub">Create your volunteer account.</p>
-
-            <form onSubmit={handleRegister}>
-              <input
-                className="input"
-                type="text"
-                placeholder="Full Name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                disabled={loading}
+            <div className="flex items-center mb-8 text-[13px] text-on-surface-variant">
+              <input 
+                type="checkbox" 
+                checked={agreed} 
+                onChange={(e) => setAgreed(e.target.checked)} 
+                disabled={loading} 
+                className="mr-3 w-4 h-4 accent-primary"
                 required
               />
-
-              <input
-                className="input"
-                type="email"
-                placeholder="Email Address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                disabled={loading}
-                required
-              />
-
-              <input
-                className="input"
-                type="text"
-                placeholder="Primary Location (City, Country)"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                disabled={loading}
-                required
-              />
-
-              <input
-                className="input"
-                type="password"
-                placeholder="Password (at least 8 characters)"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                disabled={loading}
-                required
-                minLength={8}
-              />
-
-              <div style={{ display: 'flex', alignItems: 'center', marginBottom: '28px', fontSize: '13px', color: 'var(--stone)' }}>
-                <input 
-                  type="checkbox" 
-                  checked={agreed} 
-                  onChange={(e) => setAgreed(e.target.checked)} 
-                  disabled={loading} 
-                  style={{ marginRight: '12px', width: '16px', height: '16px', accentColor: 'var(--olive)' }} 
-                  required
-                />
-                <span>
-                  I agree to the <a href="#" style={{ color: 'var(--ink)', textDecoration: 'underline' }}>Terms of Service</a> and <a href="#" style={{ color: 'var(--ink)', textDecoration: 'underline' }}>Privacy Policy</a>.
-                </span>
-              </div>
-
-              <button className="btn" type="submit" disabled={loading}>
-                {loading ? 'Creating Account...' : 'Join Terra Relief'}
-              </button>
-
-              <div className="or-divider">or sign up with</div>
-
-              <div className="social-row">
-                <button type="button" className="social-btn" onClick={handleGoogleSignIn} disabled={loading}>
-                  <img className="social-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" />
-                  Google
-                </button>
-              </div>
-            </form>
-
-            <div className="login-footer">
-              Already have an account? <Link href="/login">Log in here</Link>
+              <span>
+                I agree to the <a href="#" className="text-on-surface underline hover:text-primary transition-colors">Terms of Service</a> and <a href="#" className="text-on-surface underline hover:text-primary transition-colors">Privacy Policy</a>.
+              </span>
             </div>
-          </div>
 
+            <button 
+              className="w-full p-4 bg-on-surface text-surface text-[13px] tracking-[0.14em] uppercase rounded-md transition-all hover:bg-primary hover:shadow-lg active:shadow-inner disabled:opacity-50"
+              type="submit" 
+              disabled={loading}
+            >
+              {loading ? 'Creating Account...' : 'Join Kindred'}
+            </button>
 
-          <div className="login-right">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAreKeglV9ZJKv0zGehE1dWVuvZrijPeYA4HQmiOFaMZ5UFVHy1IW_xmFj7ZmVWbkTnEbUm7mi9uEQ7PmFIufwWsH4bZsVoqT7uGgRpLE2rKYui85nDDLq3Te3U3evUqEwira7Ca4IODlVfwWIhRliXqnA0fWrauQ4nRfj7Yw9irLFoSP_jWRarHU2q9nitqm0J98DmRY3QNec-8pYzPPdN73LXN8LnfSYsfSCvgZUotNzZvqvcwImGHu7zz4nhaQIjrdkV8Wn9w7GZ" />
-            <div className="login-overlay" />
-            <div className="login-quote">
-              Rooted in community,<br/>grown through care.
+            <div className="flex items-center gap-3 my-6 text-outline text-[12px] tracking-[0.1em] uppercase before:flex-1 before:h-px before:bg-outline-variant/30 after:flex-1 after:h-px after:bg-outline-variant/30">
+              or sign up with
             </div>
-          </div>
 
+            <button 
+              type="button" 
+              className="flex items-center justify-center gap-2.5 p-3.5 border border-outline-variant/50 bg-transparent text-[12px] font-medium tracking-[0.06em] uppercase rounded-lg transition-colors hover:border-on-surface hover:bg-surface-container disabled:opacity-50"
+              onClick={handleGoogleSignIn} 
+              disabled={loading}
+            >
+              <img className="w-4 h-4" src="https://www.svgrepo.com/show/475656/google-color.svg" alt="Google logo" />
+              Google
+            </button>
+          </form>
+
+          <div className="mt-8 text-[13px] text-on-surface-variant">
+            Already have an account? <Link href="/login" className="text-on-surface underline hover:text-primary transition-colors">Log in here</Link>
+          </div>
         </div>
-        {error && <div className="error-toast">{error}</div>}
+
+        {/* Right Side */}
+        <div className="relative hidden md:block h-full">
+          <img 
+            className="w-full h-full object-cover brightness-90 dark:brightness-75"
+            src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?auto=format&fit=crop&q=80" 
+            alt="Community"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+        </div>
+
       </div>
-    </>
+
+      {error && (
+        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 bg-on-surface text-surface px-5 py-3.5 text-[13px] tracking-[0.04em] rounded-lg shadow-2xl z-50 animate-in slide-in-from-bottom-5">
+          {error}
+        </div>
+      )}
+    </div>
   );
 }
