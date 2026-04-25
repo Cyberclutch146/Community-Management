@@ -1,12 +1,27 @@
 'use client';
 
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { ThemeToggle } from '@/components/ThemeToggle';
 
 export function MarketingNav() {
   const { user, profile } = useAuth();
-  
+
+  const pathname = usePathname();
+
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const isScrolled = window.scrollY > 40;
+      setScrolled(prev => (prev !== isScrolled ? isScrolled : prev));
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <nav className="bg-background font-['Nunito_Sans'] font-medium tracking-tight docked full-width top-0 border-b border-outline-variant shadow-[0_4px_20px_rgba(46,50,48,0.06)] z-50 sticky">
       <div className="flex justify-between items-center w-full px-6 md:px-12 h-20 max-w-7xl mx-auto">

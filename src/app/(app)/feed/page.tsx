@@ -166,9 +166,23 @@ function FeedContent() {
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event, index) => (
-            <EventCard key={event.id} event={event} featured={index === 0} />
-          ))}
+          {filteredEvents.map((event) => {
+            const hasRealImage = !!event.imageUrl;
+            const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
+
+            const normalizedEvent = {
+              ...event,
+              imageUrl: imageUrl,
+            };
+
+            return (
+              <EventCard 
+                key={event.id} 
+                event={normalizedEvent} 
+                featured={hasRealImage}
+              />
+            );
+          })}
         </div>
       )}
 
