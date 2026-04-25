@@ -3,9 +3,9 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, EventVolunteer } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function OrganizerEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,7 +33,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           getEventVolunteers(eventId)
         ]);
 
-        if (eventData?.organizerId !== user.uid) {
+        if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
           toast.error('You do not have permission to view this event.');
           router.push('/dashboard');
           return;
@@ -51,6 +51,43 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
     loadData();
   }, [eventId, user, router]);
+
+  const handleToggleAttendance = async (volunteerId: string, currentStatus: boolean | undefined) => {
+    try {
+      const newStatus = !currentStatus;
+      await updateVolunteerStatus(eventId, volunteerId, newStatus);
+      setVolunteers(prev => 
+        prev.map(v => v.id === volunteerId ? { ...v, attended: newStatus } : v)
+      );
+      toast.success(`Volunteer marked as ${newStatus ? 'attended' : 'not attended'}.`);
+    } catch (error) {
+      console.error('Failed to update attendance:', error);
+      toast.error('Failed to update attendance.');
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
+    
+    try {
+      await deleteEvent(eventId);
+      toast.success('Event deleted successfully.');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      toast.error('Failed to delete event.');
+    }
+  };
+
+  const handleEmailAll = () => {
+    const emails = volunteers.map(v => v.userEmail).filter(Boolean);
+    if (emails.length === 0) {
+      toast.info('No email addresses available to contact.');
+      return;
+    }
+    const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=Update regarding ${event?.title}`;
+    window.location.href = mailtoLink;
+  };
 
   const handleExportCSV = () => {
     if (volunteers.length === 0) {
@@ -110,16 +147,30 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           <h1 className="text-4xl font-serif font-bold text-[#1f3d2b] mb-2">{event.title}</h1>
           <p className="text-gray-600 flex items-center gap-2">
             <Calendar size={16} />
-            {event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD'} • {event.location}
+            {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : (event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD')} • {event.location}
           </p>
         </div>
         <div className="flex gap-3">
+          <button 
+            onClick={handleEmailAll}
+            className="bg-[#1f3d2b] hover:bg-[#1a3324] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <Mail size={18} />
+            Email All
+          </button>
           <button 
             onClick={handleExportCSV}
             className="bg-[#e7e4de] hover:bg-[#dedbd5] text-[#1f3d2b] px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
           >
             <Download size={18} />
             Export CSV
+          </button>
+          <button 
+            onClick={handleDeleteEvent}
+            className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm border border-red-100"
+          >
+            <Trash2 size={18} />
+            Delete Event
           </button>
         </div>
       </div>
@@ -139,6 +190,22 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
               <div 
                 className="h-full bg-[#1f3d2b] rounded-full transition-all duration-1000"
                 style={{ width: `${progress}%` }}
+              ></div>
+            </div>
+          </div>
+
+          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+            <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
+              <CheckCircle size={20} className="text-[#1f3d2b]" />
+              Checked In
+            </h3>
+            <div className="text-3xl font-bold text-[#1f3d2b] mb-2">
+              {volunteers.filter(v => v.attended).length} <span className="text-sm font-normal text-gray-500">/ {volunteers.length}</span>
+            </div>
+            <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+              <div 
+                className="h-full bg-[#1f3d2b] rounded-full transition-all duration-1000"
+                style={{ width: `${Math.min(100, Math.round((volunteers.filter(v => v.attended).length / (volunteers.length || 1)) * 100))}%` }}
               ></div>
             </div>
           </div>
@@ -166,6 +233,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
                     <tr className="bg-gray-50/50 border-b border-gray-100 text-sm text-gray-500">
                       <th className="px-6 py-4 font-medium">Volunteer Name</th>
                       <th className="px-6 py-4 font-medium">Signed Up</th>
+                      <th className="px-6 py-4 font-medium text-center">Attended</th>
                       <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
@@ -178,6 +246,15 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-600">
                           {vol.signedUpAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+                        </td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => handleToggleAttendance(vol.id, vol.attended)}
+                            className={`p-2 rounded-lg transition-colors inline-block ${vol.attended ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'}`}
+                            title={vol.attended ? 'Mark as Not Attended' : 'Mark as Attended'}
+                          >
+                            {vol.attended ? <CheckCircle size={20} /> : <Circle size={20} />}
+                          </button>
                         </td>
                         <td className="px-6 py-4 text-right">
                           {vol.userEmail ? (

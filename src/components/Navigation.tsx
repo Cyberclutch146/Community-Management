@@ -2,11 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { currentUser } from '@/data/mockData';
+import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
 
 export function SideNav() {
   const pathname = usePathname();
+  const { profile } = useAuth();
   
   const navItems = [
     { name: 'Feed', href: '/feed', icon: 'dashboard' },
@@ -50,10 +51,16 @@ export function SideNav() {
       
       <div className="px-6 mt-auto">
         <Link href="/profile" className="flex items-center gap-3 pt-4 border-t border-outline-variant/30 hover:opacity-80 transition-opacity">
-          <Image alt={currentUser.name} className="w-10 h-10 rounded-full object-cover" src={currentUser.avatar} width={40} height={40} />
+          {profile?.avatarUrl ? (
+            <Image alt={profile.displayName || 'User'} className="w-10 h-10 rounded-full object-cover" src={profile.avatarUrl} width={40} height={40} />
+          ) : (
+            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-sm">
+              {(profile?.displayName || 'U').charAt(0).toUpperCase()}
+            </div>
+          )}
           <div>
-            <p className="text-sm font-semibold text-on-surface">{currentUser.name}</p>
-            <p className="text-xs text-secondary">{currentUser.role}</p>
+            <p className="text-sm font-semibold text-on-surface">{profile?.displayName || 'User'}</p>
+            <p className="text-xs text-secondary">{profile?.role || 'Volunteer'}</p>
           </div>
         </Link>
       </div>
@@ -66,10 +73,10 @@ export function MobileHeader() {
     <header className="md:hidden flex justify-between items-center px-6 h-16 w-full bg-surface-bright text-primary font-body text-sm tracking-tight border-b border-outline-variant/30 shadow-[0_4px_20px_rgba(46,50,48,0.06)] sticky top-0 z-40">
       <div className="font-headline text-xl font-bold text-primary">Outreach & Relief</div>
       <div className="flex gap-4">
-        <button className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
+        <button aria-label="Notifications" className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
           <span className="material-symbols-outlined">notifications</span>
         </button>
-        <button className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
+        <button aria-label="Location" className="text-primary hover:bg-surface-container rounded-full p-2 transition-colors active:opacity-80 duration-150">
           <span className="material-symbols-outlined">location_on</span>
         </button>
       </div>
