@@ -26,6 +26,7 @@ function FeedContent() {
   const [filter, setFilter] = useState('All Events');
   const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+  const [userLocation, setUserLocation] = useState('Detecting location...');
 
   // Semantic search state
   const [semanticResults, setSemanticResults] = useState<string[] | null>(null);
@@ -49,6 +50,31 @@ function FeedContent() {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+
+  useEffect(() => {
+    if ('geolocation' in navigator) {
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          try {
+            const { latitude, longitude } = position.coords;
+            const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&accept-language=en`);
+            const data = await response.json();
+            const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || 'Current Location';
+            const state = data.address?.state || '';
+            setUserLocation(state ? `${city}, ${state}` : city);
+          } catch (error) {
+            setUserLocation('Location unavailable');
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          setUserLocation('Location access denied');
+        }
+      );
+    } else {
+      setUserLocation('Location not supported');
+    }
+  }, []);
 
   useEffect(() => {
     const fetchEvents = async () => {
@@ -202,13 +228,11 @@ function FeedContent() {
               Map
             </button>
           </div>
-          <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50">
-            <span className="material-symbols-outlined text-secondary mr-2 text-sm">location_on</span>
-            <select className="bg-transparent border-none text-sm font-medium text-on-surface focus:ring-0 p-0 pr-6 outline-none appearance-none cursor-pointer">
-              <option>Portland Metro Area</option>
-              <option>Seattle Area</option>
-              <option>Eugene/Springfield</option>
-            </select>
+          <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50 max-w-[200px] md:max-w-[250px]">
+            <span className="material-symbols-outlined text-secondary mr-2 text-sm shrink-0">location_on</span>
+            <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
+              {userLocation}
+            </span>
           </div>
         </div>
       </div>

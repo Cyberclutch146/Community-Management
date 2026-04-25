@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2 } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
+import PromotionModal from '@/components/PromotionModal';
 
 export default function OrganizerEventPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -19,6 +20,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   const [event, setEvent] = useState<CommunityEvent | null>(null);
   const [volunteers, setVolunteers] = useState<EventVolunteer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -153,41 +155,55 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         Back to Dashboard
       </button>
 
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-10">
+      <div className="flex flex-col gap-6 mb-10">
         <div>
-          <h1 className="text-4xl font-serif font-bold text-[#1f3d2b] mb-2">{event.title}</h1>
-          <p className="text-gray-600 flex items-center gap-2">
-            <Calendar size={16} />
+          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#1f3d2b] mb-3 leading-tight tracking-tight">{event.title}</h1>
+          <p className="text-gray-600 flex items-center gap-2 text-sm md:text-base font-medium">
+            <Calendar size={18} className="text-[#1f3d2b]/70" />
             {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : (event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD')} • {event.location}
           </p>
         </div>
-        <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+        
+        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100/80">
           <button 
             onClick={() => router.push(`/dashboard/event/${eventId}/edit`)}
-            className="bg-primary-container hover:bg-primary/20 text-on-primary-container px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
-            <span className="material-symbols-outlined text-[18px]">edit</span>
+            <Pencil size={16} />
             Edit Event
           </button>
+          
+          <button 
+            onClick={() => setIsPromotionModalOpen(true)}
+            className="bg-[#1f3d2b] hover:bg-[#162d1f] text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-md shadow-[#1f3d2b]/20 text-sm"
+          >
+            <Send size={16} />
+            Promote Campaign
+          </button>
+          
           <button 
             onClick={handleEmailAll}
-            className="bg-[#1f3d2b] hover:bg-[#1a3324] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
-            <Mail size={18} />
+            <Mail size={16} />
             Email All
           </button>
+          
           <button 
             onClick={handleExportCSV}
-            className="bg-[#e7e4de] hover:bg-[#dedbd5] text-[#1f3d2b] px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
-            <Download size={18} />
+            <Download size={16} />
             Export CSV
           </button>
+          
+          <div className="flex-1 min-w-[20px] hidden md:block"></div>
+          
           <button 
             onClick={handleDeleteEvent}
-            className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm border border-red-100"
+            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 hover:border-red-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm mt-2 md:mt-0"
           >
-            <Trash2 size={18} />
+            <Trash2 size={16} />
             Delete Event
           </button>
         </div>
@@ -302,6 +318,12 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
       </div>
+      
+      <PromotionModal 
+        isOpen={isPromotionModalOpen}
+        onClose={() => setIsPromotionModalOpen(false)}
+        campaignId={eventId}
+      />
     </main>
   );
 }
