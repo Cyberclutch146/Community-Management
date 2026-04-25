@@ -10,14 +10,14 @@ interface EventCardProps {
 export function EventCard({ event, featured = false }: EventCardProps) {
   if (featured) {
     return (
-      <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-xl overflow-hidden shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md">
-        <div className="w-full md:w-2/5 h-64 md:h-auto relative overflow-hidden">
+      <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-2xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
+        <div className="w-full md:w-1/2 h-64 md:h-auto min-h-[300px] relative overflow-hidden">
           <Image 
             alt={event.title} 
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
             src={event.imageUrl || event.image || '/logo.svg'} 
             fill 
-            sizes="(max-width: 768px) 100vw, 40vw" 
+            sizes="(max-width: 768px) 100vw, 50vw" 
           />
           {event.urgency === 'high' && (
             <div className="absolute top-4 left-4 bg-tertiary-container text-on-tertiary-container text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">

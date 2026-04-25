@@ -21,7 +21,7 @@ export default function RegisterPage() {
     return () => clearTimeout(timer);
   }, [error]);
 
-  const { register } = useAuth();
+  const { register, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -50,6 +50,23 @@ export default function RegisterPage() {
       router.push('/feed');
     } catch (err: any) {
       setError(err.message || 'Failed to register');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    if (!agreed) {
+      setError('You must agree to the Terms.');
+      return;
+    }
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      router.push('/feed');
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -225,7 +242,7 @@ export default function RegisterPage() {
 
         .social-row {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: 1fr;
           gap: 12px;
           margin-bottom: 12px;
         }
@@ -367,17 +384,9 @@ export default function RegisterPage() {
               <div className="or-divider">or sign up with</div>
 
               <div className="social-row">
-                <button type="button" className="social-btn">
+                <button type="button" className="social-btn" onClick={handleGoogleSignIn} disabled={loading}>
                   <img className="social-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" />
                   Google
-                </button>
-                <button type="button" className="social-btn">
-                  <img className="social-icon" src="https://www.svgrepo.com/show/475647/facebook-color.svg" />
-                  Facebook
-                </button>
-                <button type="button" className="social-btn">
-                  <img className="social-icon" src="https://www.svgrepo.com/show/475689/twitter-color.svg" />
-                  X
                 </button>
               </div>
             </form>

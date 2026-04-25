@@ -165,9 +165,8 @@ function FeedContent() {
           <MapWrapper events={filteredEvents} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event) => {
-            const hasRealImage = !!event.imageUrl;
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-dense">
+          {filteredEvents.map((event, index) => {
             const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
 
             const normalizedEvent = {
@@ -175,11 +174,15 @@ function FeedContent() {
               imageUrl: imageUrl,
             };
 
+            // Create a neat bento box pattern: stagger the large cards
+            const bentoPattern = [0, 4, 7, 11];
+            const isFeatured = bentoPattern.includes(index % 12);
+
             return (
               <EventCard 
                 key={event.id} 
                 event={normalizedEvent} 
-                featured={hasRealImage}
+                featured={isFeatured}
               />
             );
           })}

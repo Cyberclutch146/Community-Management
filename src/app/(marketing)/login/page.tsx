@@ -19,7 +19,7 @@ export default function LoginPage() {
     return () => clearTimeout(timer);
   }, [error]);
   
-  const { login } = useAuth();
+  const { login, loginWithGoogle } = useAuth();
   const router = useRouter();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -31,6 +31,19 @@ export default function LoginPage() {
       router.push('/feed');
     } catch (err: any) {
       setError(err.message || 'Failed to login');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleGoogleSignIn = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+      router.push('/feed');
+    } catch (err: any) {
+      setError(err.message || 'Failed to sign in with Google');
     } finally {
       setLoading(false);
     }
@@ -207,7 +220,7 @@ export default function LoginPage() {
 
         .social-row {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: 1fr;
           gap: 12px;
           margin-bottom: 12px;
         }
@@ -315,17 +328,9 @@ export default function LoginPage() {
               <div className="or-divider">or</div>
 
               <div className="social-row">
-                <button className="social-btn">
+                <button type="button" className="social-btn" onClick={handleGoogleSignIn} disabled={loading}>
                   <img className="social-icon" src="https://www.svgrepo.com/show/475656/google-color.svg" />
                   Google
-                </button>
-                <button className="social-btn">
-                  <img className="social-icon" src="https://www.svgrepo.com/show/475647/facebook-color.svg" />
-                  Facebook
-                </button>
-                <button className="social-btn">
-                  <img className="social-icon" src="https://www.svgrepo.com/show/475689/twitter-color.svg" />
-                  X
                 </button>
               </div>
             </form>

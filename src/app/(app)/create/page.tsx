@@ -207,11 +207,18 @@ export default function CreateEventPage() {
                     try {
                       toast.info('Generating image with AI...');
                       const prompt = `A high-quality, inspiring cover photo for a community event named: ${title}. ${category}. Beautiful lighting, realistic, no text.`;
-                      const encodedPrompt = encodeURIComponent(prompt);
-                      const aiImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=600&nologo=true`;
                       
-                      const response = await fetch(aiImageUrl);
-                      if (!response.ok) throw new Error('Failed to fetch AI image');
+                      const response = await fetch('/api/generate-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ prompt }),
+                      });
+                      
+                      if (!response.ok) {
+                        const errData = await response.json().catch(() => ({}));
+                        throw new Error(errData.error || 'Failed to fetch AI image');
+                      }
+                      
                       const blob = await response.blob();
                       const file = new File([blob], "ai-generated-event.jpg", { type: "image/jpeg" });
                       
