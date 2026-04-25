@@ -1,6 +1,6 @@
 "use client";
 
-export function ChatBox() {
+export function ChatBox({ eventId }: { eventId?: string }) {
   return (
     <div className="rounded-2xl border border-neutral-200 bg-white p-4 shadow-sm">
       <h3 className="text-lg font-semibold">Community Chat</h3>

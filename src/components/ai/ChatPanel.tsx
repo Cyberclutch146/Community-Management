@@ -55,7 +55,7 @@ export function ChatPanel({ onClose }: Props) {
           content: data.reply,
         },
       ]);
-    } catch (err) {
+    } catch {
       setMessages((prev) => [
         ...prev,
         {

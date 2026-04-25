@@ -126,7 +126,7 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
 
     const docRef = await addDoc(collection(db, EVENTS_COLLECTION), eventData);
     return docRef.id;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to create event in Firebase:', error);
     throw error;
   }
@@ -205,6 +205,7 @@ export interface EventVolunteer {
   userId: string;
   userName: string;
   userEmail?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   signedUpAt: any;
   attended?: boolean;
 }

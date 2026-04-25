@@ -9,7 +9,7 @@ import {
   signOut as firebaseSignOut 
 } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
-import { getUserProfile, subscribeToUserProfile } from '@/services/userService';
+import { subscribeToUserProfile } from '@/services/userService';
 import { UserProfile } from '@/types';
 
 interface AuthContextType {

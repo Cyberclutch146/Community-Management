@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Papa from "papaparse";
 import { sendEmail } from "@/services/emailService";
-// @ts-ignore
-import db from "../../../../config/firebase";
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+const firestoreDb: any = require("../../../../config/firebase");
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -31,7 +31,7 @@ export async function POST(req: NextRequest) {
     const parsedData = Papa.parse(text, {
       header: true,
       skipEmptyLines: true,
-      transformHeader: (header) => header.toLowerCase().trim()
+      transformHeader: (header: string) => header.toLowerCase().trim()
     });
 
     console.log("API: PapaParse Output Metadata:", parsedData.meta);
@@ -73,7 +73,7 @@ export async function POST(req: NextRequest) {
           await sendEmail(email, message);
           
           try {
-            await db.collection("promotion_logs").add({
+            await firestoreDb.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               email,
               status: "sent",
@@ -86,7 +86,7 @@ export async function POST(req: NextRequest) {
           return email;
         } catch (error: any) {
           try {
-            await db.collection("promotion_logs").add({
+            await firestoreDb.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               email,
               status: "failed",
@@ -106,7 +106,7 @@ export async function POST(req: NextRequest) {
 
     // 🔥 Save master summary log in Firestore
     try {
-      await db.collection("promotions").add({
+      await firestoreDb.collection("promotions").add({
         campaignId: campaignId || "unknown",
         total: emails.length,
         success,
