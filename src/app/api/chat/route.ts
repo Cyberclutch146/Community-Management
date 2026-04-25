@@ -1,110 +1,91 @@
 import { NextResponse } from "next/server";
-import {
-  getAllEvents,
-  getDonationGuidance,
-  getGeneralHelp,
-  getOrganizeGuidance,
-  getUnknownReply,
-  getVolunteerGuidance,
-  formatEventList,
-} from "@/services/aiTools";
-
-function includesAny(text: string, words: string[]) {
-  return words.some((word) => text.includes(word));
-}
+import { GoogleGenerativeAI } from "@google/generative-ai";
+import { getAllEvents } from "@/services/aiTools";
 
 export async function POST(req: Request) {
   try {
     const body = await req.json();
     const messages = body.messages || [];
-    const latestMessage =
-      messages[messages.length - 1]?.content?.toLowerCase?.().trim() || "";
-
-    let reply = getGeneralHelp();
-
-    const events = await getAllEvents();
-
-    const wantsEvents = includesAny(latestMessage, [
-      "event",
-      "events",
-      "show me events",
-      "upcoming",
-      "discover",
-      "find events",
-      "nearby events",
-    ]);
-
-    const wantsVolunteer = includesAny(latestMessage, [
-      "volunteer",
-      "help out",
-      "join",
-      "join event",
-      "i want to help",
-      "support physically",
-    ]);
-
-    const wantsDonate = includesAny(latestMessage, [
-      "donate",
-      "donation",
-      "fund",
-      "contribute",
-      "give money",
-      "support financially",
-    ]);
-
-    const wantsOrganize = includesAny(latestMessage, [
-      "organize",
-      "create event",
-      "host event",
-      "start event",
-      "make event",
-      "plan event",
-      "set up event",
-    ]);
-
-    const wantsHow = includesAny(latestMessage, [
-      "how",
-      "how do i",
-      "what can i do",
-      "help me",
-      "guide me",
-    ]);
-
-    if (wantsOrganize) {
-      reply = getOrganizeGuidance();
-    } else if (wantsDonate && wantsHow) {
-      reply = getDonationGuidance(events);
-    } else if (wantsVolunteer && wantsHow) {
-      reply = getVolunteerGuidance(events);
-    } else if (wantsDonate) {
-      reply = [
-        "These are some events you may be able to support:",
-        formatEventList(events, 3),
-        "To donate, open an event and use the donation panel on its details page."
-      ].join("\n");
-    } else if (wantsVolunteer) {
-      reply = [
-        "Here are some events where you can potentially volunteer:",
-        formatEventList(events, 3),
-        "Open any event to view details and check how you can support it."
-      ].join("\n");
-    } else if (wantsEvents) {
-      reply = [
-        "Here are some current events on the platform:",
-        formatEventList(events, 3),
-        "You can open any of them to view details, donate, or join."
-      ].join("\n");
-    } else if (wantsHow) {
-      reply = getGeneralHelp();
-    } else {
-      reply = getUnknownReply();
+    
+    if (!messages || messages.length === 0) {
+      return NextResponse.json({ success: false, error: "No messages provided." }, { status: 400 });
     }
 
-    return NextResponse.json({ success: true, reply });
-  } catch (error) {
+    const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+    
+    if (!apiKey) {
+      return NextResponse.json({ success: false, error: "AI API key is missing from environment variables" }, { status: 500 });
+    }
+
+    // Fetch live events to provide context to Gemini
+    const events = await getAllEvents();
+    const eventContext = events.map(e => {
+      let needsStr = [];
+      if (e.volunteersNeeded) needsStr.push(`${e.volunteersNeeded} volunteers`);
+      if (e.goalAmount) needsStr.push(`$${e.goalAmount} (Raised: $${e.donatedAmount || 0})`);
+      const needs = needsStr.length > 0 ? needsStr.join(", ") : "N/A";
+      return `- ${e.title} (${e.category}) at ${e.location}. Need: ${needs}. Description: ${e.description}`;
+    }).join("\n");
+
+    const systemInstruction = `You are the Kindred Relief Network AI Assistant. 
+You are a helpful, empathetic, and encouraging assistant for a community event and volunteering platform.
+Your primary goal is to help users discover events, learn how to volunteer or donate, and guide them on organizing new events.
+
+Here is the list of CURRENTLY LIVE events on the platform:
+${eventContext || "No active events right now."}
+
+When users ask for events, recommend these specific live events. Be conversational and natural. Do not list everything mechanically, but highlight a few relevant ones based on their query. Keep your responses concise (under 4-5 sentences) and engaging.`;
+
+    const genAI = new GoogleGenerativeAI(apiKey);
+    
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-flash-latest", "gemini-pro-latest"];
+    let text = "";
+    let lastError = null;
+
+    // Format history for Gemini chat
+    // The messages array is [{ role: 'user' | 'assistant', content: '...' }]
+    // Gemini expects [{ role: 'user' | 'model', parts: [{ text: '...' }] }]
+    // It also strictly requires the first message to be from the user.
+    let chatHistory = messages.slice(0, -1);
+    while (chatHistory.length > 0 && chatHistory[0].role !== 'user') {
+      chatHistory.shift();
+    }
+
+    const history = chatHistory.map((msg: any) => ({
+      role: msg.role === 'user' ? 'user' : 'model',
+      parts: [{ text: msg.content }],
+    }));
+    
+    const latestMessage = messages[messages.length - 1].content;
+
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          systemInstruction: systemInstruction 
+        });
+        
+        const chat = model.startChat({ history });
+        const result = await chat.sendMessage(latestMessage);
+        const response = await result.response;
+        text = response.text();
+        if (text) break; 
+      } catch (err: any) {
+        lastError = err;
+        console.warn(`Model ${modelName} failed:`, err.message);
+      }
+    }
+
+    if (!text) {
+      throw lastError || new Error("All AI models failed.");
+    }
+
+    return NextResponse.json({ success: true, reply: text });
+
+  } catch (error: any) {
     console.error("Chat API error:", error);
     return NextResponse.json(
-      { success: false, error: "Something went wrong while generating a response." },
+      { success: false, error: error.message || "Something went wrong while generating a response." },
       { status: 500 }
     );
   }

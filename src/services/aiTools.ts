@@ -15,10 +15,19 @@ type EventItem = {
 export async function getAllEvents(): Promise<EventItem[]> {
   const snapshot = await getDocs(collection(db, "events"));
 
-  return snapshot.docs.map((doc) => ({
-    id: doc.id,
-    ...(doc.data() as Omit<EventItem, "id">),
-  }));
+  return snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title,
+      category: data.category,
+      location: data.location,
+      description: data.description,
+      goalAmount: data.needs?.funds?.goal,
+      donatedAmount: data.needs?.funds?.current,
+      volunteersNeeded: data.needs?.volunteers?.goal,
+    };
+  });
 }
 
 export function formatEventList(events: EventItem[], limit = 3) {
