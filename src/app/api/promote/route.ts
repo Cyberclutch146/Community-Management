@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import csv from "csv-parser";
 import * as XLSX from "xlsx";
-import { Readable } from "stream";
 import { sendEmail } from "@/services/emailService";
+import { sendSMS } from "@/services/smsService";
 // eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
 const firestoreDb: any = require("../../../../config/firebase");
 
@@ -32,53 +31,54 @@ export async function POST(req: NextRequest) {
     // 🚀 Robust CSV/Excel Parsing
     console.log('API: Processing file:', file.name, 'Size:', file.size);
 
-    const parsedData = Papa.parse(text, {
-      header: true,
-      skipEmptyLines: true,
-      transformHeader: (header: string) => header.toLowerCase().trim()
-    });
+    const buffer = Buffer.from(await file.arrayBuffer());
+    const workbook = XLSX.read(buffer, { type: 'buffer' });
+    const sheetName = workbook.SheetNames[0];
+    const sheet = workbook.Sheets[sheetName];
+    const rawData = XLSX.utils.sheet_to_json(sheet) as any[];
 
     const contacts: { email?: string, phone?: string }[] = [];
     const parsedData: any[] = [];
 
-    await new Promise((resolve, reject) => {
-      Readable.from(buffer)
-        .pipe(csv({
-          mapHeaders: ({ header }) => header.toLowerCase().trim()
-        }))
-        .on("data", (row: any) => {
-          parsedData.push(row);
-          // 🔍 Find the email and phone columns no matter what they are called
-          const emailValue = row.email || row['email address'] || row.address || row['email_address'] || row.contact;
-          const phoneValue = row.phone || row['phone number'] || row.mobile || row.contact;
-          
-          const contact: { email?: string, phone?: string } = {};
+    rawData.forEach((row: any) => {
+      // Create a lowercase keyed copy of the row for easier searching
+      const lowerRow: any = {};
+      for (const key in row) {
+        if (row.hasOwnProperty(key)) {
+          lowerRow[key.toLowerCase().trim()] = row[key];
+        }
+      }
 
-          if (emailValue) {
-            const trimmedEmail = String(emailValue).trim();
-            if (isValidEmail(trimmedEmail)) {
-              contact.email = trimmedEmail;
-            } else {
-              console.log("API: Skipped invalid email format:", trimmedEmail);
-            }
-          }
+      parsedData.push(lowerRow);
 
-          if (phoneValue) {
-            const trimmedPhone = String(phoneValue).replace(/\D/g, ''); // Extract digits
-            if (trimmedPhone.length >= 10) { // Basic validation
-              // Assuming India format requires 10 digits
-              contact.phone = trimmedPhone.slice(-10); 
-            } else {
-              console.log("API: Skipped invalid phone format:", trimmedPhone);
-            }
-          }
+      // 🔍 Find the email and phone columns no matter what they are called
+      const emailValue = lowerRow.email || lowerRow['email address'] || lowerRow.address || lowerRow.contact;
+      const phoneValue = lowerRow.phone || lowerRow['phone number'] || lowerRow.mobile || lowerRow.contact;
+      
+      const contact: { email?: string, phone?: string } = {};
 
-          if (contact.email || contact.phone) {
-            contacts.push(contact);
-          }
-        })
-        .on("end", resolve)
-        .on("error", reject);
+      if (emailValue) {
+        const trimmedEmail = String(emailValue).trim();
+        if (isValidEmail(trimmedEmail)) {
+          contact.email = trimmedEmail;
+        } else {
+          console.log("API: Skipped invalid email format:", trimmedEmail);
+        }
+      }
+
+      if (phoneValue) {
+        const trimmedPhone = String(phoneValue).replace(/\D/g, ''); // Extract digits
+        if (trimmedPhone.length >= 10) { // Basic validation
+          // Assuming India format requires 10 digits
+          contact.phone = trimmedPhone.slice(-10); 
+        } else {
+          console.log("API: Skipped invalid phone format:", trimmedPhone);
+        }
+      }
+
+      if (contact.email || contact.phone) {
+        contacts.push(contact);
+      }
     });
 
     console.log("API: First Row Parsed:", parsedData[0]);
