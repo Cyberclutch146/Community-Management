@@ -132,6 +132,37 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
   }
 };
 
+// ─── Update ─────────────────────────────────────────────
+export const updateEvent = async (eventId: string, data: Partial<CommunityEventCreate>): Promise<void> => {
+  try {
+    let coords = (data.lat !== undefined && data.lng !== undefined) 
+      ? { lat: data.lat, lng: data.lng } 
+      : null;
+
+    if (!coords && data.location) {
+      coords = await geocodeLocation(data.location);
+    }
+
+    const eventRef = doc(db, EVENTS_COLLECTION, eventId);
+    
+    const updateData: any = {
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    if (coords) {
+      updateData.lat = coords.lat;
+      updateData.lng = coords.lng;
+    }
+
+    await updateDoc(eventRef, updateData);
+  } catch (error) {
+    console.error('Failed to update event:', error);
+    throw error;
+  }
+};
+
+
 // ─── Delete ─────────────────────────────────────────────
 export const deleteEvent = async (eventId: string): Promise<void> => {
   try {

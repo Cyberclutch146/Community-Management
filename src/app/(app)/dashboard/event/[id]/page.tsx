@@ -150,7 +150,14 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
             {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : (event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD')} • {event.location}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+          <button 
+            onClick={() => router.push(`/dashboard/event/${eventId}/edit`)}
+            className="bg-primary-container hover:bg-primary/20 text-on-primary-container px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">edit</span>
+            Edit Event
+          </button>
           <button 
             onClick={handleEmailAll}
             className="bg-[#1f3d2b] hover:bg-[#1a3324] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
