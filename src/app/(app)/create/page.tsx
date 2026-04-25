@@ -8,6 +8,7 @@ import { uploadImage } from '@/services/storageService';
 import { toast } from 'sonner';
 import LocationPickerWrapper from '@/components/LocationPickerWrapper';
 import DateTimePicker from '@/components/DateTimePicker';
+import PromotionModal from '@/components/PromotionModal';
 
 export default function CreateEventPage() {
   const router = useRouter();
@@ -37,6 +38,9 @@ export default function CreateEventPage() {
   const [lng, setLng] = useState<number | undefined>(undefined);
   
   const [loading, setLoading] = useState(false);
+  const [generatingAi, setGeneratingAi] = useState(false);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [promotionModalOpen, setPromotionModalOpen] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -97,7 +101,46 @@ export default function CreateEventPage() {
           </div>
           
           <div>
-            <label className="block text-sm font-semibold text-on-surface mb-2">Description</label>
+            <div className="flex items-center justify-between mb-2">
+              <label className="block text-sm font-semibold text-on-surface">Description</label>
+              <button 
+                type="button" 
+                onClick={async () => {
+                  if (!title) {
+                    toast.error('Please enter a title first to generate a description.');
+                    return;
+                  }
+                  setGeneratingAi(true);
+                  try {
+                    const res = await fetch('/api/generate-description', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({ title, category }),
+                    });
+                    const data = await res.json();
+                    if (res.ok) {
+                      setDescription(data.description);
+                      toast.success('Description generated!');
+                    } else {
+                      toast.error(data.error || 'Failed to generate description');
+                    }
+                  } catch (err) {
+                    toast.error('An error occurred while generating.');
+                  } finally {
+                    setGeneratingAi(false);
+                  }
+                }}
+                disabled={generatingAi}
+                className="text-xs flex items-center gap-1 font-bold text-primary hover:text-primary-container transition-colors disabled:opacity-50"
+              >
+                {generatingAi ? (
+                  <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
+                ) : (
+                  <span className="material-symbols-outlined text-[16px]">smart_toy</span>
+                )}
+                {generatingAi ? 'Generating...' : 'Generate with AI'}
+              </button>
+            </div>
             <textarea 
               required
               className="w-full h-32 bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface resize-none" 
@@ -151,16 +194,57 @@ export default function CreateEventPage() {
               />
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-on-surface mb-2">Event Image</label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-semibold text-on-surface">Event Image</label>
+                <button 
+                  type="button" 
+                  onClick={async () => {
+                    if (!title) {
+                      toast.error('Please enter a title first to generate an image.');
+                      return;
+                    }
+                    setGeneratingImage(true);
+                    try {
+                      toast.info('Generating image with AI...');
+                      const prompt = `A high-quality, inspiring cover photo for a community event named: ${title}. ${category}. Beautiful lighting, realistic, no text.`;
+                      const encodedPrompt = encodeURIComponent(prompt);
+                      const aiImageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=800&height=600&nologo=true`;
+                      
+                      const response = await fetch(aiImageUrl);
+                      if (!response.ok) throw new Error('Failed to fetch AI image');
+                      const blob = await response.blob();
+                      const file = new File([blob], "ai-generated-event.jpg", { type: "image/jpeg" });
+                      
+                      const url = await uploadImage(file, 'campaigns');
+                      setImage(url);
+                      toast.success('AI Image generated successfully!');
+                    } catch (err) {
+                      console.error(err);
+                      toast.error('Failed to generate image. Please try again.');
+                    } finally {
+                      setGeneratingImage(false);
+                    }
+                  }}
+                  disabled={generatingImage || uploadingImage}
+                  className="text-xs flex items-center gap-1 font-bold text-primary hover:text-primary-container transition-colors disabled:opacity-50"
+                >
+                  {generatingImage ? (
+                    <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
+                  ) : (
+                    <span className="material-symbols-outlined text-[16px]">image</span>
+                  )}
+                  {generatingImage ? 'Generating...' : 'Generate with AI'}
+                </button>
+              </div>
               <div className="flex items-center gap-4">
-                <label className="bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface cursor-pointer flex-1 text-center font-medium flex items-center justify-center gap-2">
+                <label className={`bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface ${generatingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex-1 text-center font-medium flex items-center justify-center gap-2`}>
                   <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
                   {uploadingImage ? 'Uploading...' : 'Choose File'}
                   <input 
                     type="file" 
                     accept="image/*"
                     className="hidden" 
-                    disabled={uploadingImage}
+                    disabled={uploadingImage || generatingImage}
                     onChange={async (e) => {
                       const file = e.target.files?.[0];
                       if (!file) return;
@@ -275,15 +359,31 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          <button 
-            type="submit" 
-            disabled={loading || !user} 
-            className="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-container hover:text-on-primary-container transition-colors"
-          >
-            {loading ? 'Publishing...' : user ? 'Publish Event' : 'Sign in to publish'}
-          </button>
+          <div className="flex flex-col sm:flex-row gap-4">
+            <button 
+              type="submit" 
+              disabled={loading || !user} 
+              className="flex-1 bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-container hover:text-on-primary-container transition-colors"
+            >
+              {loading ? 'Publishing...' : user ? 'Publish Event' : 'Sign in to publish'}
+            </button>
+            
+            <button 
+              type="button"
+              onClick={() => setPromotionModalOpen(true)}
+              className="flex-1 bg-surface-container-high text-on-surface px-8 py-3 rounded-xl font-semibold border border-outline-variant/50 hover:bg-surface-variant transition-colors flex items-center justify-center gap-2"
+            >
+              <span className="material-symbols-outlined text-[20px]">campaign</span>
+              Promote Event
+            </button>
+          </div>
         </form>
       </div>
+
+      <PromotionModal 
+        isOpen={promotionModalOpen} 
+        onClose={() => setPromotionModalOpen(false)} 
+      />
     </main>
   );
 }
