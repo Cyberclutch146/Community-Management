@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import { SentinelAlert } from '@/types/sentinel';
 import SentinelAlertFeed from '@/components/SentinelAlertFeed';
-import { Activity, Map as MapIcon, Loader2 } from 'lucide-react';
+import { Activity, Map as MapIcon, Loader2, ShieldAlert } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import 'leaflet/dist/leaflet.css';
 
 // Use dynamic import for the map to avoid SSR issues with Leaflet
 const MapContainer = dynamic(
@@ -23,6 +24,7 @@ const SentinelMapOverlay = dynamic(
 export default function SentinelDashboardPage() {
   const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'map' | 'feed'>('map');
 
   useEffect(() => {
     async function fetchAlerts() {
@@ -46,30 +48,45 @@ export default function SentinelDashboardPage() {
   }, []);
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-serif font-bold text-[#1f3d2b] flex items-center gap-3">
-            <Activity className="h-8 w-8 text-[#1f3d2b]" />
+    <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] min-h-[600px] md:min-h-[700px] px-2 md:px-0">
+      {/* Header section shrink to fit */}
+      <div className="shrink-0 bg-gradient-to-br from-white via-emerald-50/40 to-emerald-100/20 border border-emerald-100/50 rounded-[2rem] p-6 md:p-8 shadow-sm relative overflow-hidden">
+        <div className="relative z-10">
+          <h1 className="text-2xl md:text-4xl font-serif font-bold flex items-center gap-3 text-slate-800 tracking-tight">
+            <ShieldAlert className="h-8 w-8 text-emerald-500 shrink-0" />
             Community Sentinel
           </h1>
-          <p className="text-gray-600 mt-1">
+          <p className="text-slate-500 mt-2 max-w-2xl text-sm md:text-base font-medium leading-relaxed">
             Real-time public data synchronization for environmental and social awareness.
           </p>
         </div>
+        <div className="absolute right-0 top-0 w-64 h-full opacity-[0.03] pointer-events-none text-emerald-900">
+           <Activity className="w-full h-full transform translate-x-1/4 scale-150" />
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-[70vh] min-h-[600px]">
-        {/* Map View */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-100 p-2 overflow-hidden flex flex-col">
-          <div className="p-3 bg-gray-50/50 flex justify-between items-center border-b border-gray-100 mb-2 rounded-t-lg">
-             <h2 className="font-bold text-[#1f3d2b] flex items-center gap-2">
-                <MapIcon className="h-4 w-4" /> Global Threat Map
-             </h2>
-          </div>
-          <div className="flex-1 rounded-lg overflow-hidden border border-gray-200 z-0">
+      {/* Tabs */}
+      <div className="shrink-0 flex bg-white/80 backdrop-blur-md border border-slate-200/60 p-1.5 rounded-2xl w-full max-w-sm mx-auto shadow-sm">
+         <button 
+           onClick={() => setActiveTab('map')} 
+           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'map' ? 'bg-white shadow-sm text-emerald-700 ring-1 ring-emerald-100/50' : 'text-slate-500 hover:text-emerald-600 hover:bg-white/50'}`}
+         >
+           <MapIcon className="h-4 w-4" /> Threat Map
+         </button>
+         <button 
+           onClick={() => setActiveTab('feed')} 
+           className={`flex-1 flex items-center justify-center gap-2 py-3 text-sm font-bold rounded-xl transition-all duration-300 ${activeTab === 'feed' ? 'bg-white shadow-sm text-emerald-700 ring-1 ring-emerald-100/50' : 'text-slate-500 hover:text-emerald-600 hover:bg-white/50'}`}
+         >
+           <Activity className="h-4 w-4" /> Live Feed
+         </button>
+      </div>
+
+      {/* Content Area flexes to fill available space */}
+      <div className="flex-1 bg-white/60 backdrop-blur-xl rounded-[2rem] shadow-sm border border-slate-200/60 p-2 md:p-4 overflow-hidden flex flex-col relative min-h-[500px] md:min-h-0">
+        {activeTab === 'map' && (
+          <div className="flex-1 rounded-2xl md:rounded-[1.5rem] overflow-hidden z-0 bg-slate-50 shadow-inner h-full w-full relative">
              <MapContainer 
-                center={[39.8283, -98.5795]} // Center of US roughly
+                center={[39.8283, -98.5795]} 
                 zoom={4} 
                 style={{ height: '100%', width: '100%', zIndex: 0 }}
              >
@@ -80,19 +97,20 @@ export default function SentinelDashboardPage() {
                 <SentinelMapOverlay alerts={alerts} />
              </MapContainer>
           </div>
-        </div>
+        )}
 
-        {/* Feed View */}
-        <div className="h-full">
-          {loading ? (
-             <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-8 h-full flex flex-col items-center justify-center">
-                <Loader2 className="h-10 w-10 text-[#1f3d2b] animate-spin mb-4" />
-                <p className="text-gray-500 font-medium">Synchronizing data streams...</p>
-             </div>
-          ) : (
-             <SentinelAlertFeed alerts={alerts} />
-          )}
-        </div>
+        {activeTab === 'feed' && (
+          <div className="h-full overflow-hidden rounded-2xl md:rounded-[1.5rem] border border-slate-200/60 bg-white">
+            {loading ? (
+               <div className="bg-slate-50/50 h-full flex flex-col items-center justify-center">
+                  <Loader2 className="h-10 w-10 text-emerald-500 animate-spin mb-4" />
+                  <p className="text-slate-500 font-medium text-sm">Synchronizing data streams...</p>
+               </div>
+            ) : (
+               <SentinelAlertFeed alerts={alerts} />
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
