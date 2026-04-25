@@ -2,12 +2,17 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { CommunityEvent } from '@/types';
 
+import { SentinelAlert } from '@/types/sentinel';
+
 interface EventCardProps {
   event: CommunityEvent;
   featured?: boolean;
+  sentinelAlerts?: SentinelAlert[];
 }
 
-export function EventCard({ event, featured = false }: EventCardProps) {
+export function EventCard({ event, featured = false, sentinelAlerts = [] }: EventCardProps) {
+  const hasAlerts = sentinelAlerts.length > 0;
+  
   if (featured) {
     return (
       <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-2xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
@@ -22,6 +27,11 @@ export function EventCard({ event, featured = false }: EventCardProps) {
           {event.urgency === 'high' && (
             <div className="absolute top-4 left-4 bg-tertiary-container text-on-tertiary-container text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
               <span className="material-symbols-outlined text-[14px]">local_fire_department</span> High Urgency
+            </div>
+          )}
+          {hasAlerts && (
+            <div className={`absolute top-4 ${event.urgency === 'high' ? 'left-36' : 'left-4'} bg-red-100 text-red-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1 border border-red-200`}>
+              <span className="material-symbols-outlined text-[14px]">warning</span> Active Alert Zone
             </div>
           )}
         </div>
@@ -92,6 +102,11 @@ export function EventCard({ event, featured = false }: EventCardProps) {
         {event.urgency === 'high' && (
           <div className="absolute top-3 left-3 bg-tertiary-container/90 backdrop-blur-sm text-on-tertiary-container text-[10px] font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1">
             <span className="material-symbols-outlined text-[12px]">local_fire_department</span> URGENT
+          </div>
+        )}
+        {hasAlerts && (
+          <div className={`absolute top-3 ${event.urgency === 'high' ? 'left-24' : 'left-3'} bg-red-100/90 backdrop-blur-sm text-red-800 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1 border border-red-200`}>
+            <span className="material-symbols-outlined text-[12px]">warning</span> ALERT ZONE
           </div>
         )}
       </div>

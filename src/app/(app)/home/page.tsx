@@ -6,6 +6,7 @@ import { Filter, Plus, Calendar, MapPin, Users, Mail, Loader2 } from 'lucide-rea
 import { getEvents } from '@/services/eventService'
 import { useAuth } from '@/context/AuthContext'
 import { CommunityEvent } from '@/types'
+import { SentinelAlert } from '@/types/sentinel'
 import MapWrapper from '@/components/MapWrapper'
 import SkillMatchBanner from '@/components/SkillMatchBanner'
 
@@ -14,13 +15,18 @@ export default function HomePage() {
   const { user, profile } = useAuth()
 
   const [events, setEvents] = useState<CommunityEvent[]>([])
+  const [alerts, setAlerts] = useState<SentinelAlert[]>([])
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const load = async () => {
       try {
-        const { events: data } = await getEvents()
+        const [{ events: data }, sentinelData] = await Promise.all([
+          getEvents(),
+          fetch('/api/sentinel').then(res => res.ok ? res.json() : [])
+        ])
         setEvents(data)
+        setAlerts(sentinelData)
       } catch (err) {
         console.error('Failed to load events:', err)
       } finally {
@@ -234,7 +240,7 @@ export default function HomePage() {
           <h2 className="text-2xl font-serif">Explore on Map</h2>
         </div>
         <div className="h-[400px] w-full">
-          <MapWrapper events={events} />
+          <MapWrapper events={events} alerts={alerts} />
         </div>
       </div>
 

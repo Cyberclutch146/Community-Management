@@ -5,9 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import PromotionModal from '@/components/PromotionModal';
+import { SentinelAlert } from '@/types/sentinel';
+import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
 
 export default function OrganizerEventPage({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
@@ -19,6 +21,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
   const [event, setEvent] = useState<CommunityEvent | null>(null);
   const [volunteers, setVolunteers] = useState<EventVolunteer[]>([]);
+  const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
 
@@ -30,9 +33,10 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
     const loadData = async () => {
       try {
-        const [eventData, volunteerData] = await Promise.all([
+        const [eventData, volunteerData, alertsData] = await Promise.all([
           getEventById(eventId),
-          getEventVolunteers(eventId)
+          getEventVolunteers(eventId),
+          fetch('/api/sentinel').then(r => r.json()).catch(() => [])
         ]);
 
         if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
@@ -43,6 +47,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
         setEvent(eventData);
         setVolunteers(volunteerData);
+        setAlerts(alertsData);
       } catch (err) {
         console.error('Failed to load event data:', err);
         toast.error('Could not load event data.');
@@ -145,6 +150,30 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   const goalVols = event.needs?.volunteers?.goal || 1;
   const progress = Math.min(100, Math.round((currentVols / goalVols) * 100));
 
+  const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
+    if (!event.lat || !event.lng) return false;
+    
+    // Check polygon intersection if it's an extreme alert with a defined area
+    if (alert.severity === 'Extreme' && alert.polygon && alert.polygon.length > 2) {
+      if (isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon)) {
+        return true;
+      }
+    }
+    
+    // Fallback to radius check (30 miles for general alerts)
+    if (alert.coordinates?.lat && alert.coordinates?.lng) {
+      const distance = getDistanceMiles(
+        event.lat, 
+        event.lng, 
+        alert.coordinates.lat, 
+        alert.coordinates.lng
+      );
+      return distance <= 30; // 30 miles radius
+    }
+    
+    return false;
+  });
+
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
       <button 
@@ -208,6 +237,44 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           </button>
         </div>
       </div>
+
+      {intersectingAlerts.length > 0 && (
+        <div className="mb-8 p-5 rounded-2xl bg-amber-50/80 border border-amber-200/60 shadow-sm">
+          <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
+            <AlertTriangle size={20} className="text-amber-600" />
+            <h3 className="text-lg">Sentinel Safety Awareness</h3>
+          </div>
+          <p className="text-sm text-amber-900 mb-4">
+            The following alerts overlap with your event's location. Please review them and communicate any safety concerns or cancellations to your volunteers.
+          </p>
+          <div className="space-y-3">
+            {intersectingAlerts.map(alert => (
+              <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
+                <span className={`px-2.5 py-1 text-xs font-bold rounded-lg whitespace-nowrap w-fit ${
+                  alert.severity === 'Extreme' ? 'bg-red-100 text-red-700' :
+                  alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700' :
+                  'bg-amber-100 text-amber-700'
+                }`}>
+                  {alert.severity} • {alert.type}
+                </span>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-amber-950 mb-0.5">{alert.title}</p>
+                  <p className="text-xs text-amber-800/80 line-clamp-2">{alert.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+          <div className="mt-4 flex gap-3">
+            <button 
+              onClick={handleEmailAll}
+              className="bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+            >
+              <Mail size={16} />
+              Email Volunteers
+            </button>
+          </div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Left Column: Stats */}

@@ -11,8 +11,10 @@ import { useState, useEffect, use, useCallback } from 'react';
 import { getEventById, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
-import { Trash2 } from 'lucide-react';
+import { Trash2, AlertTriangle, Info } from 'lucide-react';
 import { CommunityEvent } from '@/types';
+import { SentinelAlert } from '@/types/sentinel';
+import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
 
 export default function EventDetails({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -20,21 +22,26 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
   const router = useRouter();
   const { user } = useAuth();
   const [event, setEvent] = useState<CommunityEvent | null>(null);
+  const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchEvent = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getEventById(id);
-        if (!data) notFound();
-        setEvent(data);
+        const [eventData, alertsData] = await Promise.all([
+          getEventById(id),
+          fetch('/api/sentinel').then(r => r.json()).catch(() => [])
+        ]);
+        if (!eventData) notFound();
+        setEvent(eventData);
+        setAlerts(alertsData);
       } catch (error) {
-        console.error("Failed to load event:", error);
+        console.error("Failed to load event data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchEvent();
+    fetchData();
   }, [id]);
 
   const refreshEvent = useCallback(async () => {
@@ -70,6 +77,30 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
   }
 
   if (!event) return null;
+
+  const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
+    if (!event.lat || !event.lng) return false;
+    
+    // Check polygon intersection if it's an extreme alert with a defined area
+    if (alert.severity === 'Extreme' && alert.polygon && alert.polygon.length > 2) {
+      if (isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon)) {
+        return true;
+      }
+    }
+    
+    // Fallback to radius check (30 miles for general alerts)
+    if (alert.coordinates?.lat && alert.coordinates?.lng) {
+      const distance = getDistanceMiles(
+        event.lat, 
+        event.lng, 
+        alert.coordinates.lat, 
+        alert.coordinates.lng
+      );
+      return distance <= 30; // 30 miles radius
+    }
+    
+    return false;
+  });
 
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
@@ -114,6 +145,36 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
                   <Trash2 size={18} />
                   Delete Event
                 </button>
+              </div>
+            )}
+
+            {intersectingAlerts.length > 0 && (
+              <div className="mb-6 p-5 rounded-2xl bg-amber-50/80 border border-amber-200/60 shadow-sm">
+                <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
+                  <AlertTriangle size={20} className="text-amber-600" />
+                  <h3 className="text-lg">Sentinel Safety Awareness</h3>
+                </div>
+                <div className="space-y-3">
+                  {intersectingAlerts.map(alert => (
+                    <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
+                      <span className={`px-2.5 py-1 text-xs font-bold rounded-lg whitespace-nowrap w-fit ${
+                        alert.severity === 'Extreme' ? 'bg-red-100 text-red-700' :
+                        alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700' :
+                        'bg-amber-100 text-amber-700'
+                      }`}>
+                        {alert.severity} • {alert.type}
+                      </span>
+                      <div className="flex-1">
+                        <p className="text-sm font-semibold text-amber-950 mb-0.5">{alert.title}</p>
+                        <p className="text-xs text-amber-800/80 line-clamp-2">{alert.description}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs font-medium text-amber-700/80 mt-4 flex items-center gap-1.5 bg-amber-100/50 p-2 rounded-lg">
+                  <Info size={14} className="flex-shrink-0" /> 
+                  Please exercise caution if you plan to attend. Conditions may change rapidly.
+                </p>
               </div>
             )}
             

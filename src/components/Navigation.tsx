@@ -12,6 +12,7 @@ export function SideNav() {
   const navItems = [
     { name: 'Feed', href: '/feed', icon: 'dashboard' },
     { name: 'Dashboard', href: '/dashboard', icon: 'volunteer_activism' },
+    { name: 'Sentinel', href: '/dashboard/sentinel', icon: 'security' },
     { name: 'Create', href: '/create', icon: 'inventory_2' },
     { name: 'Profile', href: '/profile', icon: 'settings' },
   ];

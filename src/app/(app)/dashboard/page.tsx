@@ -6,12 +6,15 @@ import { useAuth } from '@/context/AuthContext';
 import { getEventsByOrganizer, getRegisteredEvents, backfillEventCoordinates } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
 import Image from 'next/image';
+import { SentinelAlert } from '@/types/sentinel';
+import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
 
 export default function DashboardPage() {
   const router = useRouter();
   const { user, profile } = useAuth();
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [registeredEvents, setRegisteredEvents] = useState<CommunityEvent[]>([]);
+  const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [backfilling, setBackfilling] = useState(false);
 
@@ -32,12 +35,14 @@ export default function DashboardPage() {
     if (!user) { setLoading(false); return; }
     const load = async () => {
       try {
-        const [organizedData, registeredData] = await Promise.all([
+        const [organizedData, registeredData, alertsData] = await Promise.all([
           getEventsByOrganizer(user.uid),
-          getRegisteredEvents(user.uid)
+          getRegisteredEvents(user.uid),
+          fetch('/api/sentinel').then(res => res.ok ? res.json() : [])
         ]);
         setEvents(organizedData);
         setRegisteredEvents(registeredData);
+        setAlerts(alertsData);
       } catch (err) {
         console.error('Failed to load dashboard:', err);
       } finally {
@@ -51,6 +56,7 @@ export default function DashboardPage() {
   const totalRaised = events.reduce((sum, e) => sum + (e.needs?.funds?.current ?? 0), 0);
   const totalVolunteers = events.reduce((sum, e) => sum + (e.needs?.volunteers?.current ?? 0), 0);
   const activeCount = events.filter(e => e.status === 'active').length;
+  const highRiskAlertsCount = alerts.filter(a => a.severity === 'Extreme' || a.severity === 'Severe').length;
 
   if (!user) {
     return (
@@ -78,7 +84,7 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
         <div className="bg-primary-container/30 px-6 py-5 rounded-2xl border border-primary-container/20">
           <div className="flex items-center gap-3 mb-3">
             <span className="material-symbols-outlined text-primary bg-primary-container/40 p-2 rounded-xl text-[20px]">campaign</span>
@@ -101,6 +107,14 @@ export default function DashboardPage() {
             <p className="text-xs font-semibold text-secondary uppercase tracking-wider">Volunteers Recruited</p>
           </div>
           <p className="text-4xl font-bold text-on-surface">{totalVolunteers}</p>
+        </div>
+
+        <div className="bg-error-container/30 px-6 py-5 rounded-2xl border border-error-container/20">
+          <div className="flex items-center gap-3 mb-3">
+            <span className="material-symbols-outlined text-error bg-error-container/40 p-2 rounded-xl text-[20px]">warning</span>
+            <p className="text-xs font-semibold text-error uppercase tracking-wider">Severe Alerts</p>
+          </div>
+          <p className="text-4xl font-bold text-on-surface">{highRiskAlertsCount}</p>
         </div>
       </div>
 
@@ -143,7 +157,7 @@ export default function DashboardPage() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {events.map(event => (
-            <EventCard key={event.id} event={event} onClick={() => router.push(`/dashboard/event/${event.id}`)} />
+            <EventCard key={event.id} event={event} alerts={alerts} onClick={() => router.push(`/dashboard/event/${event.id}`)} />
           ))}
         </div>
       )}
@@ -157,7 +171,7 @@ export default function DashboardPage() {
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {registeredEvents.map(event => (
-              <EventCard key={event.id} event={event} onClick={() => router.push(`/event/${event.id}`)} />
+              <EventCard key={event.id} event={event} alerts={alerts} onClick={() => router.push(`/event/${event.id}`)} />
             ))}
           </div>
         </div>
@@ -167,9 +181,21 @@ export default function DashboardPage() {
 }
 
 // ── Helper Component for Event Cards ──
-function EventCard({ event, onClick }: { event: CommunityEvent, onClick: () => void }) {
+function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: SentinelAlert[], onClick: () => void }) {
   const fundPercent = event.needs?.funds ? Math.min(100, Math.round((event.needs.funds.current / event.needs.funds.goal) * 100)) : null;
   const volPercent = event.needs?.volunteers ? Math.min(100, Math.round((event.needs.volunteers.current / event.needs.volunteers.goal) * 100)) : null;
+
+  const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
+    if (!event.lat || !event.lng) return false;
+    if (alert.polygon && alert.polygon.length > 0) {
+      return isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon);
+    } else if (alert.coordinates) {
+      const dist = getDistanceMiles(event.lat, event.lng, alert.coordinates.lat, alert.coordinates.lng);
+      return dist <= 30;
+    }
+    return false;
+  });
+  const hasAlerts = intersectingAlerts.length > 0;
 
   return (
     <button
@@ -183,6 +209,11 @@ function EventCard({ event, onClick }: { event: CommunityEvent, onClick: () => v
           fill
           className="object-cover group-hover:scale-105 transition-transform duration-300"
         />
+        {hasAlerts && (
+          <span className={`absolute top-3 ${event.status === 'active' ? 'right-24' : 'right-28'} text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 flex items-center gap-1`}>
+            <span className="material-symbols-outlined text-[14px]">warning</span> Alert
+          </span>
+        )}
         <span className={`absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-full ${
           event.status === 'active' 
             ? 'bg-primary-container text-on-primary-container' 
