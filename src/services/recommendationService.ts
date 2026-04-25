@@ -76,7 +76,10 @@ export function getRecommendedEvents(
     let score = 0;
     const matchedSkills: string[] = [];
 
-    const eventText = `${event.title} ${event.description} ${event.category}`.toLowerCase();
+    const eventCategory = event.category || '';
+    const eventTitle = event.title || '';
+    const eventDescription = event.description || '';
+    const eventText = `${eventTitle} ${eventDescription} ${eventCategory}`.toLowerCase();
 
     for (const skill of normalizedSkills) {
       let skillScore = 0;
@@ -87,19 +90,19 @@ export function getRecommendedEvents(
         for (const keyword of mappings) {
           const kw = keyword.toLowerCase();
           // Category exact match (highest weight)
-          if (event.category.toLowerCase() === kw) {
+          if (eventCategory.toLowerCase() === kw) {
             skillScore += 15;
           }
           // Category partial match
-          else if (event.category.toLowerCase().includes(kw)) {
+          else if (eventCategory.toLowerCase().includes(kw)) {
             skillScore += 10;
           }
           // Title match (high weight)
-          else if (event.title.toLowerCase().includes(kw)) {
+          else if (eventTitle.toLowerCase().includes(kw)) {
             skillScore += 6;
           }
           // Description match (moderate weight)
-          else if (event.description.toLowerCase().includes(kw)) {
+          else if (eventDescription.toLowerCase().includes(kw)) {
             skillScore += 3;
           }
         }
