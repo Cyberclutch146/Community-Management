@@ -111,7 +111,7 @@ export default function PromotionModal({ isOpen, onClose, campaignId }: Promotio
                         Click to upload email list
                       </p>
                       <p className="text-xs text-on-surface-variant/60 mt-1">
-                        CSV file with 'email' column
+                        CSV or Excel file with 'email' column
                       </p>
                     </>
                   )}
@@ -120,10 +120,17 @@ export default function PromotionModal({ isOpen, onClose, campaignId }: Promotio
               <input 
                 ref={fileInputRef}
                 type="file" 
+                accept=".csv, .xlsx"
                 className="hidden" 
                 onChange={(e) => {
                   const selectedFile = e.target.files?.[0] || null;
                   if (selectedFile) {
+                    const fileName = selectedFile.name.toLowerCase();
+                    if (!fileName.endsWith('.csv') && !fileName.endsWith('.xlsx')) {
+                      toast.error('Please select a valid CSV or Excel file.');
+                      e.target.value = '';
+                      return;
+                    }
                     console.log('File selected:', selectedFile.name);
                     setFile(selectedFile);
                     toast.success(`File selected: ${selectedFile.name}`);
