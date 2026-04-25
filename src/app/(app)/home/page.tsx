@@ -7,6 +7,7 @@ import { getEvents } from '@/services/eventService'
 import { useAuth } from '@/context/AuthContext'
 import { CommunityEvent } from '@/types'
 import MapWrapper from '@/components/MapWrapper'
+import SkillMatchBanner from '@/components/SkillMatchBanner'
 
 export default function HomePage() {
   const router = useRouter()
@@ -121,8 +122,13 @@ export default function HomePage() {
         </div>
       </div>
 
+      {/* Skill-Based Recommendations */}
+      <div className="px-10 mt-10">
+        <SkillMatchBanner />
+      </div>
+
       {/* Main Section */}
-      <div className="px-10 mt-12 grid grid-cols-3 gap-6">
+      <div className="px-10 mt-4 grid grid-cols-3 gap-6">
 
         {/* Large Featured Card — links to the event detail page */}
         <div
