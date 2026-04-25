@@ -95,15 +95,15 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl border-t bg-[#faf6f0]/95 border-stone-200/40 shadow-[0_-4px_20px_rgba(46,50,48,0.04)] pb-[env(safe-area-inset-bottom)]">
-      <div className="flex justify-around items-center px-4 h-20">
+    <nav className="md:hidden fixed bottom-0 w-full z-50 rounded-t-xl border-t bg-[#faf6f0]/95 border-stone-200/40 shadow-[0_-4px_20px_rgba(46,50,48,0.04)] pb-[env(safe-area-inset-bottom)] backdrop-blur-md">
+      <div className="flex justify-between items-center px-6 h-20 w-full max-w-md mx-auto">
         {navItems.map(item => {
           const isActive = pathname === item.href;
           return (
             <Link 
               key={item.name}
               href={item.href}
-              className={`flex flex-col items-center justify-center rounded-xl px-4 py-1.5 transition-all duration-300 ease-out active:scale-95 font-sans text-[11px] font-semibold ${
+              className={`flex flex-col items-center justify-center rounded-xl px-3 py-1.5 transition-all duration-300 ease-out active:scale-95 font-sans text-[11px] font-semibold flex-1 ${
                 isActive ? 'bg-[#4a7c59]/10 text-primary' : 'text-stone-500 hover:text-primary'
               }`}
             >

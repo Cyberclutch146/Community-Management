@@ -115,7 +115,10 @@ export default function HomePage() {
             <Filter size={16} />
             Filter
           </button>
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out">
+          <button 
+            onClick={() => router.push('/create')}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out"
+          >
             <Plus size={16} />
             Create Event
           </button>

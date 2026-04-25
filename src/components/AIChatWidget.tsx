@@ -141,7 +141,7 @@ export default function AIChatWidget() {
       {/* Floating Button */}
       <button
         onClick={toggleChat}
-        className="fixed bottom-6 right-6 md:bottom-8 md:right-8 z-50 p-4 rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 group"
+        className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-8 md:right-8 z-[60] p-4 rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 group"
         aria-label="Toggle AI Chat"
       >
         <AnimatePresence mode="wait">
@@ -165,7 +165,7 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-24 right-4 md:right-8 z-50 w-[calc(100vw-32px)] md:w-[420px] h-[540px] max-h-[calc(100vh-120px)] bg-surface rounded-2xl shadow-2xl border border-outline-variant flex flex-col overflow-hidden"
+            className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-24 md:right-8 z-[60] w-[calc(100vw-32px)] md:w-[420px] h-[540px] max-h-[calc(100vh-7rem-env(safe-area-inset-bottom))] md:max-h-[calc(100vh-120px)] bg-surface rounded-2xl shadow-2xl border border-outline-variant flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="bg-primary p-4 text-on-primary flex items-center justify-between">
