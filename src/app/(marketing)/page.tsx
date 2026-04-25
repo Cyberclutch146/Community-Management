@@ -25,7 +25,7 @@ export default function LandingPage() {
           </p>
           <div className="flex flex-wrap items-center gap-6">
             <Link href="/register" className="inline-flex items-center gap-3 px-8 py-4 bg-on-background text-background font-medium text-[13px] tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-all duration-300 transform hover:-translate-y-1">
-              Get Involved
+              Join Us
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
             </Link>
             <Link href="/about" className="inline-flex items-center gap-2 px-0 py-4 bg-transparent text-on-surface-variant font-medium text-[13px] tracking-wider uppercase hover:text-on-background transition-colors group">
