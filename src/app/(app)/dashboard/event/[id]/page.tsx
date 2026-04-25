@@ -79,13 +79,24 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const handleEmailAll = () => {
+  const handleEmailAll = async () => {
     const emails = volunteers.map(v => v.userEmail).filter(Boolean);
     if (emails.length === 0) {
       toast.info('No email addresses available to contact.');
       return;
     }
-    const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=Update regarding ${event?.title}`;
+    
+    try {
+      await navigator.clipboard.writeText(emails.join(', '));
+      toast.success('Emails copied to clipboard! Opening mail client...');
+    } catch (err) {
+      toast.success('Opening mail client...');
+    }
+
+    const subject = encodeURIComponent(`Update regarding ${event?.title || 'Community Event'}`);
+    const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+    
+    // Fallback to simple location assignment
     window.location.href = mailtoLink;
   };
 

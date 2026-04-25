@@ -243,7 +243,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                     setGeneratingImage(true);
                     try {
                       toast.info('Generating image with AI...');
-                      const prompt = \`A high-quality, inspiring cover photo for a community event named: \${title}. \${category}. Beautiful lighting, realistic, no text.\`;
+                      const prompt = `A high-quality, inspiring cover photo for a community event named: ${title}. ${category}. Beautiful lighting, realistic, no text.`;
                       
                       const response = await fetch('/api/generate-image', {
                         method: 'POST',
@@ -281,7 +281,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
                 </button>
               </div>
               <div className="flex items-center gap-4">
-                <label className={\`bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface \${generatingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex-1 text-center font-medium flex items-center justify-center gap-2\`}>
+                <label className={`bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface ${generatingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex-1 text-center font-medium flex items-center justify-center gap-2`}>
                   <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
                   {uploadingImage ? 'Uploading...' : 'Choose File'}
                   <input 
