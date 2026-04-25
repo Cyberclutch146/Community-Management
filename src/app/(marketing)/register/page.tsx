@@ -244,34 +244,10 @@ export default function RegisterPage() {
               Already have an account?{' '}
               <Link className="font-semibold text-primary hover:text-primary-container underline decoration-primary/30 underline-offset-4 transition-colors" href="/login">Log in here</Link>
             </p>
-
-            <form onSubmit={handleRegister}>
-              <input className="input" placeholder="Full Name" value={fullName} onChange={(e) => setFullName(e.target.value)} />
-              <input className="input" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-              <input className="input" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} />
-              <input className="input" type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
-
-              <label style={{ fontSize: '13px', color: 'var(--stone)', marginBottom: '24px', display: 'block' }}>
-                <input type="checkbox" checked={agreed} onChange={(e) => setAgreed(e.target.checked)} /> Agree to terms
-              </label>
-
-              <button className="btn">{loading ? 'Creating...' : 'Create Account'}</button>
-            </form>
-
-            <div className="login-footer">
-              Already have an account? <Link href="/login">Log in</Link>
-            </div>
-          </div>
-
-          <div className="login-right">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6SsSRVlGYy_mYUBPddi5PP0YThIbaZOjDdbxdceDg1Y6UxF6lR23T8POlRObgpuxvvTDIgemtKHSk6ULAH8zMBeYYhFLPPR6xG3JggHWG8qMeJhf9bP7xWgBa02EDitKYJHAnyhB9qcai7rJAG3Gvw5XuoAnrg9DapfZkm0Q7na_aJgu6Cvx-HWuO24YEv4d25UPMK1HQJT_U6VknyixRH1bCSgVgHwpuQZCp6Zh_9LOBd2EzXwdbY784qMeRhQ88skYX-y_rNIUN" />
-            <div className="login-overlay" />
-            <div className="login-quote">Rooted in community,<br/>grown through care.</div>
-          </div>
-
         </div>
-        {error && <div className="error-toast">{error}</div>}
       </div>
-    </>
-  );
+      {error && <div className="error-toast">{error}</div>}
+    </div>
+  </div>
+);
 }
