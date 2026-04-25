@@ -3,9 +3,8 @@ import csv from "csv-parser";
 import * as XLSX from "xlsx";
 import { Readable } from "stream";
 import { sendEmail } from "@/services/emailService";
-import { sendSMS } from "@/services/smsService";
-// @ts-ignore
-const db: any = require("../../../../config/firebase").default || require("../../../../config/firebase");
+// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
+const firestoreDb: any = require("../../../../config/firebase");
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -33,16 +32,11 @@ export async function POST(req: NextRequest) {
     // 🚀 Robust CSV/Excel Parsing
     console.log('API: Processing file:', file.name, 'Size:', file.size);
 
-    let buffer = Buffer.from(await file.arrayBuffer());
-    
-    if (fileName.endsWith('.xlsx')) {
-      console.log('API: Converting XLSX to CSV format');
-      const workbook = XLSX.read(buffer, { type: 'buffer' });
-      const sheetName = workbook.SheetNames[0];
-      const sheet = workbook.Sheets[sheetName];
-      const csvData = XLSX.utils.sheet_to_csv(sheet);
-      buffer = Buffer.from(csvData);
-    }
+    const parsedData = Papa.parse(text, {
+      header: true,
+      skipEmptyLines: true,
+      transformHeader: (header: string) => header.toLowerCase().trim()
+    });
 
     const contacts: { email?: string, phone?: string }[] = [];
     const parsedData: any[] = [];
@@ -112,7 +106,7 @@ export async function POST(req: NextRequest) {
           await Promise.all(tasks);
           
           try {
-            await db.collection("promotion_logs").add({
+            await firestoreDb.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               contact,
               status: "sent",
@@ -125,7 +119,7 @@ export async function POST(req: NextRequest) {
           return contact;
         } catch (error: any) {
           try {
-            await db.collection("promotion_logs").add({
+            await firestoreDb.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               contact,
               status: "failed",
@@ -145,7 +139,7 @@ export async function POST(req: NextRequest) {
 
     // 🔥 Save master summary log in Firestore
     try {
-      await db.collection("promotions").add({
+      await firestoreDb.collection("promotions").add({
         campaignId: campaignId || "unknown",
         total: contacts.length,
         success,

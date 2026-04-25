@@ -16,21 +16,37 @@ export async function POST(req: NextRequest) {
     }
 
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    
+    // Fallback list of models to try if one is experiencing high demand
+    const modelsToTry = ["gemini-2.5-flash", "gemini-2.0-flash-lite", "gemini-flash-latest", "gemini-pro-latest"];
+    let text = "";
 
     const prompt = `Write a short, engaging, and professional description (around 3-4 sentences) for a community event. 
     The event title is "${title}". 
     The event category is "${category || 'community event'}".
     The description should motivate people to join or contribute to the cause. Do not include hashtags or greetings, just the description paragraph.`;
 
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const text = response.text();
+    for (const modelName of modelsToTry) {
+      try {
+        const model = genAI.getGenerativeModel({ model: modelName });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        text = response.text();
+        if (text) break; // Successfully generated text, stop trying other models
+      } catch (err: any) {
+        console.warn(`Model ${modelName} failed:`, err.message);
+        // Continue to the next model in the list
+      }
+    }
+
+    if (!text) {
+      throw new Error("All AI models are currently experiencing high demand. Please try again later.");
+    }
 
     return NextResponse.json({ description: text });
 
   } catch (error: any) {
     console.error("AI Generation Error:", error);
-    return NextResponse.json({ error: "Failed to generate description" }, { status: 500 });
+    return NextResponse.json({ error: error?.message || "Failed to generate description" }, { status: 500 });
   }
 }

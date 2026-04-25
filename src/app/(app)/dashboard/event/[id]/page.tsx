@@ -3,9 +3,9 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function OrganizerEventPage({ params }: { params: Promise<{ id: string }> }) {
@@ -33,7 +33,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           getEventVolunteers(eventId)
         ]);
 
-        if (eventData?.organizerId !== user.uid) {
+        if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
           toast.error('You do not have permission to view this event.');
           router.push('/dashboard');
           return;
@@ -66,14 +66,38 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const handleEmailAll = () => {
+  const handleDeleteEvent = async () => {
+    if (!confirm('Are you sure you want to delete this event? This action cannot be undone.')) return;
+    
+    try {
+      await deleteEvent(eventId);
+      toast.success('Event deleted successfully.');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Failed to delete event:', error);
+      toast.error('Failed to delete event.');
+    }
+  };
+
+  const handleEmailAll = async () => {
     const emails = volunteers.map(v => v.userEmail).filter(Boolean);
     if (emails.length === 0) {
       toast.info('No email addresses available to contact.');
       return;
     }
-    const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=Update regarding ${event?.title}`;
+    
+    const subject = encodeURIComponent(`Update regarding ${event?.title || 'Community Event'}`);
+    const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
+    
+    // Trigger the mail client IMMEDIATELY so the browser doesn't block it due to async delay
     window.location.href = mailtoLink;
+
+    try {
+      await navigator.clipboard.writeText(emails.join(', '));
+      toast.success('Opening mail client (and copied emails to clipboard just in case!)');
+    } catch (err) {
+      // ignore clipboard errors
+    }
   };
 
   const handleExportCSV = () => {
@@ -137,7 +161,14 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
             {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : (event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD')} • {event.location}
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3 mt-4 md:mt-0">
+          <button 
+            onClick={() => router.push(`/dashboard/event/${eventId}/edit`)}
+            className="bg-primary-container hover:bg-primary/20 text-on-primary-container px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
+          >
+            <span className="material-symbols-outlined text-[18px]">edit</span>
+            Edit Event
+          </button>
           <button 
             onClick={handleEmailAll}
             className="bg-[#1f3d2b] hover:bg-[#1a3324] text-white px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm"
@@ -151,6 +182,13 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           >
             <Download size={18} />
             Export CSV
+          </button>
+          <button 
+            onClick={handleDeleteEvent}
+            className="bg-red-50 hover:bg-red-100 text-red-600 px-4 py-2 rounded-lg font-medium flex items-center gap-2 transition-colors shadow-sm border border-red-100"
+          >
+            <Trash2 size={18} />
+            Delete Event
           </button>
         </div>
       </div>

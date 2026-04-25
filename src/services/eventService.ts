@@ -1,8 +1,10 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
+export const ADMIN_EMAIL = 'ece2024033@rcciit.org.in';
+
 // ─── Paginated fetch ────────────────────────────────────
 export interface PaginatedEvents {
   events: CommunityEvent[];
@@ -124,8 +126,52 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
 
     const docRef = await addDoc(collection(db, EVENTS_COLLECTION), eventData);
     return docRef.id;
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Failed to create event in Firebase:', error);
+    throw error;
+  }
+};
+
+// ─── Update ─────────────────────────────────────────────
+export const updateEvent = async (eventId: string, data: Partial<CommunityEventCreate>): Promise<void> => {
+  try {
+    let coords = (data.lat !== undefined && data.lng !== undefined) 
+      ? { lat: data.lat, lng: data.lng } 
+      : null;
+
+    if (!coords && data.location) {
+      coords = await geocodeLocation(data.location);
+    }
+
+    const eventRef = doc(db, EVENTS_COLLECTION, eventId);
+    
+    const updateData: any = {
+      ...data,
+      updatedAt: new Date()
+    };
+    
+    if (coords) {
+      updateData.lat = coords.lat;
+      updateData.lng = coords.lng;
+    }
+
+    await updateDoc(eventRef, updateData);
+  } catch (error) {
+    console.error('Failed to update event:', error);
+    throw error;
+  }
+};
+
+
+// ─── Delete ─────────────────────────────────────────────
+export const deleteEvent = async (eventId: string): Promise<void> => {
+  try {
+    const eventRef = doc(db, EVENTS_COLLECTION, eventId);
+    // Note: This doesn't delete subcollections. 
+    // In a production environment, you might want to use a Cloud Function for recursive deletion.
+    await deleteDoc(eventRef);
+  } catch (error) {
+    console.error('Failed to delete event:', error);
     throw error;
   }
 };
@@ -190,6 +236,7 @@ export interface EventVolunteer {
   userId: string;
   userName: string;
   userEmail?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   signedUpAt: any;
   attended?: boolean;
 }

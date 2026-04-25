@@ -22,7 +22,7 @@ export default function AppLayout({
         <div className="fixed top-0 left-0 w-full z-50 hidden md:block">
           <NavbarTop />
         </div>
-        <div className="flex-1 flex flex-col min-w-0 md:pt-24">
+        <div className="flex-1 flex flex-col min-w-0 md:pt-24 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
           <div className="md:hidden">
             <MobileHeader />
           </div>

@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect, Suspense, useRef } from 'react';
+import { useState, useEffect, Suspense, useRef, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { EventCard } from '@/components/EventCard';
 import { getEvents } from '@/services/eventService';
 import MapWrapper from '@/components/MapWrapper';
+import SkillMatchBanner from '@/components/SkillMatchBanner';
 import { CommunityEvent } from '@/types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { Sparkles } from 'lucide-react';
 
 const PAGE_SIZE = 12;
 
@@ -24,6 +26,12 @@ function FeedContent() {
   const [filter, setFilter] = useState('All Events');
   const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
+
+  // Semantic search state
+  const [semanticResults, setSemanticResults] = useState<string[] | null>(null);
+  const [isAIPowered, setIsAIPowered] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
+  const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync from URL when it changes (e.g. user searches from navbar)
   useEffect(() => { setSearchQuery(urlQuery) }, [urlQuery]);
@@ -58,6 +66,65 @@ function FeedContent() {
     fetchEvents();
   }, []);
 
+  // Semantic search effect with debounce
+  const performSemanticSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSemanticResults(null);
+      setIsAIPowered(false);
+      setSearchLoading(false);
+      return;
+    }
+
+    setSearchLoading(true);
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: query.trim() }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSemanticResults(data.results);
+        setIsAIPowered(data.isAIPowered);
+      } else {
+        // Fallback: clear semantic results and use client-side filtering
+        setSemanticResults(null);
+        setIsAIPowered(false);
+      }
+    } catch (error) {
+      console.error('Semantic search failed:', error);
+      setSemanticResults(null);
+      setIsAIPowered(false);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, []);
+
+  // Debounced search trigger
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      clearTimeout(searchTimeoutRef.current);
+    }
+
+    if (searchQuery.trim()) {
+      setSearchLoading(true);
+      searchTimeoutRef.current = setTimeout(() => {
+        performSemanticSearch(searchQuery);
+      }, 500);
+    } else {
+      setSemanticResults(null);
+      setIsAIPowered(false);
+      setSearchLoading(false);
+    }
+
+    return () => {
+      if (searchTimeoutRef.current) {
+        clearTimeout(searchTimeoutRef.current);
+      }
+    };
+  }, [searchQuery, performSemanticSearch]);
+
   const loadMore = async () => {
     if (loadingMore || !hasMore) return;
     setLoadingMore(true);
@@ -73,16 +140,31 @@ function FeedContent() {
     }
   };
 
-  const filteredEvents = events.filter(e => {
-    // Category filter
-    if (filter !== 'All Events' && e.category !== filter) return false;
-    // Text search filter
-    if (searchQuery) {
+  // Smart filtering: use semantic results if available, otherwise fallback to client-side
+  const filteredEvents = (() => {
+    let result = events;
+
+    // If semantic search returned results, reorder by those IDs
+    if (semanticResults && searchQuery.trim()) {
+      const idOrder = new Map(semanticResults.map((id, index) => [id, index]));
+      result = events
+        .filter(e => idOrder.has(e.id))
+        .sort((a, b) => (idOrder.get(a.id) ?? 999) - (idOrder.get(b.id) ?? 999));
+    } else if (searchQuery.trim() && !semanticResults) {
+      // Fallback to client-side keyword search
       const q = searchQuery.toLowerCase();
-      return e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q);
+      result = events.filter(e =>
+        e.title.toLowerCase().includes(q) || e.description.toLowerCase().includes(q)
+      );
     }
-    return true;
-  });
+
+    // Category filter (applied on top of search)
+    if (filter !== 'All Events') {
+      result = result.filter(e => e.category === filter);
+    }
+
+    return result;
+  })();
 
   return (
     <div className="flex-1 flex flex-col text-[#1f3d2b] w-full">
@@ -95,6 +177,12 @@ function FeedContent() {
             <div className="mt-3 flex items-center gap-2">
               <span className="text-sm text-gray-500">Showing results for</span>
               <span className="bg-[#1f3d2b]/10 text-[#1f3d2b] text-sm font-medium px-3 py-1 rounded-full">&ldquo;{searchQuery}&rdquo;</span>
+              {isAIPowered && (
+                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full border border-amber-200">
+                  <Sparkles size={12} />
+                  AI-powered
+                </span>
+              )}
               <button onClick={() => setSearchQuery('')} className="text-xs text-gray-400 hover:text-red-500 transition-colors ml-1">✕ Clear</button>
             </div>
           )}
@@ -125,6 +213,9 @@ function FeedContent() {
         </div>
       </div>
 
+      {/* Skill-Based Recommendations — only show when no search query */}
+      {!searchQuery && <SkillMatchBanner condensed />}
+
       <section className="mb-8 overflow-x-auto pb-4 no-scrollbar">
         <div className="flex gap-3 min-w-max">
           {categories.map((cat) => {
@@ -150,9 +241,15 @@ function FeedContent() {
         </div>
       </section>
 
-      {loading ? (
-        <div className="flex justify-center items-center py-20">
+      {loading || searchLoading ? (
+        <div className="flex flex-col justify-center items-center py-20 gap-3">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          {searchLoading && (
+            <p className="text-sm text-on-surface-variant flex items-center gap-2">
+              <Sparkles size={14} className="text-amber-500" />
+              Searching with AI...
+            </p>
+          )}
         </div>
       ) : filteredEvents.length === 0 ? (
         <div className="bg-surface-container rounded-2xl p-10 text-center text-on-surface-variant border border-outline-variant/30">
@@ -165,14 +262,31 @@ function FeedContent() {
           <MapWrapper events={filteredEvents} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredEvents.map((event, index) => (
-            <EventCard key={event.id} event={event} featured={index === 0} />
-          ))}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-dense">
+          {filteredEvents.map((event, index) => {
+            const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
+
+            const normalizedEvent = {
+              ...event,
+              imageUrl: imageUrl,
+            };
+
+            // Create a neat bento box pattern: stagger the large cards
+            const bentoPattern = [0, 4, 7, 11];
+            const isFeatured = bentoPattern.includes(index % 12);
+
+            return (
+              <EventCard 
+                key={event.id} 
+                event={normalizedEvent} 
+                featured={isFeatured}
+              />
+            );
+          })}
         </div>
       )}
 
-      {hasMore && !loading && (
+      {hasMore && !loading && !searchQuery && (
         <div className="mt-12 flex justify-center">
           <button 
             onClick={loadMore}
