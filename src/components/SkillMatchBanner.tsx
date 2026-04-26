@@ -26,7 +26,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
 
       try {
         const result = await getEvents(50);
-        const recommended = getRecommendedEvents(profile.skills, result.events, 3);
+        const recommended = getRecommendedEvents(profile.skills, result.events, 3, profile.equipment || []);
         setHasRecommendations(recommended.length > 0);
       } catch (error) {
         console.error('Failed to fetch recommendations:', error);

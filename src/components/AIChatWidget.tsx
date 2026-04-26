@@ -91,6 +91,9 @@ export default function AIChatWidget() {
           userName: profile?.displayName || 'Volunteer',
           userEmail: user?.email || '',
           userSkills: profile?.skills || [],
+          userEquipment: profile?.equipment || [],
+          userAvailability: profile?.availability || 'anytime',
+          userTravelRadius: profile?.travelRadius || 0,
           pendingSignup: pendingSignup || undefined,
         }),
       });

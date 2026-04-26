@@ -172,7 +172,7 @@ function FeedContent() {
   // Calculate recommendation percentages when sorted by recommended
   useEffect(() => {
     if (sortBy === 'recommended' && profile?.skills && events.length > 0) {
-      const recommendedEvents = getRecommendedEvents(profile.skills, events, events.length);
+      const recommendedEvents = getRecommendedEvents(profile.skills, events, events.length, profile.equipment || []);
 
       if (recommendedEvents.length > 0) {
         // Find max score to calculate percentages
@@ -352,7 +352,7 @@ function FeedContent() {
 
     if (sortBy === 'recommended') {
       const recommendedOrder = new Map(
-        getRecommendedEvents(profile?.skills ?? [], result, result.length).map(({ event }, index) => [event.id, index])
+        getRecommendedEvents(profile?.skills ?? [], result, result.length, profile?.equipment ?? []).map(({ event }, index) => [event.id, index])
       );
 
       return result.sort((a, b) => {

@@ -9,6 +9,9 @@ export interface UserProfile {
   location: string;
   phone: string;
   skills: string[];
+  equipment: string[];        // e.g. ["truck", "generator", "first aid kit"]
+  travelRadius: number;       // km willing to travel (0 = not set)
+  availability: string;       // "weekdays" | "weekends" | "evenings" | "anytime"
   avatarUrl: string;
   role: string;
   volunteerHours: number;

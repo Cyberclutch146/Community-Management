@@ -63,9 +63,10 @@ interface ScoredEvent {
 export function getRecommendedEvents(
   userSkills: string[],
   events: CommunityEvent[],
-  maxResults: number = 5
+  maxResults: number = 5,
+  userEquipment: string[] = []
 ): ScoredEvent[] {
-  if (!userSkills || userSkills.length === 0 || events.length === 0) {
+  if ((!userSkills || userSkills.length === 0) && (!userEquipment || userEquipment.length === 0) || events.length === 0) {
     return [];
   }
 
@@ -142,6 +143,26 @@ export function getRecommendedEvents(
         // Extra boost if they're really short-handed
         const fillRate = goal > 0 ? current / goal : 1;
         if (fillRate < 0.5) score += 2;
+      }
+    }
+
+    // Equipment match boost
+    if (userEquipment && userEquipment.length > 0) {
+      const normalizedEquipment = userEquipment.map(e => e.toLowerCase().trim());
+      for (const item of normalizedEquipment) {
+        // Check event text for equipment keyword mentions
+        if (eventText.includes(item)) {
+          score += 6;
+          matchedSkills.push(`🔧 ${item}`);
+        }
+        // Partial word match (e.g. "truck" matches "trucks needed")
+        const itemWords = item.split(/\s+/);
+        for (const word of itemWords) {
+          if (word.length > 2 && eventText.includes(word) && !matchedSkills.includes(`🔧 ${item}`)) {
+            score += 3;
+            matchedSkills.push(`🔧 ${item}`);
+          }
+        }
       }
     }
 

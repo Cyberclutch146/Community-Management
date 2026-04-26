@@ -21,6 +21,9 @@ export default function ProfilePage() {
   const [bio, setBio] = useState('');
   const [location, setLocation] = useState('');
   const [skills, setSkills] = useState('');
+  const [equipment, setEquipment] = useState('');
+  const [travelRadius, setTravelRadius] = useState(10);
+  const [availability, setAvailability] = useState('anytime');
 
   // Sync state initially
   useEffect(() => {
@@ -29,6 +32,9 @@ export default function ProfilePage() {
       setBio(profile.bio || '');
       setLocation(profile.location || '');
       setSkills(profile.skills ? profile.skills.join(', ') : '');
+      setEquipment(profile.equipment ? profile.equipment.join(', ') : '');
+      setTravelRadius(profile.travelRadius || 10);
+      setAvailability(profile.availability || 'anytime');
     }
   }, [profile, isEditing]);
 
@@ -91,6 +97,9 @@ export default function ProfilePage() {
         bio: bio.trim(),
         location: location.trim(),
         skills: skills.split(',').map(s => s.trim()).filter(Boolean),
+        equipment: equipment.split(',').map(s => s.trim()).filter(Boolean),
+        travelRadius,
+        availability,
         profileComplete: true
       });
       setIsEditing(false);
@@ -225,6 +234,79 @@ export default function ProfilePage() {
               />
               <p className="text-xs text-on-surface-variant mt-2">These help us match you with relevant impact opportunities.</p>
             </div>
+
+            {/* Equipment */}
+            <div>
+              <label className="block text-sm font-bold text-on-surface mb-2" htmlFor="equipment">Equipment You Can Provide (comma separated)</label>
+              <div className="relative">
+                <span className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-on-surface-variant">
+                  <span aria-hidden="true" className="material-symbols-outlined text-[20px]">build</span>
+                </span>
+                <input
+                  id="equipment"
+                  type="text"
+                  value={equipment}
+                  onChange={(e) => setEquipment(e.target.value)}
+                  placeholder="e.g. Truck, Generator, Medical Kit, Tent"
+                  className="w-full rounded-xl border-0 py-3 pl-11 pr-4 text-on-surface focus:ring-2 focus:ring-primary/30 transition-all placeholder:text-on-surface-variant/50"
+                  style={inputStyle}
+                />
+              </div>
+              <p className="text-xs text-on-surface-variant mt-2">Resources you can bring to relief efforts.</p>
+            </div>
+
+            {/* Travel Radius */}
+            <div>
+              <label className="block text-sm font-bold text-on-surface mb-2" htmlFor="travelRadius">
+                Travel Radius: <span style={{ color: 'var(--color-primary-base)' }}>{travelRadius} km</span>
+              </label>
+              <input
+                id="travelRadius"
+                type="range"
+                min={0}
+                max={100}
+                step={5}
+                value={travelRadius}
+                onChange={(e) => setTravelRadius(Number(e.target.value))}
+                className="w-full h-2 rounded-full appearance-none cursor-pointer accent-primary"
+                style={{ background: `linear-gradient(to right, var(--color-primary-base) 0%, var(--color-primary-base) ${travelRadius}%, var(--color-surface-container-base) ${travelRadius}%, var(--color-surface-container-base) 100%)` }}
+              />
+              <div className="flex justify-between text-[10px] text-on-surface-variant mt-1 font-semibold">
+                <span>0 km</span>
+                <span>25 km</span>
+                <span>50 km</span>
+                <span>75 km</span>
+                <span>100 km</span>
+              </div>
+            </div>
+
+            {/* Availability */}
+            <div>
+              <label className="block text-sm font-bold text-on-surface mb-3">Availability</label>
+              <div className="flex flex-wrap gap-2">
+                {(['weekdays', 'weekends', 'evenings', 'anytime'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => setAvailability(opt)}
+                    className={`px-4 py-2.5 rounded-xl text-sm font-semibold transition-all duration-200 capitalize ${
+                      availability === opt
+                        ? 'text-on-primary shadow-md'
+                        : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                    style={availability === opt ? {
+                      background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                      boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+                    } : {
+                      background: 'var(--glass-bg)',
+                      border: '1px solid var(--glass-border)',
+                    }}
+                  >
+                    {opt === 'anytime' ? '🕐 Anytime' : opt === 'weekdays' ? '📅 Weekdays' : opt === 'weekends' ? '🌴 Weekends' : '🌙 Evenings'}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Action Buttons */}
@@ -324,6 +406,58 @@ export default function ProfilePage() {
                     {skill}
                   </span>
                 ))}
+              </div>
+            )}
+
+            {/* Equipment Tags */}
+            {profile.equipment && profile.equipment.length > 0 && (
+              <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+                {profile.equipment.map((item, idx) => (
+                  <span
+                    key={idx}
+                    className="text-xs font-semibold px-3 py-1 rounded-full flex items-center gap-1"
+                    style={{
+                      background: 'rgba(212,168,82,0.12)',
+                      color: 'var(--color-warm-amber)',
+                      border: '1px solid rgba(212,168,82,0.2)',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[14px]">build</span>
+                    {item}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            {/* Resource Info Chips */}
+            {(profile.travelRadius > 0 || profile.availability) && (
+              <div className="flex flex-wrap gap-2 mb-4 justify-center md:justify-start">
+                {profile.travelRadius > 0 && (
+                  <span
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5"
+                    style={{
+                      background: 'rgba(59,107,74,0.08)',
+                      color: 'var(--color-primary-base)',
+                      border: '1px solid rgba(59,107,74,0.12)',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[14px]">near_me</span>
+                    Within {profile.travelRadius} km
+                  </span>
+                )}
+                {profile.availability && profile.availability !== 'anytime' && (
+                  <span
+                    className="text-xs font-semibold px-3 py-1.5 rounded-full flex items-center gap-1.5"
+                    style={{
+                      background: 'rgba(139,109,46,0.08)',
+                      color: 'var(--color-tertiary-base)',
+                      border: '1px solid rgba(139,109,46,0.12)',
+                    }}
+                  >
+                    <span className="material-symbols-outlined text-[14px]">schedule</span>
+                    {profile.availability.charAt(0).toUpperCase() + profile.availability.slice(1)}
+                  </span>
+                )}
               </div>
             )}
 

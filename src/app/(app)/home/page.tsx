@@ -41,7 +41,7 @@ export default function HomePage() {
   // Pick a featured event: prefer the first 'high' urgency active event, else the newest
   const featured = events.find(e => e.urgency === 'high' && e.status === 'active') ?? events[0] ?? null
 
-  const recommendedEvents = getRecommendedEvents(profile?.skills ?? [], events, 4)
+  const recommendedEvents = getRecommendedEvents(profile?.skills ?? [], events, 4, profile?.equipment ?? [])
     .map(({ event }) => event)
     .filter(event => event.id !== featured?.id)
     .slice(0, 3)

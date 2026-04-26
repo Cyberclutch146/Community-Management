@@ -12,6 +12,9 @@ export async function POST(req: Request) {
     const userName = body.userName || "Volunteer";
     const userEmail = body.userEmail || "";
     const userSkills = body.userSkills || [];
+    const userEquipment = body.userEquipment || [];
+    const userAvailability = body.userAvailability || 'anytime';
+    const userTravelRadius = body.userTravelRadius || 0;
     const pendingSignup = body.pendingSignup || null;
 
     if (!messages || messages.length === 0) {
@@ -55,7 +58,15 @@ export async function POST(req: Request) {
           userSkills.length > 0
             ? `Their skills include: ${userSkills.join(", ")}.`
             : ""
-        }`
+        }${
+          userEquipment.length > 0
+            ? ` They have equipment: ${userEquipment.join(", ")}.`
+            : ""
+        }${
+          userTravelRadius > 0
+            ? ` They can travel up to ${userTravelRadius} km.`
+            : ""
+        } Available: ${userAvailability}.`
       : "\nThe user is not logged in.";
 
     const sentinelContext = sentinelAlerts.length > 0 
