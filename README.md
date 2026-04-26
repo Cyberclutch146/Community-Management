@@ -1,69 +1,140 @@
 # Kindred Relief Network (KRN) 🤝
 
-**Kindred Relief Network** is a community-driven platform designed to coordinate disaster relief efforts, manage volunteer activities, and facilitate community mutual aid. Built with speed and compassion in mind, KRN empowers local communities to organize quickly during times of need.
+[![Next.js](https://img.shields.io/badge/Next.js-15+-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
+[![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
+[![Gemini AI](https://img.shields.io/badge/Gemini_AI-1.5_Flash-4285F4?style=for-the-badge&logo=google-gemini)](https://ai.google.dev/)
 
-## 🌟 Key Features
+**Kindred Relief Network** is a comprehensive, professional, community-centric platform engineered to streamline disaster relief, volunteer coordination, and mutual aid. It combines real-time situational awareness with intelligent matchmaking to empower communities when they need it most. Designed with a focus on speed, compassion, and automation, KRN empowers local communities and NGOs to organize efficiently during critical times.
+
+---
+
+## 🚀 Key Innovation Pillars
+
+### 🛡️ Community Sentinel (Live Safety Monitoring)
+*   **Real-Time Data**: Integrates live feeds from **USGS** and **NOAA** to track environmental risks.
+*   **Situational Map**: Interactive Leaflet-based map with custom hazard overlays (Weather, Earthquakes, etc.).
+*   **Proactive Alerts**: Notifies community organizers of nearby critical signals before they escalate.
+
+### 🧠 Intelligent Matchmaking
+*   **Skill-Based Recommendations**: Proprietary scoring algorithm that matches volunteers to events based on their unique expertise (Medical, Logistics, Technical, etc.).
+*   **Match Clarity**: Dynamic "Why it's a match" insights for every recommended event.
+*   **Capacity Handling**: Optimized to show up to 6 high-relevance matches at a glance.
 
 ### 📢 Event & Campaign Management
-- **Create Events**: Easily set up relief campaigns with titles, descriptions, and specific needs.
-- **Resource Tracking**: Real-time progress bars for both funding goals and volunteer counts.
-- **Location-Aware**: Integrated maps showing the proximity of events to the user.
+* **Intelligent Event Creation**: Quickly set up relief campaigns or events with titles, descriptions, and specific needs. Features an AI-powered description generator to formulate compelling campaign messages.
+* **Interactive Resource Tracking**: Real-time progress tracking for funding goals and volunteer registration.
+* **Interactive Mapping**: Integrated geospatial mapping (using Leaflet & OpenStreetMap) displaying real-time proximity of events and "Sentinel" hazard overlays to users.
 
-### 💬 Real-Time Coordination
-- **Community Chat**: Each event has a dedicated Firestore-backed chatroom for volunteers to coordinate.
-- **AI Assistant**: A globally available AI chatbot powered by Google Gemini to help users navigate the platform and provide volunteering guidance.
+### 🤖 AI-Native Operations
+*   **24/7 AI Guide**: A persistent Gemini-powered assistant to answer platform questions and guide volunteer signups.
+*   **Generative Event Tools**: AI-assisted generation for professional event descriptions and promotional imagery.
+*   **Smart Skill Matching**: Dynamic banners and feeds that recommend specific volunteering tasks based on user profile skills.
 
-### 🏆 Gamified Impact
-- **Volunteer Leaderboard**: Highlighting "Community Heroes" who have stepped up to support specific causes.
-- **Organizer Dashboard**: Tools for organizers to track volunteer check-ins and manage logistics.
+### 💬 Real-Time Coordination & Alerts
+* **Sentinel Alert System**: Active tracking and mapping of emergency/relief zones to send immediate, automated visual notifications across the feed and dashboards.
+* **Community Chat Rooms**: Dedicated Firestore-backed real-time chat spaces for event volunteers to coordinate effectively.
 
-### 🔐 Secure & Seamless Access
-- **Firebase Auth**: Secure login and registration flows.
-- **Social Integration**: Ready for Google and GitHub authentication.
+### 🚀 Automated Bulk Communications
+* **Multi-Channel Promos**: Built-in promotion service that supports bulk parsing of `.csv` and `.xlsx` contact files.
+* **Email & SMS Automation**: Delivers automated event invitations and updates utilizing **Nodemailer** (Email) and **Twilio** (SMS) simultaneously.
+* **Firebase Audit Logs**: Ensures every promotion outcome is reliably logged within Firestore.
 
-## 🛠 Tech Stack
+### 🔐 Verified Volunteer Ecosystem
+*   **Email OTP Verification**: Secure, real-world verification via **Nodemailer** to ensure valid participants.
+*   **Digital Tickets**: Automated delivery of confirmation emails containing unique **QR codes** for seamless event check-ins.
+*   **Volunteer Leaderboard**: Gamified "Community Heroes" system to recognize top contributors.
 
-- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router, Turbopack)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
-- **Backend/Database**: [Firebase](https://firebase.google.com/) (Firestore, Auth)
-- **AI Engine**: [Google Generative AI (Gemini 1.5 Flash)](https://ai.google.dev/)
-- **Animations**: [Framer Motion](https://www.framer.com/motion/)
-- **Mapping**: [Leaflet](https://leafletjs.com/) with OpenStreetMap & Nominatim Geocoding
-- **Icons**: [Lucide React](https://lucide.dev/) & Google Material Symbols
+### 💳 Donations & Financial Integrations
+* **Razorpay Integration**: Secure, seamless in-app donation panel for funding campaigns, complete with order creation and fulfillment endpoints.
 
-## 📁 Project Structure
+---
+
+## 🛠 Technical Excellence
+
+| Category         | Technologies Used                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| **Framework**    | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) & [React 19](https://react.dev/)          |
+| **Language**     | TypeScript                                                                                          |
+| **Styling**      | [Tailwind CSS 4](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)        |
+| **Database**     | [Firebase](https://firebase.google.com/) (Firestore, Auth, Admin SDK)                               |
+| **AI Engines**   | [Google Generative AI (Gemini 1.5+)](https://ai.google.dev/) & [OpenAI API](https://openai.com/)    |
+| **Payments**     | [Razorpay](https://razorpay.com/)                                                                   |
+| **Mapping**      | [Leaflet](https://leafletjs.com/) & [React-Leaflet](https://react-leaflet.js.org/)                  |
+| **Comms/Parser** | [Twilio](https://twilio.com/), [Nodemailer](https://nodemailer.com/), CSV-Parser, Papaparse, XLSX   |
+
+---
+
+## 🏗 Architecture & Process Flows
+
+### High-Level System Architecture
+```mermaid
+graph TD
+    Client[Next.js Frontend Client] -->|API Requests| NextAPI[Next.js Serverless API Routes]
+    Client -->|Direct Read/Write| Firestore[(Firebase Firestore)]
+    Client -->|Auth State| FirebaseAuth[Firebase Authentication]
+    
+    NextAPI -->|Event Data & Logs| FirestoreAdmin[(Firebase Admin SDK)]
+    NextAPI -->|Emails| Nodemailer[Nodemailer Service]
+    NextAPI -->|SMS| Twilio[Twilio Service]
+    NextAPI -->|AI Prompts| LLM[Google Gemini / OpenAI]
+    NextAPI -->|Payments| Razorpay[Razorpay API]
+```
+
+### Event Creation & Bulk Promotion Flow
+```mermaid
+sequenceDiagram
+    participant Organizer
+    participant Frontend
+    participant PromotionAPI
+    participant EmailSMS (Twilio/NodeMailer)
+    participant Database
+
+    Organizer->>Frontend: Creates Event & Uploads CSV/Excel Contacts
+    Frontend->>Frontend: Parses CSV/XLSX locally or via API
+    Frontend->>PromotionAPI: Sends Batch Contacts & Message Templates
+    PromotionAPI->>EmailSMS: Dispatch Bulk Emails & SMS in parallel
+    EmailSMS-->>PromotionAPI: Delivery Status / Callbacks
+    PromotionAPI->>Database: Log successful deliveries & errors
+    Database-->>Frontend: Real-time update on delivery progress
+    Frontend-->>Organizer: Promotion Summary & Success Notifications
+```
+
+---
+
+## 📂 Project Architecture
 
 ```text
 ├── src/
-│   ├── app/            # Next.js App Router (Pages & API Routes)
-│   │   ├── (app)/      # Authenticated application routes
-│   │   ├── (auth)/     # Authentication flows
-│   │   └── api/        # Serverless functions (AI Chat)
-│   ├── components/     # Reusable UI components
-│   ├── context/        # React Context providers (Auth)
-│   ├── lib/            # Shared libraries (Firebase config)
-│   ├── services/       # Business logic & API calls (Firestore services)
-│   ├── types/          # TypeScript definitions
-│   └── styles/         # Global CSS and Tailwind configuration
-├── public/             # Static assets
-└── firebase.json       # Firebase configuration & Security Rules
+│   ├── app/                # Next.js App Router (Pages, Layouts & APIs)
+│   │   ├── (app)/          # Main App Views (Dashboard, Feed, Profile)
+│   │   ├── (marketing)/    # Public routes (Landing, Login, Register)
+│   │   └── api/            # Serverless Functions (Sentinel, Payments, AI, Promote)
+│   ├── components/         # Reusable Premium UI Components (Glassmorphism, Modals, Maps, AI Widgets)
+│   ├── context/            # Global State (AuthContext, Theme)
+│   ├── lib/                # External library configurations (Firebase, Razorpay, OpenAI)
+│   ├── services/           # Backend Logic (EventService, Email, Recommendation, SMS, AI)
+│   ├── types/              # TypeScript Interfaces
+│   ├── utils/              # Helper functions (Geo-calculations, formatters)
+│   └── styles/             # Global CSS & Tailwind Config
+├── public/                 # Static Assets & Icons
+├── firebase.json           # Firebase Deployment Config
+└── tailwind.config.ts      # Tailwind styling definitions
 ```
 
-## 🚀 Getting Started
+---
 
-### 1. Clone the repository
-```bash
-git clone <your-repo-url>
-cd Community-Management
-```
+## ⚙️ Configuration & Setup
 
-### 2. Install dependencies
-```bash
-npm install
-```
+### 1. Prerequisites
+- Node.js 18+
+- Firebase Project
+- Google AI (Gemini) API Key
+- Razorpay Account (Optional)
+- Twilio Account (Optional)
 
-### 3. Environment Setup
-Create a `.env.local` file in the root directory and add your credentials:
+### 2. Environment Variables
+Create a `.env` or `.env.local` file in the root directory and add your credentials. Refer to the expected variables below:
 
 ```env
 # Firebase Configuration
@@ -74,20 +145,39 @@ NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
 NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
 NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-# AI Chatbot
-GEMINI_API_KEY_AI_CHAT_BOT=your_gemini_api_key
+# AI Integrations
+GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+GEMINI_API_KEY_AI_CHAT_BOT=your_gemini_api_key_for_bot
 
-# Optional: Cloudinary for Image Uploads
-NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=your_cloud_name
-NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET=your_preset
+# Communications (Email / SMS)
+EMAIL=your-email@gmail.com
+EMAIL_PASS=your-google-app-password
+TWILIO_SID=your_twilio_sid
+TWILIO_AUTH=your_twilio_auth_token
+TWILIO_PHONE=your_twilio_phone
+
+# Payments
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_secret
 ```
 
-### 4. Run the development server
+### 3. Installation
 ```bash
+# Install dependencies
+npm install
+
+# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to see the application in action.
+---
+
+## 🛡 Security & Reliability
+- **Firestore Security Rules**: Strict access control for user data and chatrooms.
+- **Input Validation**: Server-side checks for all API routes.
+- **Error Handling**: Comprehensive logging and user-friendly error boundaries.
 
 ---
-Built with ❤️ for community resilience.
+
+Built with ❤️ by the Kindred Relief Team to foster community resilience and rapid response.
