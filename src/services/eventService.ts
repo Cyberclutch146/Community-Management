@@ -194,42 +194,31 @@ export const updateDonation = async (eventId: string, amount: number): Promise<v
   });
 };
 
-// ─── Volunteer signup (transactional) ───────────────────
+// ─── Volunteer signup (transactional via API) ─────────────
 export const addVolunteerSignup = async (eventId: string, userId: string, userName: string, userEmail: string = '', ticketId: string = ''): Promise<void> => {
-  const eventRef = doc(db, EVENTS_COLLECTION, eventId);
-
-  await runTransaction(db, async (transaction) => {
-    const eventSnap = await transaction.get(eventRef);
-    if (!eventSnap.exists()) throw new Error('Event not found');
-
-    const data = eventSnap.data();
-    const currentVolunteers = data.needs?.volunteers?.current ?? 0;
-
-    // Increment the volunteer count atomically
-    transaction.update(eventRef, {
-      'needs.volunteers.current': currentVolunteers + 1,
-      updatedAt: new Date()
+  try {
+    const response = await fetch('/api/events/join', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventId,
+        userId,
+        userName,
+        userEmail,
+        ticketId
+      }),
     });
-  });
 
-  // Track the volunteer in a subcollection (outside the transaction — this is append-only)
-  const volunteerRef = collection(db, `${EVENTS_COLLECTION}/${eventId}/volunteers`);
-  await addDoc(volunteerRef, {
-    userId,
-    userName,
-    userEmail,
-    ticketId,
-    signedUpAt: new Date()
-  });
-
-  // Also track at the user level for easy retrieval in dashboard
-  const userRegistrationRef = doc(db, `users/${userId}/registrations`, eventId);
-  await setDoc(userRegistrationRef, {
-    eventId,
-    ticketId,
-    signedUpAt: new Date(),
-    status: 'registered'
-  });
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || 'Failed to sign up for event');
+    }
+  } catch (error) {
+    console.error('API /events/join Error:', error);
+    throw error;
+  }
 };
 
 // ─── Volunteer Fetching ──────────────────────────────────
