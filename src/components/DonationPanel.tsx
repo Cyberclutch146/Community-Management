@@ -1,11 +1,17 @@
 'use client';
 
 import { EventNeeds } from '@/types';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { updateDonation, addVolunteerSignup } from '@/services/eventService';
 import { toast } from 'sonner';
 import { VolunteerModal } from './VolunteerModal';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 interface DonationPanelProps {
   eventId: string;
@@ -32,22 +38,83 @@ export function DonationPanel({
   const [pledged, setPledged] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
+  const [donationAmount, setDonationAmount] = useState(50);
   const [activeTab, setActiveTab] = useState<'funds' | 'volunteers' | 'goods'>(
     needs.funds ? 'funds' : needs.volunteers ? 'volunteers' : 'goods'
   );
+
+  // Load Razorpay script
+  useEffect(() => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    document.body.appendChild(script);
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
 
   const handleDonate = async () => {
     if (!user) { toast.info('Please sign in to donate'); return; }
     if (loading) return;
     setLoading(true);
+    
     try {
-      await updateDonation(eventId, 10);
-      setPledged(true);
-      toast.success('Thank you for your $10 donation!');
-      onActionComplete?.();
+      // Create payment order on server
+      const response = await fetch('/api/create-payment-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ 
+          amount: donationAmount, 
+          eventId,
+          eventTitle 
+        }),
+      });
+      
+      const order = await response.json();
+      
+      if (!order.id) {
+        throw new Error('Failed to create payment order');
+      }
+      
+      // Open Razorpay checkout
+      const razorpay = new window.Razorpay({
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+        order_id: order.id,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Community Event',
+        description: `Donation for ${eventTitle}`,
+        prefill: {
+          name: profile?.displayName || user.displayName || '',
+          email: user.email || '',
+        },
+        handler: async (paymentResponse: any) => {
+          // Payment successful - update donation in database
+          try {
+            await updateDonation(eventId, donationAmount);
+            setPledged(true);
+            toast.success(`Thank you for your ₹${donationAmount} donation!`);
+            onActionComplete?.();
+          } catch (err) {
+            console.error('Error updating donation:', err);
+            toast.error('Payment successful but failed to update. Contact support.');
+          }
+        },
+        modal: {
+          ondismiss: () => {
+            setLoading(false);
+            toast.info('Payment cancelled');
+          },
+        },
+      });
+      
+      razorpay.open();
     } catch (err) {
       console.error(err);
-      toast.error('Donation failed. Please try again.');
+      toast.error('Payment failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -105,13 +172,39 @@ export function DonationPanel({
             <p className="text-on-surface-variant text-sm flex mb-6 text-left">
               Your donation goes directly to the organizer to fulfill the goals of this event.
             </p>
+            
+            {/* Donation Amount Slider */}
+            <div className="mb-6">
+              <label className="text-sm font-medium text-on-surface block mb-2">
+                Donation Amount
+              </label>
+              <div className="flex items-center gap-4">
+                <input
+                  type="range"
+                  min="50"
+                  max="2000"
+                  step="50"
+                  value={donationAmount}
+                  onChange={(e) => setDonationAmount(Number(e.target.value))}
+                  className="flex-1 h-2 bg-surface-variant rounded-lg appearance-none cursor-pointer accent-primary"
+                />
+                <span className="text-lg font-bold text-primary min-w-[70px] text-right">
+                  ₹{donationAmount}
+                </span>
+              </div>
+              <div className="flex justify-between text-xs text-on-surface-variant mt-1">
+                <span>₹50</span>
+                <span>₹2000</span>
+              </div>
+            </div>
+
             {!pledged ? (
               <button 
                 onClick={handleDonate}
                 disabled={loading || !user}
                 className="w-full bg-primary text-on-primary py-3.5 rounded-xl font-bold shadow hover:bg-primary-container hover:text-on-primary-container transition-colors active:scale-[0.98] disabled:opacity-50"
               >
-                {loading ? 'Processing...' : user ? 'Donate $10 Now' : 'Sign in to Donate'}
+                {loading ? 'Processing...' : user ? `Donate ₹${donationAmount} Now` : 'Sign in to Donate'}
               </button>
             ) : (
               <div className="bg-primary-fixed text-on-primary-fixed p-4 rounded-xl flex items-center justify-center gap-2 font-semibold">
