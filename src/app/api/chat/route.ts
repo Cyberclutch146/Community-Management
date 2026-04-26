@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { getAllEvents } from "@/services/aiTools";
+import { ragRetrieveEvents } from "@/services/searchService";
 import { AI_FUNCTION_DECLARATIONS, executeFunction } from "@/services/aiActions";
 import { getAllSentinelAlerts } from "@/services/sentinelService";
 
@@ -33,9 +33,13 @@ export async function POST(req: Request) {
       );
     }
 
-    // Fetch live events to provide context to Gemini
+    // Fetch relevant events to provide targeted RAG context to Gemini
     const [events, sentinelAlerts] = await Promise.all([
-      getAllEvents(),
+      ragRetrieveEvents(messages[messages.length - 1]?.content || "", {
+        skills: userSkills,
+        equipment: userEquipment,
+        travelRadius: userTravelRadius
+      }),
       getAllSentinelAlerts().catch(() => []) // fail gracefully
     ]);
     

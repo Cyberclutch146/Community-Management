@@ -30,7 +30,7 @@ async function fetchSearchableEvents(): Promise<SearchableEvent[]> {
 }
 
 // ─── Keyword fallback search ────────────────────────────
-function keywordSearch(searchQuery: string, events: SearchableEvent[]): string[] {
+export function keywordSearch(searchQuery: string, events: SearchableEvent[], userContext?: any): string[] {
   const q = searchQuery.toLowerCase();
   const queryWords = q.split(/\s+/).filter((w) => w.length > 2);
 
@@ -51,6 +51,13 @@ function keywordSearch(searchQuery: string, events: SearchableEvent[]): string[]
 
     // Urgency boost
     if (event.urgency === "high") score += 2;
+
+    // User context boost
+    if (userContext) {
+      if (userContext.skills?.some((s: string) => text.includes(s.toLowerCase()))) score += 3;
+      if (userContext.equipment?.some((e: string) => text.includes(e.toLowerCase()))) score += 3;
+      // Location boost could be added here if coordinates were available
+    }
 
     return { id: event.id, score };
   });
@@ -127,3 +134,45 @@ Example response: ["id1", "id2", "id3"]`;
     return { results: keywordSearch(searchQuery, events), isAIPowered: false };
   }
 }
+
+// ─── RAG Retrieval for AI Chatbot ───────────────────────
+export async function ragRetrieveEvents(userMessage: string, userContext?: any): Promise<any[]> {
+  const snapshot = await getDocs(
+    query(collection(db, "events"), orderBy("createdAt", "desc"))
+  );
+  
+  const allEvents = snapshot.docs.map((doc) => {
+    const data = doc.data();
+    return {
+      id: doc.id,
+      title: data.title || "",
+      description: data.description || "",
+      category: data.category || "",
+      location: data.location || "",
+      urgency: data.urgency || "normal",
+      volunteersNeeded: data.needs?.volunteers?.goal,
+      goalAmount: data.needs?.funds?.goal,
+      donatedAmount: data.needs?.funds?.current,
+    };
+  });
+
+  if (allEvents.length === 0) return [];
+
+  // Use the local keyword search with user context to score and rank events
+  const rankedIds = keywordSearch(userMessage, allEvents, userContext);
+  
+  // If the user didn't type much that matched, and we have no context matches, 
+  // just return the 5 most recent events as a baseline.
+  if (rankedIds.length === 0) {
+    return allEvents.slice(0, 5);
+  }
+
+  // Map IDs back to full event objects and return the top 5
+  const topEvents = rankedIds
+    .slice(0, 5)
+    .map(id => allEvents.find(e => e.id === id))
+    .filter(Boolean);
+
+  return topEvents;
+}
+
