@@ -61,7 +61,7 @@ export default function DashboardPage() {
   if (!user) {
     return (
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10 flex justify-center items-center">
-        <p className="text-secondary">Please sign in to view your dashboard.</p>
+        <p className="text-on-surface-variant font-medium">Please sign in to view your dashboard.</p>
       </main>
     );
   }
@@ -69,70 +69,67 @@ export default function DashboardPage() {
   if (loading) {
     return (
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="absolute inset-0 rounded-full animate-subtle-pulse" style={{ boxShadow: '0 0 30px rgba(59,107,74,0.15)' }} />
+        </div>
       </main>
     );
   }
 
+  const statCards = [
+    { label: 'Active Events', value: activeCount, icon: 'campaign', color: 'rgba(59,107,74,0.12)', iconColor: 'var(--color-primary-base)' },
+    { label: 'Total Raised', value: `$${totalRaised.toLocaleString()}`, icon: 'attach_money', color: 'rgba(139,109,46,0.12)', iconColor: 'var(--color-warm-amber)' },
+    { label: 'Volunteers Recruited', value: totalVolunteers, icon: 'group', color: 'rgba(194,113,91,0.12)', iconColor: 'var(--color-terracotta)' },
+    { label: 'Severe Alerts', value: highRiskAlertsCount, icon: 'warning', color: 'rgba(184,50,48,0.1)', iconColor: 'var(--color-error-base)' },
+  ];
+
   return (
-    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
-      <div className="mb-10">
-        <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Your Community Impact</h2>
-        <p className="text-secondary font-medium mt-2">
+    <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
+      <div className="mb-10 animate-fade-in-up">
+        <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Your Community Impact</h2>
+        <p className="text-on-surface-variant font-medium mt-2">
           Welcome back, {profile?.displayName || 'Organizer'}. Here&apos;s a snapshot of your local support efforts.
         </p>
       </div>
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div className="premium-panel px-6 py-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">campaign</span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Active Events</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+        {statCards.map((stat, i) => (
+          <div
+            key={stat.label}
+            className="premium-glass p-5 animate-fade-in-up"
+            style={{ animationDelay: `${i * 80}ms` }}
+          >
+            <div className="flex items-center gap-3 mb-3">
+              <span
+                className="material-symbols-outlined rounded-xl px-2.5 py-2 text-[20px]"
+                style={{ background: stat.color, color: stat.iconColor }}
+              >
+                {stat.icon}
+              </span>
+              <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{stat.label}</p>
+            </div>
+            <p className="text-3xl md:text-4xl font-bold text-on-surface">{stat.value}</p>
           </div>
-          <p className="text-4xl font-bold text-on-surface">{activeCount}</p>
-        </div>
-
-        <div className="premium-panel px-6 py-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">attach_money</span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Total Raised</p>
-          </div>
-          <p className="text-4xl font-bold text-on-surface">${totalRaised.toLocaleString()}</p>
-        </div>
-
-        <div className="premium-panel px-6 py-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">group</span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Volunteers Recruited</p>
-          </div>
-          <p className="text-4xl font-bold text-on-surface">{totalVolunteers}</p>
-        </div>
-
-        <div className="premium-panel px-6 py-5">
-          <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">warning</span>
-            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Severe Alerts</p>
-          </div>
-          <p className="text-4xl font-bold text-on-surface">{highRiskAlertsCount}</p>
-        </div>
+        ))}
       </div>
 
       {/* ── Events Grid ── */}
-      <div className="mb-6 flex items-center justify-between">
+      <div className="mb-6 flex items-center justify-between animate-fade-in-up delay-300">
         <h3 className="font-headline text-xl font-bold text-on-surface">Your Events</h3>
         <div className="flex items-center gap-3">
           <button
             onClick={handleBackfill}
             disabled={backfilling}
-            className="bg-surface-variant text-on-surface-variant px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-outline-variant transition-colors flex items-center gap-2 disabled:opacity-50"
+            className="premium-button-muted text-sm gap-2 disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">map</span>
             {backfilling ? 'Refreshing...' : 'Refresh Coordinates'}
           </button>
           <button
             onClick={() => router.push('/create')}
-            className="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-primary-container hover:text-on-primary-container transition-colors flex items-center gap-2"
+            className="premium-button-primary text-sm gap-2"
           >
             <span className="material-symbols-outlined text-[18px]">add</span>
             New Event
@@ -141,15 +138,15 @@ export default function DashboardPage() {
       </div>
 
       {events.length === 0 ? (
-        <div className="premium-panel p-8 flex flex-col items-center justify-center text-center py-20">
-          <span className="material-symbols-outlined text-[64px] text-surface-variant mb-4">volunteer_activism</span>
+        <div className="premium-glass-strong p-8 flex flex-col items-center justify-center text-center py-16 animate-fade-in-up delay-400">
+          <span className="material-symbols-outlined text-[64px] mb-4" style={{ color: 'var(--color-outline-variant-base)' }}>volunteer_activism</span>
           <h3 className="font-headline text-xl text-on-surface font-bold mb-2">No events yet</h3>
           <p className="text-on-surface-variant max-w-md mb-6">
             You haven&apos;t organized any events yet. Start a local initiative and rally your community!
           </p>
           <button
             onClick={() => router.push('/create')}
-            className="bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold hover:bg-primary-container hover:text-on-primary-container transition-colors"
+            className="premium-button-primary text-sm"
           >
             Create Your First Event
           </button>
@@ -164,10 +161,10 @@ export default function DashboardPage() {
 
       {/* ── Registered Events Section ── */}
       {registeredEvents.length > 0 && (
-        <div className="mt-16">
+        <div className="mt-16 animate-fade-in-up">
           <div className="mb-6">
             <h3 className="font-headline text-xl font-bold text-on-surface">Events You&apos;re Supporting</h3>
-            <p className="text-secondary text-sm mt-1">Local initiatives you&apos;re helping through volunteer support.</p>
+            <p className="text-on-surface-variant text-sm mt-1">Local initiatives you&apos;re helping through volunteer support.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {registeredEvents.map(event => (
@@ -200,25 +197,40 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
   return (
     <button
       onClick={onClick}
-      className="bg-surface-container-lowest rounded-3xl border border-outline-variant/20 overflow-hidden text-left hover:shadow-[0_18px_44px_rgba(46,50,48,0.05)] hover:-translate-y-0.5 transition-all duration-200 group flex flex-col h-full"
+      className="rounded-[24px] overflow-hidden text-left transition-all duration-300 group flex flex-col h-full hover:-translate-y-1"
+      style={{
+        background: 'var(--glass-bg-strong)',
+        backdropFilter: 'blur(20px) saturate(1.3)',
+        WebkitBackdropFilter: 'blur(20px) saturate(1.3)',
+        border: '1px solid var(--glass-border)',
+        boxShadow: 'var(--glass-shadow)',
+      }}
     >
       <div className="relative h-40 w-full overflow-hidden">
         <Image
           src={event.imageUrl || '/logo.svg'}
           alt={event.title}
           fill
-          className="object-cover group-hover:scale-105 transition-transform duration-300"
+          className="object-cover group-hover:scale-105 transition-transform duration-500"
         />
         {hasAlerts && (
-          <span className={`absolute top-3 ${event.status === 'active' ? 'right-24' : 'right-28'} text-xs font-bold px-3 py-1 rounded-full bg-red-100 text-red-800 border border-red-200 flex items-center gap-1`}>
+          <span className={`absolute top-3 ${event.status === 'active' ? 'right-24' : 'right-28'} text-xs font-bold px-3 py-1 rounded-full bg-red-500/90 text-white flex items-center gap-1`} style={{ boxShadow: '0 2px 8px rgba(239,68,68,0.3)' }}>
             <span className="material-symbols-outlined text-[14px]">warning</span> Alert
           </span>
         )}
-        <span className={`absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-full ${
-          event.status === 'active' 
-            ? 'bg-primary-container text-on-primary-container' 
-            : 'bg-surface-variant text-on-surface-variant'
-        }`}>
+        <span
+          className="absolute top-3 right-3 text-xs font-bold px-3 py-1 rounded-full"
+          style={event.status === 'active' ? {
+            background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+            color: 'var(--color-on-primary-base)',
+            boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+          } : {
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(12px)',
+            color: 'var(--color-on-surface-variant-base)',
+            border: '1px solid var(--glass-border)',
+          }}
+        >
           {event.status === 'active' ? 'Active' : 'Completed'}
         </span>
       </div>
@@ -226,17 +238,17 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
       <div className="p-5 flex flex-col flex-1">
         <div>
           <h4 className="font-headline font-bold text-on-surface mb-1 line-clamp-1">{event.title}</h4>
-          <p className="text-secondary text-sm mb-4">{event.category}</p>
+          <p className="text-on-surface-variant text-sm mb-4">{event.category}</p>
         </div>
 
         {fundPercent !== null && (
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-on-surface-variant font-medium">Funds</span>
-              <span className="font-bold text-primary">{fundPercent}%</span>
+              <span className="font-bold" style={{ color: 'var(--color-primary-base)' }}>{fundPercent}%</span>
             </div>
-            <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${fundPercent}%` }} />
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
+              <div className="h-full rounded-full transition-all duration-700 progress-glow" style={{ width: `${fundPercent}%`, background: 'linear-gradient(90deg, var(--color-primary-base), var(--color-sage))' }} />
             </div>
           </div>
         )}
@@ -245,16 +257,16 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
           <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-on-surface-variant font-medium">Volunteers</span>
-              <span className="font-bold text-tertiary">{volPercent}%</span>
+              <span className="font-bold" style={{ color: 'var(--color-warm-amber)' }}>{volPercent}%</span>
             </div>
-            <div className="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-              <div className="h-full bg-tertiary rounded-full transition-all duration-500" style={{ width: `${volPercent}%` }} />
+            <div className="w-full h-2 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
+              <div className="h-full rounded-full transition-all duration-700 progress-glow-amber" style={{ width: `${volPercent}%`, background: 'linear-gradient(90deg, var(--color-warm-amber), var(--color-earth-gold))' }} />
             </div>
           </div>
         )}
 
-        <div className="mt-auto pt-4 border-t border-surface-variant/20">
-          <span className="text-primary font-semibold text-sm tracking-[0.08em] uppercase">View details</span>
+        <div className="mt-auto pt-4" style={{ borderTop: '1px solid var(--glass-border)' }}>
+          <span className="font-bold text-sm tracking-[0.06em] uppercase" style={{ color: 'var(--color-primary-base)' }}>View details</span>
         </div>
       </div>
     </button>

@@ -54,10 +54,25 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
         transition={{ duration: 0.4, delay: 0.2 }}
         className="mb-8"
       >
-        <div className="relative overflow-hidden rounded-2xl border border-outline-variant/30 bg-gradient-to-br from-primary/5 via-surface-container to-tertiary/5 p-5 md:p-6">
-          <div className="flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
-              <UserPlus size={20} className="text-primary" />
+        <div
+          className="relative overflow-hidden rounded-2xl p-5 md:p-6"
+          style={{
+            background: 'var(--glass-bg)',
+            backdropFilter: 'blur(20px) saturate(1.3)',
+            border: '1px solid rgba(212, 168, 82, 0.25)',
+            boxShadow: '0 4px 20px rgba(212, 168, 82, 0.08)',
+          }}
+        >
+          {/* Warm ambient gradient */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(135deg, rgba(59,107,74,0.04), transparent, rgba(139,109,46,0.04))' }} />
+          <div className="relative flex items-center gap-4">
+            <div
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0"
+              style={{
+                background: 'linear-gradient(135deg, rgba(212, 168, 82, 0.15), rgba(139, 109, 46, 0.1))',
+              }}
+            >
+              <UserPlus size={20} className="text-[var(--color-warm-amber)]" />
             </div>
             <div className="flex-1">
               <p className="font-semibold text-on-surface text-sm">Get personalized recommendations</p>
@@ -67,7 +82,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
             </div>
             <Link
               href="/profile"
-              className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors flex items-center gap-1 flex-shrink-0"
+              className="text-xs font-bold text-[var(--color-warm-amber)] hover:text-[var(--color-earth-gold)] transition-colors flex items-center gap-1 flex-shrink-0"
             >
               Add Skills
               <ArrowRight size={14} />
@@ -90,8 +105,14 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
     >
       {/* Header */}
       <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
+        <div className="flex items-center gap-2.5">
+          <div
+            className="w-8 h-8 rounded-lg flex items-center justify-center"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-warm-amber), var(--color-earth-gold))',
+              boxShadow: '0 3px 10px rgba(212, 168, 82, 0.3)',
+            }}
+          >
             <Sparkles size={16} className="text-white" />
           </div>
           <div>
@@ -109,7 +130,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
         {condensed && (
           <Link
             href="/feed"
-            className="text-xs font-semibold text-primary hover:text-primary-dark transition-colors flex items-center gap-1"
+            className="text-xs font-bold text-primary hover:text-primary/80 transition-colors flex items-center gap-1"
           >
             View All
             <ArrowRight size={14} />
@@ -133,7 +154,13 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
             >
               <Link
                 href={`/event/${event.id}`}
-                className={`block ${condensed ? 'w-64' : 'w-72'} rounded-2xl overflow-hidden border border-outline-variant/30 bg-surface-container hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group`}
+                className={`block ${condensed ? 'w-64' : 'w-72'} rounded-2xl overflow-hidden transition-all duration-300 group hover:-translate-y-1`}
+                style={{
+                  background: 'var(--glass-bg-strong)',
+                  backdropFilter: 'blur(16px) saturate(1.3)',
+                  border: '1px solid var(--glass-border)',
+                  boxShadow: 'var(--glass-shadow)',
+                }}
               >
                 {/* Image */}
                 <div className="relative h-32 w-full overflow-hidden">
@@ -145,15 +172,21 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
                   />
                   {/* Match Badge */}
                   <div className="absolute top-2.5 right-2.5">
-                    <div className="px-2 py-1 rounded-full bg-black/60 backdrop-blur-sm flex items-center gap-1">
-                      <Sparkles size={10} className="text-amber-400" />
+                    <div
+                      className="px-2.5 py-1 rounded-full flex items-center gap-1"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(212,168,82,0.9), rgba(196,155,58,0.9))',
+                        boxShadow: '0 2px 8px rgba(212,168,82,0.3)',
+                      }}
+                    >
+                      <Sparkles size={10} className="text-white" />
                       <span className="text-[10px] font-bold text-white">{matchPercent}% match</span>
                     </div>
                   </div>
                   {/* Urgency Badge */}
                   {event.urgency === 'high' && (
                     <div className="absolute top-2.5 left-2.5">
-                      <span className="px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[10px] font-bold uppercase tracking-wider">
+                      <span className="px-2 py-0.5 rounded-full bg-red-500/90 text-white text-[10px] font-bold uppercase tracking-wider" style={{ boxShadow: '0 2px 6px rgba(239,68,68,0.3)' }}>
                         Urgent
                       </span>
                     </div>
@@ -162,7 +195,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
 
                 {/* Content */}
                 <div className="p-4">
-                  <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                  <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--color-primary-base)' }}>
                     {event.category}
                   </span>
                   <h4 className="font-semibold text-on-surface text-sm mt-1 line-clamp-1 group-hover:text-primary transition-colors">
@@ -177,13 +210,20 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
                     {matchedSkills.slice(0, 2).map((skill) => (
                       <span
                         key={skill}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-medium capitalize"
+                        className="text-[10px] px-2 py-0.5 rounded-full font-medium capitalize"
+                        style={{
+                          background: 'rgba(59, 107, 74, 0.1)',
+                          color: 'var(--color-primary-base)',
+                        }}
                       >
                         {skill}
                       </span>
                     ))}
                     {matchedSkills.length > 2 && (
-                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-medium">
+                      <span
+                        className="text-[10px] px-2 py-0.5 rounded-full font-medium"
+                        style={{ background: 'var(--glass-bg)', color: 'var(--color-on-surface-variant-base)' }}
+                      >
                         +{matchedSkills.length - 2}
                       </span>
                     )}

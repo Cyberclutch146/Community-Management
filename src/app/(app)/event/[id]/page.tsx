@@ -26,6 +26,10 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'auto' });
+  }, [id]);
+
+  useEffect(() => {
     const fetchData = async () => {
       try {
         const [eventData, alertsData] = await Promise.all([
@@ -71,7 +75,10 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
   if (loading) {
     return (
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10 flex justify-center items-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="absolute inset-0 rounded-full animate-subtle-pulse" style={{ boxShadow: '0 0 30px rgba(59,107,74,0.15)' }} />
+        </div>
       </main>
     );
   }
@@ -103,9 +110,9 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
   });
 
   return (
-    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
-      <div className="mb-6">
-        <Link href="/feed" className="inline-flex items-center text-sm font-semibold text-secondary hover:text-primary transition-colors">
+    <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+      <div className="mb-6 animate-fade-in-up">
+        <Link href="/feed" className="inline-flex items-center text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors">
           <span className="material-symbols-outlined text-[18px] mr-1">arrow_back</span>
           Back to Feed
         </Link>
@@ -113,22 +120,30 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
 
       <div className="flex flex-col lg:flex-row gap-8">
         <div className="flex-1">
-          <div className="w-full h-64 md:h-96 rounded-3xl overflow-hidden mb-8 shadow-sm relative">
+          <div
+            className="w-full h-64 md:h-96 rounded-[24px] overflow-hidden mb-8 relative animate-fade-in-up"
+            style={{ boxShadow: 'var(--glass-shadow-lg)', border: '1px solid var(--glass-border)' }}
+          >
             <Image src={event.imageUrl || event.image || '/logo.svg'} alt={event.title || 'Event'} className="w-full h-full object-cover" fill />
           </div>
 
-          <div className="mb-8">
+          <div className="mb-8 animate-fade-in-up delay-100">
             <div className="flex items-center gap-2 mb-4">
-              <span className="material-symbols-outlined text-primary text-[20px] bg-primary-container/20 p-1.5 rounded-full">verified</span>
-              <span className="text-base font-bold text-secondary">{event.organizer}</span>
-              <span className="text-secondary mx-2">•</span>
-              <div className="flex items-center text-secondary text-sm font-medium">
+              <span
+                className="material-symbols-outlined text-[20px] p-1.5 rounded-full"
+                style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
+              >
+                verified
+              </span>
+              <span className="text-base font-bold text-on-surface-variant">{event.organizer}</span>
+              <span className="text-on-surface-variant/40 mx-1">•</span>
+              <div className="flex items-center text-on-surface-variant text-sm font-medium">
                 <span className="material-symbols-outlined text-[16px] mr-1">location_on</span>
                 {event.distance}
               </div>
             </div>
             
-            <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight">
+            <h1 className="font-headline text-3xl md:text-5xl font-bold text-on-surface mb-4 leading-tight tracking-tight">
               {event.title}
             </h1>
             <p className="text-on-surface-variant text-base leading-relaxed max-w-2xl mb-6">
@@ -136,14 +151,21 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             </p>
 
             {isAdmin && (
-              <div className="mb-6 p-4 bg-surface-container-lowest rounded-3xl border border-outline-variant/20 flex items-center justify-between">
+              <div
+                className="mb-6 p-4 rounded-[20px] flex items-center justify-between"
+                style={{
+                  background: 'rgba(184,50,48,0.05)',
+                  border: '1px solid rgba(184,50,48,0.15)',
+                }}
+              >
                 <div>
-                  <p className="text-red-800 font-bold text-sm uppercase tracking-wider">Admin Controls</p>
-                  <p className="text-red-600 text-sm">You have administrative privileges to manage this event.</p>
+                  <p className="text-red-800 dark:text-red-300 font-bold text-sm uppercase tracking-wider">Admin Controls</p>
+                  <p className="text-red-600 dark:text-red-400 text-sm">You have administrative privileges to manage this event.</p>
                 </div>
                 <button 
                   onClick={handleDeleteEvent}
-                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+                  className="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2"
+                  style={{ boxShadow: '0 3px 12px rgba(220,38,38,0.25)' }}
                 >
                   <Trash2 size={18} />
                   Delete Event
@@ -152,29 +174,36 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             )}
 
             {intersectingAlerts.length > 0 && (
-              <div className="mb-6 p-5 rounded-3xl bg-surface-container-lowest border border-outline-variant/20 shadow-sm">
-                <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
-                  <AlertTriangle size={20} className="text-amber-600" />
+              <div
+                className="mb-6 p-5 rounded-[20px]"
+                style={{
+                  background: 'rgba(212,168,82,0.06)',
+                  border: '1px solid rgba(212,168,82,0.2)',
+                  boxShadow: '0 4px 16px rgba(212,168,82,0.06)',
+                }}
+              >
+                <div className="flex items-center gap-2 font-bold mb-3" style={{ color: 'var(--color-warm-amber)' }}>
+                  <AlertTriangle size={20} />
                   <h3 className="text-lg">Sentinel Safety Awareness</h3>
                 </div>
                 <div className="space-y-3">
                   {intersectingAlerts.map(alert => (
-                    <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 bg-surface-container-lowest p-3 rounded-3xl border border-outline-variant/20 shadow-sm">
+                    <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
                       <span className={`px-2.5 py-1 text-xs font-bold rounded-lg whitespace-nowrap w-fit ${
-                        alert.severity === 'Extreme' ? 'bg-red-100 text-red-700' :
-                        alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700' :
-                        'bg-amber-100 text-amber-700'
+                        alert.severity === 'Extreme' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                        alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                        'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
                       }`}>
                         {alert.severity} • {alert.type}
                       </span>
                       <div className="flex-1">
-                        <p className="text-sm font-semibold text-amber-950 mb-0.5">{alert.title}</p>
-                        <p className="text-xs text-amber-800/80 line-clamp-2">{alert.description}</p>
+                        <p className="text-sm font-semibold text-on-surface mb-0.5">{alert.title}</p>
+                        <p className="text-xs text-on-surface-variant line-clamp-2">{alert.description}</p>
                       </div>
                     </div>
                   ))}
                 </div>
-                <p className="text-xs font-medium text-amber-700/80 mt-4 flex items-center gap-1.5 bg-amber-100/50 p-2 rounded-lg">
+                <p className="text-xs font-medium mt-4 flex items-center gap-1.5 p-2.5 rounded-lg" style={{ background: 'rgba(212,168,82,0.08)', color: 'var(--color-warm-amber)' }}>
                   <Info size={14} className="flex-shrink-0" /> 
                   Please exercise caution if you plan to attend. Conditions may change rapidly.
                 </p>
@@ -187,7 +216,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
           </div>
 
           {event.needs?.funds && (
-            <div className="mb-10 premium-panel p-6">
+            <div className="mb-10 premium-glass p-6 animate-fade-in-up delay-200">
               <ProgressBar 
                 current={event.needs.funds.current} 
                 goal={event.needs.funds.goal} 
@@ -196,7 +225,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             </div>
           )}
 
-          <div className="mt-10">
+          <div className="mt-10 animate-fade-in-up delay-300">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               <ChatBox eventId={event.id} />
               <VolunteerLeaderboard eventId={event.id} />
@@ -204,7 +233,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
           </div>
         </div>
 
-        <div className="w-full lg:w-[400px] flex-shrink-0">
+        <div className="w-full lg:w-[400px] flex-shrink-0 animate-fade-in-up delay-200">
           <DonationPanel 
             eventId={event.id} 
             eventTitle={event.title}

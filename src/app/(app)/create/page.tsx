@@ -75,25 +75,33 @@ export default function CreateEventPage() {
       setLoading(false);
     }
   };
+
+  const inputStyle = {
+    background: 'var(--glass-bg)',
+    backdropFilter: 'blur(12px)',
+    border: '1px solid var(--glass-border)',
+  };
+
   return (
-    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
-      <div className="mb-10">
-        <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Create an Event</h2>
-        <p className="text-secondary font-medium mt-2">Start a local response initiative to gather volunteers or necessary supplies.</p>
+    <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+      <div className="mb-10 animate-fade-in-up">
+        <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Create an Event</h2>
+        <p className="text-on-surface-variant font-medium mt-2">Start a local response initiative to gather volunteers or necessary supplies.</p>
       </div>
 
-      <div className="premium-panel p-8">
-        <p className="text-on-surface-variant mb-6 pb-6 border-b border-outline-variant/30">
+      <div className="premium-glass-strong p-6 md:p-8 animate-fade-in-up delay-100">
+        <p className="text-on-surface-variant mb-6 pb-6" style={{ borderBottom: '1px solid var(--glass-border)' }}>
           We believe in grassroots organizing. Share your vision and rally your community around local needs.
         </p>
         
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
           <div>
-            <label className="block text-sm font-semibold text-on-surface mb-2">Event Title</label>
+            <label className="block text-sm font-bold text-on-surface mb-2">Event Title</label>
             <input 
               type="text" 
               required
-              className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface" 
+              className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-on-surface transition-all" 
+              style={inputStyle}
               placeholder="e.g. Neighborhood Cleanup" 
               value={title}
               onChange={(e) => setTitle(e.target.value)}
@@ -102,7 +110,7 @@ export default function CreateEventPage() {
           
           <div>
             <div className="flex items-center justify-between mb-2">
-              <label className="block text-sm font-semibold text-on-surface">Description</label>
+              <label className="block text-sm font-bold text-on-surface">Description</label>
               <button 
                 type="button" 
                 onClick={async () => {
@@ -131,7 +139,8 @@ export default function CreateEventPage() {
                   }
                 }}
                 disabled={generatingAi}
-                className="text-xs flex items-center gap-1 font-bold text-primary hover:text-primary-container transition-colors disabled:opacity-50"
+                className="text-xs flex items-center gap-1 font-bold transition-colors disabled:opacity-50"
+                style={{ color: 'var(--color-warm-amber)' }}
               >
                 {generatingAi ? (
                   <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
@@ -143,7 +152,8 @@ export default function CreateEventPage() {
             </div>
             <textarea 
               required
-              className="w-full h-32 bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface resize-none" 
+              className="w-full h-32 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-on-surface resize-none transition-all" 
+              style={inputStyle}
               placeholder="Describe the goal..."
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -152,9 +162,10 @@ export default function CreateEventPage() {
 
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-on-surface mb-2">Category</label>
+              <label className="block text-sm font-bold text-on-surface mb-2">Category</label>
               <select 
-                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-3xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface"
+                className="w-full rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 text-on-surface transition-all"
+                style={inputStyle}
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -165,19 +176,35 @@ export default function CreateEventPage() {
               </select>
             </div>
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-on-surface mb-2">Urgency Level</label>
-              <div className="flex gap-4">
+              <label className="block text-sm font-bold text-on-surface mb-2">Urgency Level</label>
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setUrgency('normal')}
-                  className={`flex-1 py-3 rounded-3xl text-sm font-semibold transition-colors ${urgency === 'normal' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface border border-outline-variant/20'}`}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
+                  style={urgency === 'normal' ? {
+                    background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                    color: 'var(--color-on-primary-base)',
+                    boxShadow: '0 3px 12px rgba(59,107,74,0.25)',
+                  } : {
+                    ...inputStyle,
+                    color: 'var(--color-on-surface-base)',
+                  }}
                 >
                   Normal
                 </button>
                 <button
                   type="button"
                   onClick={() => setUrgency('high')}
-                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${urgency === 'high' ? 'bg-error text-on-error' : 'bg-surface-container-low text-on-surface border border-outline-variant/50'}`}
+                  className="flex-1 py-3 rounded-xl text-sm font-semibold transition-all duration-300"
+                  style={urgency === 'high' ? {
+                    background: 'linear-gradient(135deg, var(--color-error-base), #C44040)',
+                    color: 'white',
+                    boxShadow: '0 3px 12px rgba(184,50,48,0.25)',
+                  } : {
+                    ...inputStyle,
+                    color: 'var(--color-on-surface-base)',
+                  }}
                 >
                   High
                 </button>
@@ -187,7 +214,7 @@ export default function CreateEventPage() {
 
           <div className="flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              <label className="block text-sm font-semibold text-on-surface mb-2">Event Date & Time</label>
+              <label className="block text-sm font-bold text-on-surface mb-2">Event Date & Time</label>
               <DateTimePicker 
                 value={eventDate}
                 onChange={(val) => setEventDate(val)}
@@ -195,7 +222,7 @@ export default function CreateEventPage() {
             </div>
             <div className="flex-1">
               <div className="flex items-center justify-between mb-2">
-                <label className="block text-sm font-semibold text-on-surface">Event Image</label>
+                <label className="block text-sm font-bold text-on-surface">Event Image</label>
                 <button 
                   type="button" 
                   onClick={async () => {
@@ -233,7 +260,8 @@ export default function CreateEventPage() {
                     }
                   }}
                   disabled={generatingImage || uploadingImage}
-                  className="text-xs flex items-center gap-1 font-bold text-primary hover:text-primary-container transition-colors disabled:opacity-50"
+                  className="text-xs flex items-center gap-1 font-bold transition-colors disabled:opacity-50"
+                  style={{ color: 'var(--color-warm-amber)' }}
                 >
                   {generatingImage ? (
                     <span className="material-symbols-outlined text-[16px] animate-spin">refresh</span>
@@ -244,7 +272,10 @@ export default function CreateEventPage() {
                 </button>
               </div>
               <div className="flex items-center gap-4">
-                <label className={`bg-surface-container-low hover:bg-surface-container-high transition-colors border border-outline-variant/50 rounded-xl px-4 py-3 text-sm text-on-surface ${generatingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex-1 text-center font-medium flex items-center justify-center gap-2`}>
+                <label
+                  className={`rounded-xl px-4 py-3 text-sm ${generatingImage ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'} flex-1 text-center font-medium flex items-center justify-center gap-2 transition-all hover:opacity-80`}
+                  style={inputStyle}
+                >
                   <span className="material-symbols-outlined text-[18px]">cloud_upload</span>
                   {uploadingImage ? 'Uploading...' : 'Choose File'}
                   <input 
@@ -269,7 +300,7 @@ export default function CreateEventPage() {
                   />
                 </label>
                 {image && (
-                  <div className="w-12 h-12 rounded-lg relative overflow-hidden flex-shrink-0 border border-outline-variant/30">
+                  <div className="w-12 h-12 rounded-lg relative overflow-hidden flex-shrink-0" style={{ border: '1px solid var(--glass-border)' }}>
                     <img src={image} alt="Preview" className="w-full h-full object-cover" />
                   </div>
                 )}
@@ -278,8 +309,8 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          <div className="border-t border-outline-variant/30 pt-6">
-            <label className="block text-sm font-semibold text-on-surface mb-2">Event Location</label>
+          <div className="pt-6" style={{ borderTop: '1px solid var(--glass-border)' }}>
+            <label className="block text-sm font-bold text-on-surface mb-2">Event Location</label>
             <p className="text-xs text-on-surface-variant mb-4">Search for an address or click on the map to set the exact location.</p>
             <LocationPickerWrapper 
               onLocationSelect={(loc) => {
@@ -290,26 +321,33 @@ export default function CreateEventPage() {
             />
           </div>
 
-          <div className="border border-outline-variant/50 rounded-xl p-4 bg-surface-container-lowest">
-            <div className="font-semibold text-sm mb-4">What do you need?</div>
+          <div
+            className="rounded-xl p-5"
+            style={{
+              background: 'var(--glass-bg)',
+              backdropFilter: 'blur(12px)',
+              border: '1px solid var(--glass-border)',
+            }}
+          >
+            <div className="font-bold text-sm mb-4 text-on-surface">What do you need?</div>
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <input type="checkbox" id="needFunds" checked={needFunds} onChange={(e) => setNeedFunds(e.target.checked)} className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" />
+                <input type="checkbox" id="needFunds" checked={needFunds} onChange={(e) => setNeedFunds(e.target.checked)} className="w-5 h-5 rounded accent-[var(--color-primary-base)]" />
                 <label htmlFor="needFunds" className="text-sm font-medium">Funds</label>
                 {needFunds && (
-                  <input type="number" value={fundGoal} onChange={(e) => setFundGoal(Number(e.target.value))} placeholder="Goal ($)" className="ml-auto w-32 bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-1.5 text-sm" />
+                  <input type="number" value={fundGoal} onChange={(e) => setFundGoal(Number(e.target.value))} placeholder="Goal ($)" className="ml-auto w-32 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" style={inputStyle} />
                 )}
               </div>
               <div className="flex items-center gap-4">
-                <input type="checkbox" id="needVols" checked={needVols} onChange={(e) => setNeedVols(e.target.checked)} className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" />
+                <input type="checkbox" id="needVols" checked={needVols} onChange={(e) => setNeedVols(e.target.checked)} className="w-5 h-5 rounded accent-[var(--color-primary-base)]" />
                 <label htmlFor="needVols" className="text-sm font-medium">Volunteers</label>
                 {needVols && (
-                  <input type="number" value={volGoal} onChange={(e) => setVolGoal(Number(e.target.value))} placeholder="Goal (people)" className="ml-auto w-32 bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-1.5 text-sm" />
+                  <input type="number" value={volGoal} onChange={(e) => setVolGoal(Number(e.target.value))} placeholder="Goal (people)" className="ml-auto w-32 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30" style={inputStyle} />
                 )}
               </div>
               <div className="space-y-3">
                 <div className="flex items-center gap-4">
-                  <input type="checkbox" id="needGoods" checked={needGoods} onChange={(e) => setNeedGoods(e.target.checked)} className="w-5 h-5 rounded text-primary focus:ring-primary accent-primary" />
+                  <input type="checkbox" id="needGoods" checked={needGoods} onChange={(e) => setNeedGoods(e.target.checked)} className="w-5 h-5 rounded accent-[var(--color-primary-base)]" />
                   <label htmlFor="needGoods" className="text-sm font-medium">Specific Goods</label>
                 </div>
                 {needGoods && (
@@ -329,7 +367,8 @@ export default function CreateEventPage() {
                           }
                         }}
                         placeholder="Add an item (e.g. Blankets) and press Enter" 
-                        className="flex-1 bg-surface-container border border-outline-variant/50 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:border-primary" 
+                        className="flex-1 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary/30 transition-all" 
+                        style={inputStyle}
                       />
                       <button 
                         type="button" 
@@ -339,7 +378,8 @@ export default function CreateEventPage() {
                             setGoodsItem('');
                           }
                         }}
-                        className="bg-primary text-on-primary px-4 py-1.5 rounded-lg text-sm font-bold"
+                        className="px-4 py-1.5 rounded-lg text-sm font-bold text-on-primary transition-all"
+                        style={{ background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))' }}
                       >
                         Add
                       </button>
@@ -347,12 +387,12 @@ export default function CreateEventPage() {
                     {goodsList.length > 0 && (
                       <ul className="space-y-2">
                         {goodsList.map((item, index) => (
-                          <li key={index} className="flex justify-between items-center bg-surface-container-high px-3 py-2 rounded-lg text-sm">
+                          <li key={index} className="flex justify-between items-center px-3 py-2 rounded-lg text-sm" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
                             <span>{item}</span>
                             <button 
                               type="button" 
                               onClick={() => setGoodsList(goodsList.filter((_, i) => i !== index))}
-                              className="text-error hover:bg-error/10 p-1 rounded-md"
+                              className="text-error hover:bg-error/10 p-1 rounded-md transition-colors"
                             >
                               <span className="material-symbols-outlined text-[16px]">close</span>
                             </button>
@@ -366,11 +406,15 @@ export default function CreateEventPage() {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 pt-2">
             <button 
               type="submit" 
               disabled={loading || !user} 
-              className="flex-1 bg-primary text-on-primary px-8 py-3 rounded-xl font-semibold shadow-sm disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-container hover:text-on-primary-container transition-colors"
+              className="flex-1 px-8 py-3 rounded-xl font-bold text-on-primary disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
+                boxShadow: '0 4px 14px rgba(59,107,74,0.25)',
+              }}
             >
               {loading ? 'Publishing...' : user ? 'Publish Event' : 'Sign in to publish'}
             </button>
@@ -378,7 +422,7 @@ export default function CreateEventPage() {
             <button 
               type="button"
               onClick={() => setPromotionModalOpen(true)}
-              className="flex-1 bg-surface-container-high text-on-surface px-8 py-3 rounded-xl font-semibold border border-outline-variant/50 hover:bg-surface-variant transition-colors flex items-center justify-center gap-2"
+              className="flex-1 premium-button-muted font-bold flex items-center justify-center gap-2"
             >
               <span className="material-symbols-outlined text-[20px]">campaign</span>
               Promote Event

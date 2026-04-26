@@ -139,7 +139,10 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   if (loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3d2b]"></div>
+        <div className="relative">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+          <div className="absolute inset-0 rounded-full animate-subtle-pulse" style={{ boxShadow: '0 0 30px rgba(59,107,74,0.15)' }} />
+        </div>
       </div>
     );
   }
@@ -153,14 +156,12 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
     if (!event.lat || !event.lng) return false;
     
-    // Check polygon intersection if it's an extreme alert with a defined area
     if (alert.severity === 'Extreme' && alert.polygon && alert.polygon.length > 2) {
       if (isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon)) {
         return true;
       }
     }
     
-    // Fallback to radius check (30 miles for general alerts)
     if (alert.coordinates?.lat && alert.coordinates?.lng) {
       const distance = getDistanceMiles(
         event.lat, 
@@ -168,35 +169,35 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         alert.coordinates.lat, 
         alert.coordinates.lng
       );
-      return distance <= 30; // 30 miles radius
+      return distance <= 30;
     }
     
     return false;
   });
 
   return (
-    <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
+    <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-28 md:pb-10">
       <button 
         onClick={() => router.push('/dashboard')}
-        className="flex items-center gap-2 text-gray-500 hover:text-black mb-6 transition-colors"
+        className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface mb-6 transition-colors font-semibold animate-fade-in-up"
       >
         <ArrowLeft size={20} />
         Back to Dashboard
       </button>
 
-      <div className="flex flex-col gap-6 mb-10">
+      <div className="flex flex-col gap-6 mb-10 animate-fade-in-up delay-100">
         <div>
-          <h1 className="text-4xl md:text-5xl font-serif font-bold text-[#1f3d2b] mb-3 leading-tight tracking-tight">{event.title}</h1>
-          <p className="text-gray-600 flex items-center gap-2 text-sm md:text-base font-medium">
-            <Calendar size={18} className="text-[#1f3d2b]/70" />
+          <h1 className="text-3xl md:text-5xl font-serif font-bold text-gradient-earth mb-3 leading-tight tracking-tight">{event.title}</h1>
+          <p className="text-on-surface-variant flex items-center gap-2 text-sm md:text-base font-medium">
+            <Calendar size={18} style={{ color: 'var(--color-primary-base)' }} />
             {event.eventDate ? new Date(event.eventDate).toLocaleDateString() : (event.createdAt?.toDate?.()?.toLocaleDateString() || 'TBD')} • {event.location}
           </p>
         </div>
         
-        <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100/80">
+        <div className="flex flex-wrap items-center gap-3 pt-4" style={{ borderTop: '1px solid var(--glass-border)' }}>
           <button 
             onClick={() => router.push(`/dashboard/event/${eventId}/edit`)}
-            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="premium-button-muted text-sm gap-2"
           >
             <Pencil size={16} />
             Edit Event
@@ -204,7 +205,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={() => setIsPromotionModalOpen(true)}
-            className="bg-[#1f3d2b] hover:bg-[#162d1f] text-white px-5 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-md shadow-[#1f3d2b]/20 text-sm"
+            className="premium-button-primary text-sm gap-2"
           >
             <Send size={16} />
             Promote Campaign
@@ -212,7 +213,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={handleEmailAll}
-            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="premium-button-muted text-sm gap-2"
           >
             <Mail size={16} />
             Email All
@@ -220,7 +221,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={handleExportCSV}
-            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="premium-button-muted text-sm gap-2"
           >
             <Download size={16} />
             Export CSV
@@ -230,7 +231,12 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={handleDeleteEvent}
-            className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-100 hover:border-red-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm mt-2 md:mt-0"
+            className="px-4 py-2.5 rounded-full font-semibold flex items-center gap-2 transition-all text-sm mt-2 md:mt-0 hover:-translate-y-0.5"
+            style={{
+              background: 'rgba(184,50,48,0.06)',
+              color: 'var(--color-error-base)',
+              border: '1px solid rgba(184,50,48,0.15)',
+            }}
           >
             <Trash2 size={16} />
             Delete Event
@@ -239,27 +245,34 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
       </div>
 
       {intersectingAlerts.length > 0 && (
-        <div className="mb-8 p-5 rounded-3xl bg-surface-container-lowest border border-outline-variant/20 shadow-sm">
-          <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
-            <AlertTriangle size={20} className="text-amber-600" />
+        <div
+          className="mb-8 p-5 rounded-[20px] animate-fade-in-up delay-200"
+          style={{
+            background: 'rgba(212,168,82,0.06)',
+            border: '1px solid rgba(212,168,82,0.2)',
+            boxShadow: '0 4px 16px rgba(212,168,82,0.06)',
+          }}
+        >
+          <div className="flex items-center gap-2 font-bold mb-3" style={{ color: 'var(--color-warm-amber)' }}>
+            <AlertTriangle size={20} />
             <h3 className="text-lg">Sentinel Safety Awareness</h3>
           </div>
-          <p className="text-sm text-amber-900 mb-4">
+          <p className="text-sm text-on-surface-variant mb-4">
             The following alerts overlap with your event's location. Please review them and communicate any safety concerns or cancellations to your volunteers.
           </p>
           <div className="space-y-3">
             {intersectingAlerts.map(alert => (
-              <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 bg-white p-3 rounded-xl border border-amber-100 shadow-sm">
+              <div key={alert.id} className="flex flex-col sm:flex-row sm:items-start gap-3 p-3 rounded-xl" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
                 <span className={`px-2.5 py-1 text-xs font-bold rounded-lg whitespace-nowrap w-fit ${
-                  alert.severity === 'Extreme' ? 'bg-red-100 text-red-700' :
-                  alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700' :
-                  'bg-amber-100 text-amber-700'
+                  alert.severity === 'Extreme' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300' :
+                  alert.severity === 'Severe' ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-300' :
+                  'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300'
                 }`}>
                   {alert.severity} • {alert.type}
                 </span>
                 <div className="flex-1">
-                  <p className="text-sm font-semibold text-amber-950 mb-0.5">{alert.title}</p>
-                  <p className="text-xs text-amber-800/80 line-clamp-2">{alert.description}</p>
+                  <p className="text-sm font-semibold text-on-surface mb-0.5">{alert.title}</p>
+                  <p className="text-xs text-on-surface-variant line-clamp-2">{alert.description}</p>
                 </div>
               </div>
             ))}
@@ -267,7 +280,11 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           <div className="mt-4 flex gap-3">
             <button 
               onClick={handleEmailAll}
-              className="bg-amber-100 hover:bg-amber-200 text-amber-800 px-4 py-2 rounded-lg text-sm font-semibold flex items-center gap-2 transition-colors"
+              className="px-4 py-2 rounded-xl text-sm font-semibold flex items-center gap-2 transition-all hover:-translate-y-0.5"
+              style={{
+                background: 'rgba(212,168,82,0.12)',
+                color: 'var(--color-warm-amber)',
+              }}
             >
               <Mail size={16} />
               Email Volunteers
@@ -276,37 +293,37 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         </div>
       )}
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-8 animate-fade-in-up delay-300">
         {/* Left Column: Stats */}
         <div className="md:col-span-1 space-y-6">
-          <div className="premium-panel p-6">
-            <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
-              <Users size={20} className="text-[#1f3d2b]" />
+          <div className="premium-glass p-6">
+            <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2 text-on-surface">
+              <Users size={20} style={{ color: 'var(--color-primary-base)' }} />
               Volunteer Progress
             </h3>
-            <div className="text-3xl font-bold text-[#1f3d2b] mb-2">
-              {currentVols} <span className="text-sm font-normal text-gray-500">/ {goalVols}</span>
+            <div className="text-3xl font-bold mb-2" style={{ color: 'var(--color-primary-base)' }}>
+              {currentVols} <span className="text-sm font-normal text-on-surface-variant">/ {goalVols}</span>
             </div>
-            <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
               <div 
-                className="h-full bg-[#1f3d2b] rounded-full transition-all duration-1000"
-                style={{ width: `${progress}%` }}
+                className="h-full rounded-full transition-all duration-1000 progress-glow"
+                style={{ width: `${progress}%`, background: 'linear-gradient(90deg, var(--color-primary-base), var(--color-sage))' }}
               ></div>
             </div>
           </div>
 
-          <div className="premium-panel p-6">
-            <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
-              <CheckCircle size={20} className="text-[#1f3d2b]" />
+          <div className="premium-glass p-6">
+            <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2 text-on-surface">
+              <CheckCircle size={20} style={{ color: 'var(--color-warm-amber)' }} />
               Checked In
             </h3>
-            <div className="text-3xl font-bold text-[#1f3d2b] mb-2">
+            <div className="text-3xl font-bold mb-2" style={{ color: 'var(--color-warm-amber)' }}>
               {volunteers.filter(v => v.attended).length} <span className="text-sm font-normal text-on-surface-variant">/ {volunteers.length}</span>
             </div>
-            <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
+            <div className="w-full h-2.5 rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
               <div 
-                className="h-full bg-[#1f3d2b] rounded-full transition-all duration-1000"
-                style={{ width: `${Math.min(100, Math.round((volunteers.filter(v => v.attended).length / (volunteers.length || 1)) * 100))}%` }}
+                className="h-full rounded-full transition-all duration-1000 progress-glow-amber"
+                style={{ width: `${Math.min(100, Math.round((volunteers.filter(v => v.attended).length / (volunteers.length || 1)) * 100))}%`, background: 'linear-gradient(90deg, var(--color-warm-amber), var(--color-earth-gold))' }}
               ></div>
             </div>
           </div>
@@ -314,16 +331,19 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
         {/* Right Column: Volunteer List */}
         <div className="md:col-span-3">
-          <div className="premium-panel overflow-hidden">
-            <div className="p-6 border-b border-gray-100 flex justify-between items-center">
-              <h3 className="font-serif text-xl font-bold">Volunteer Roster</h3>
-              <span className="bg-[#1f3d2b]/10 text-[#1f3d2b] px-3 py-1 rounded-full text-sm font-medium">
+          <div className="premium-glass-strong overflow-hidden">
+            <div className="p-6 flex justify-between items-center" style={{ borderBottom: '1px solid var(--glass-border)' }}>
+              <h3 className="font-serif text-xl font-bold text-on-surface">Volunteer Roster</h3>
+              <span
+                className="px-3 py-1 rounded-full text-sm font-semibold"
+                style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
+              >
                 {volunteers.length} Signed Up
               </span>
             </div>
             
             {volunteers.length === 0 ? (
-              <div className="p-12 text-center text-gray-500">
+              <div className="p-12 text-center text-on-surface-variant">
                 <Users size={48} className="mx-auto mb-4 opacity-20" />
                 <p>No volunteers have signed up yet.</p>
               </div>
@@ -331,27 +351,28 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-gray-50/50 border-b border-gray-100 text-sm text-gray-500">
+                    <tr style={{ borderBottom: '1px solid var(--glass-border)' }} className="text-sm text-on-surface-variant">
                       <th className="px-6 py-4 font-medium">Volunteer Name</th>
                       <th className="px-6 py-4 font-medium">Signed Up</th>
                       <th className="px-6 py-4 font-medium text-center">Attended</th>
                       <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody>
                     {volunteers.map(vol => (
-                      <tr key={vol.id} className="hover:bg-gray-50/50 transition-colors">
+                      <tr key={vol.id} className="hover:bg-surface-container/30 transition-colors" style={{ borderBottom: '1px solid var(--glass-border)' }}>
                         <td className="px-6 py-4">
-                          <div className="font-medium text-gray-900">{vol.userName}</div>
-                          <div className="text-sm text-gray-500 font-mono text-xs">{vol.userId}</div>
+                          <div className="font-medium text-on-surface">{vol.userName}</div>
+                          <div className="text-xs text-on-surface-variant font-mono">{vol.userId}</div>
                         </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
+                        <td className="px-6 py-4 text-sm text-on-surface-variant">
                           {vol.signedUpAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
                         </td>
                         <td className="px-6 py-4 text-center">
                           <button
                             onClick={() => handleToggleAttendance(vol.id, vol.attended)}
-                            className={`p-2 rounded-lg transition-colors inline-block ${vol.attended ? 'text-green-600 hover:bg-green-50' : 'text-gray-400 hover:bg-gray-100'}`}
+                            className={`p-2 rounded-lg transition-all inline-block ${vol.attended ? 'hover:bg-primary/10' : 'hover:bg-surface-container/50'}`}
+                            style={{ color: vol.attended ? 'var(--color-primary-base)' : 'var(--color-outline-base)' }}
                             title={vol.attended ? 'Mark as Not Attended' : 'Mark as Attended'}
                           >
                             {vol.attended ? <CheckCircle size={20} /> : <Circle size={20} />}
@@ -361,7 +382,8 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
                           {vol.userEmail ? (
                             <a 
                               href={`mailto:${vol.userEmail}`}
-                              className="text-[#1f3d2b] hover:bg-[#1f3d2b]/10 p-2 rounded-lg transition-colors inline-block"
+                              className="p-2 rounded-lg transition-all inline-block hover:bg-primary/10"
+                              style={{ color: 'var(--color-primary-base)' }}
                               title="Contact Volunteer"
                             >
                               <Mail size={18} />
@@ -369,7 +391,8 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
                           ) : (
                             <button 
                               onClick={() => toast.info('No email provided for this volunteer.')}
-                              className="text-gray-400 p-2 rounded-lg transition-colors inline-block cursor-not-allowed"
+                              className="p-2 rounded-lg transition-colors inline-block cursor-not-allowed"
+                              style={{ color: 'var(--color-outline-base)' }}
                               title="No Email Available"
                             >
                               <Mail size={18} />

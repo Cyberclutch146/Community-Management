@@ -141,8 +141,12 @@ export default function AIChatWidget() {
       {/* Floating Button */}
       <button
         onClick={toggleChat}
-        className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-8 md:right-8 z-[60] p-4 rounded-full bg-primary text-on-primary shadow-lg hover:bg-primary-dark transition-all duration-300 transform hover:scale-105 group"
+        className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-8 md:right-8 z-[60] p-4 rounded-full text-on-primary transition-all duration-300 transform hover:scale-105 active:scale-95 group"
         aria-label="Toggle AI Chat"
+        style={{
+          background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
+          boxShadow: '0 8px 28px rgba(59, 107, 74, 0.35), 0 2px 8px rgba(59, 107, 74, 0.15)',
+        }}
       >
         <AnimatePresence mode="wait">
           {isOpen ? (
@@ -165,12 +169,26 @@ export default function AIChatWidget() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 20, scale: 0.95 }}
             transition={{ duration: 0.2 }}
-            className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-24 md:right-8 z-[60] w-[calc(100vw-32px)] md:w-[420px] h-[540px] max-h-[calc(100vh-7rem-env(safe-area-inset-bottom))] md:max-h-[calc(100vh-120px)] bg-surface rounded-2xl shadow-2xl border border-outline-variant flex flex-col overflow-hidden"
+            className="fixed bottom-[calc(6rem+env(safe-area-inset-bottom))] right-4 md:bottom-24 md:right-8 z-[60] w-[calc(100vw-32px)] md:w-[420px] h-[540px] max-h-[calc(100vh-7rem-env(safe-area-inset-bottom))] md:max-h-[calc(100vh-120px)] rounded-2xl flex flex-col overflow-hidden"
+            style={{
+              background: 'var(--glass-bg-strong)',
+              backdropFilter: 'blur(32px) saturate(1.5)',
+              WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
+              border: '1px solid var(--glass-border)',
+              boxShadow: 'var(--glass-shadow-lg)',
+            }}
           >
             {/* Header */}
-            <div className="bg-primary p-4 text-on-primary flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Bot size={20} />
+            <div
+              className="p-4 text-on-primary flex items-center justify-between"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
+              }}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-full bg-white/15 flex items-center justify-center">
+                  <Bot size={18} />
+                </div>
                 <div>
                   <h3 className="font-semibold text-sm">Kindred AI Assistant</h3>
                   <div className="flex items-center gap-1 text-on-primary/70 text-[10px]">
@@ -179,34 +197,44 @@ export default function AIChatWidget() {
                   </div>
                 </div>
               </div>
-              <button onClick={toggleChat} className="text-on-primary/80 hover:text-on-primary transition-colors">
-                <X size={20} />
+              <button onClick={toggleChat} className="text-on-primary/80 hover:text-on-primary transition-colors p-1 rounded-full hover:bg-white/10">
+                <X size={18} />
               </button>
             </div>
 
             {/* Messages Area */}
-            <div className="flex-1 overflow-y-auto p-4 space-y-4 bg-surface-container-lowest">
+            <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ background: 'var(--color-surface-container-lowest-base)' }}>
               {messages.map((msg, idx) => (
                 <div
                   key={idx}
                   className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <div className={`max-w-[85%] rounded-2xl p-3 ${
-                    msg.role === 'user'
-                      ? 'bg-primary text-on-primary rounded-tr-sm'
-                      : 'bg-surface-container text-on-surface rounded-tl-sm'
-                  }`}>
+                  <div
+                    className={`max-w-[85%] rounded-2xl p-3.5 ${
+                      msg.role === 'user'
+                        ? 'rounded-tr-sm text-on-primary'
+                        : 'rounded-tl-sm text-on-surface'
+                    }`}
+                    style={msg.role === 'user' ? {
+                      background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
+                      boxShadow: '0 2px 8px rgba(59,107,74,0.2)',
+                    } : {
+                      background: 'var(--glass-bg)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid var(--glass-border)',
+                    }}
+                  >
                     <div className="text-sm whitespace-pre-wrap leading-relaxed">
                       {renderMessageContent(msg.content)}
                     </div>
 
                     {/* Action Buttons */}
                     {msg.action && (
-                      <div className="mt-2 pt-2 border-t border-current/10">
+                      <div className="mt-2.5 pt-2" style={{ borderTop: '1px solid rgba(255,255,255,0.1)' }}>
                         {msg.action.type === 'navigate' && msg.action.url && (
                           <button
                             onClick={() => handleNavigate(msg.action!.url!)}
-                            className="inline-flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-colors"
+                            className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full bg-white/15 hover:bg-white/25 transition-colors"
                           >
                             <ExternalLink size={12} />
                             View Page
@@ -215,14 +243,15 @@ export default function AIChatWidget() {
 
                         {msg.action.type === 'signed_up' && (
                           <div className="flex items-center gap-2">
-                            <span className="inline-flex items-center gap-1 text-xs font-medium text-emerald-600 bg-emerald-50 px-2 py-1 rounded-full">
+                            <span className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full" style={{ background: 'rgba(59,107,74,0.15)', color: 'var(--color-primary-base)' }}>
                               <CheckCircle2 size={12} />
                               Signed up!
                             </span>
                             {msg.action.url && (
                               <button
                                 onClick={() => handleNavigate(msg.action!.url!)}
-                                className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                                className="inline-flex items-center gap-1 text-xs font-semibold px-3 py-1.5 rounded-full transition-colors"
+                                style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
                               >
                                 <ExternalLink size={12} />
                                 View Event
@@ -262,7 +291,14 @@ export default function AIChatWidget() {
 
               {isLoading && (
                 <div className="flex justify-start">
-                  <div className="bg-surface-container text-on-surface rounded-2xl rounded-tl-sm p-3 flex items-center gap-2">
+                  <div
+                    className="rounded-2xl rounded-tl-sm p-3.5 flex items-center gap-2 text-on-surface"
+                    style={{
+                      background: 'var(--glass-bg)',
+                      backdropFilter: 'blur(12px)',
+                      border: '1px solid var(--glass-border)',
+                    }}
+                  >
                     <Loader2 size={16} className="animate-spin" />
                     <span className="text-sm">Thinking...</span>
                   </div>
@@ -272,19 +308,31 @@ export default function AIChatWidget() {
             </div>
 
             {/* Input Area */}
-            <form onSubmit={handleSendMessage} className="p-3 bg-surface border-t border-outline-variant flex gap-2">
+            <form
+              onSubmit={handleSendMessage}
+              className="p-3 flex gap-2"
+              style={{ borderTop: '1px solid var(--glass-border)', background: 'var(--glass-bg)' }}
+            >
               <input
                 type="text"
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 placeholder={user ? "Ask me anything..." : "Log in for full features..."}
-                className="flex-1 bg-surface-container-lowest border border-outline rounded-full px-4 py-2 text-sm focus:outline-none focus:border-primary text-on-surface placeholder:text-on-surface-variant"
+                className="flex-1 rounded-full px-4 py-2.5 text-sm focus:outline-none text-on-surface placeholder:text-on-surface-variant/50"
+                style={{
+                  background: 'var(--color-surface-container-lowest-base)',
+                  border: '1px solid var(--glass-border)',
+                }}
                 disabled={isLoading}
               />
               <button
                 type="submit"
                 disabled={!inputMessage.trim() || isLoading}
-                className="p-2 rounded-full bg-primary text-on-primary disabled:opacity-50 disabled:cursor-not-allowed hover:bg-primary-dark transition-colors"
+                className="p-2.5 rounded-full text-on-primary disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 hover:scale-105 active:scale-95"
+                style={{
+                  background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
+                  boxShadow: inputMessage.trim() ? '0 2px 8px rgba(59,107,74,0.25)' : 'none',
+                }}
               >
                 <Send size={18} />
               </button>

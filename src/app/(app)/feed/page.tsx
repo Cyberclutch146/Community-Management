@@ -16,7 +16,7 @@ const PAGE_SIZE = 12;
 
 export default function FeedPage() {
   return (
-    <Suspense fallback={<div className="flex-1 flex bg-[#f5f4f1] items-center justify-center"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1f3d2b]"></div></div>}>
+    <Suspense fallback={<div className="flex-1 flex items-center justify-center h-[3.5rem]"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
       <FeedContent />
     </Suspense>
   );
@@ -83,8 +83,8 @@ function FeedContent() {
     const fetchEventsAndAlerts = async () => {
       try {
         const [eventsResult, alertsResult] = await Promise.all([
-           getEvents(PAGE_SIZE),
-           fetch('/api/sentinel').then(res => res.ok ? res.json() : [])
+          getEvents(PAGE_SIZE),
+          fetch('/api/sentinel').then(res => res.ok ? res.json() : [])
         ]);
         setEvents(eventsResult.events);
         setAlerts(alertsResult);
@@ -200,160 +200,220 @@ function FeedContent() {
   })();
 
   return (
-    <div className="flex-1 flex flex-col text-[#1f3d2b] w-full">
-      <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-10">
-        <div>
-          <p className="text-secondary font-medium mb-1">Local Events Feed</p>
-          <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Discover & Support</h2>
-          <p className="mt-3 text-on-surface-variant max-w-xl leading-relaxed">
-            Find local community events and support neighbors in need.
-          </p>
-          {searchQuery && (
-            <div className="mt-3 flex items-center gap-2">
-              <span className="text-sm text-gray-500">Showing results for</span>
-              <span className="bg-[#1f3d2b]/10 text-[#1f3d2b] text-sm font-medium px-3 py-1 rounded-full">&ldquo;{searchQuery}&rdquo;</span>
-              {isAIPowered && (
-                <span className="inline-flex items-center gap-1 bg-amber-50 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full border border-amber-200">
-                  <Sparkles size={12} />
-                  AI-powered
-                </span>
-              )}
-              <button onClick={() => setSearchQuery('')} className="text-xs text-gray-400 hover:text-red-500 transition-colors ml-1">✕ Clear</button>
-            </div>
-          )}
-        </div>
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex bg-surface-container-lowest rounded-full p-1 border border-outline-variant/20 shadow-sm">
-            <button
-              onClick={() => setViewMode('list')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-[#1f3d2b] text-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
-            >
-              List
-            </button>
-            <button
-              onClick={() => setViewMode('map')}
-              className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${viewMode === 'map' ? 'bg-[#1f3d2b] text-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
-            >
-              Map
-            </button>
-          </div>
-          <div className="flex items-center bg-surface-container-lowest rounded-full px-4 py-2 border border-outline-variant/20 max-w-[200px] md:max-w-[250px]">
-            <span className="material-symbols-outlined text-secondary mr-2 text-sm shrink-0">location_on</span>
-            <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
-              {userLocation}
-            </span>
-          </div>
-        </div>
-      </div>
-
-      {/* Skill-Based Recommendations — only show when no search query */}
-      {!searchQuery && <SkillMatchBanner condensed />}
-
-      <section className="mb-8 overflow-x-auto pb-4 no-scrollbar">
-        <div className="flex gap-3 min-w-max">
-          {categories.map((cat) => {
-            const isActive = filter === cat.name;
-            return (
-              <button
-                key={cat.name}
-                onClick={() => setFilter(cat.name)}
-                className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-transform hover:-translate-y-0.5 ${
-                  isActive 
-                    ? 'bg-primary text-on-primary font-semibold shadow-sm' 
-                    : 'bg-surface-container text-on-surface font-medium border border-outline-variant/30 hover:bg-surface-container-high transition-colors'
-                }`}
-              >
-                {cat.name !== 'All Events' ? cat.name : undefined}
-                <span className={`material-symbols-outlined text-[16px] ${cat.extraClasses && !isActive ? cat.extraClasses : ''}`}>
-                  {cat.icon}
-                </span>
-                {cat.name === 'All Events' ? cat.name : undefined}
-              </button>
-            );
-          })}
-        </div>
-      </section>
-
-      {loading || searchLoading ? (
-        <div className="flex flex-col justify-center items-center py-20 gap-3">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
-          {searchLoading && (
-            <p className="text-sm text-on-surface-variant flex items-center gap-2">
-              <Sparkles size={14} className="text-amber-500" />
-              Searching with AI...
+    <div className="flex-1 flex flex-col text-on-surface w-full">
+      <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8 animate-fade-in-up">
+          <div>
+            <p className="text-secondary font-semibold mb-1 text-sm uppercase tracking-wider">Local Events Feed</p>
+            <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Discover & Support</h2>
+            <p className="mt-3 text-on-surface-variant max-w-xl leading-relaxed">
+              Find local community events and support neighbors in need.
             </p>
-          )}
-        </div>
-      ) : filteredEvents.length === 0 ? (
-        <div className="bg-surface-container rounded-2xl p-10 text-center text-on-surface-variant border border-outline-variant/30">
-          <span className="material-symbols-outlined text-4xl mb-4 text-primary">event_busy</span>
-          <h3 className="font-headline text-xl font-bold mb-2 text-on-surface">No events found</h3>
-          <p>No events are currently scheduled matching this criteria. Be the first to create one!</p>
-        </div>
-      ) : viewMode === 'map' ? (
-        <div className="h-[600px] w-full mt-4">
-          <MapWrapper events={filteredEvents} alerts={alerts} />
-        </div>
-      ) : (
-        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6 items-start">
-          {filteredEvents.map((event, index) => {
-            const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
-
-            const normalizedEvent = {
-              ...event,
-              imageUrl: imageUrl,
-            };
-
-            // Compute overlapping alerts
-            const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
-              if (!event.lat || !event.lng) return false;
-              
-              if (alert.polygon && alert.polygon.length > 0) {
-                return isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon);
-              } else if (alert.coordinates) {
-                // 30 mile radius for point alerts
-                const dist = getDistanceMiles(event.lat, event.lng, alert.coordinates.lat, alert.coordinates.lng);
-                return dist <= 30;
-              }
-              return false;
-            });
-
-            // Create a neat bento box pattern: stagger the large cards
-            const bentoPattern = [0, 4, 7, 11];
-            const isFeatured = bentoPattern.includes(index % 12);
-
-            return (
-              <EventCard 
-                key={event.id} 
-                event={normalizedEvent} 
-                featured={isFeatured}
-                sentinelAlerts={intersectingAlerts}
-              />
-            );
-          })}
-        </div>
-      )}
-
-      {hasMore && !loading && !searchQuery && (
-        <div className="mt-12 flex justify-center">
-          <button 
-            onClick={loadMore}
-            disabled={loadingMore}
-            className="bg-transparent border border-outline text-on-surface px-8 py-3 rounded-xl font-semibold hover:bg-surface-container-low transition-colors disabled:opacity-50 flex items-center gap-2"
-          >
-            {loadingMore ? (
-              <>
-                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
-                Loading...
-              </>
-            ) : (
-              'Load More Events'
+            {searchQuery && (
+              <div className="mt-3 flex items-center gap-2 flex-wrap">
+                <span className="text-sm text-on-surface-variant">Showing results for</span>
+                <span
+                  className="text-sm font-semibold px-3 py-1 rounded-full"
+                  style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
+                >
+                  &ldquo;{searchQuery}&rdquo;
+                </span>
+                {isAIPowered && (
+                  <span
+                    className="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full"
+                    style={{ background: 'rgba(212,168,82,0.12)', color: 'var(--color-warm-amber)', border: '1px solid rgba(212,168,82,0.2)' }}
+                  >
+                    <Sparkles size={12} />
+                    AI-powered
+                  </span>
+                )}
+                <button onClick={() => setSearchQuery('')} className="text-xs text-on-surface-variant hover:text-error transition-colors ml-1">✕ Clear</button>
+              </div>
             )}
-          </button>
+          </div>
+          <div className="flex flex-wrap items-center gap-3">
+            {/* View Toggle */}
+            <div
+              className="flex rounded-full p-1"
+              style={{
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid var(--glass-border)',
+                boxShadow: '0 2px 8px rgba(42,45,43,0.04)',
+              }}
+            >
+              <button
+                onClick={() => setViewMode('list')}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'list'
+                    ? 'text-on-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                style={viewMode === 'list' ? {
+                  background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                  boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+                } : undefined}
+              >
+                List
+              </button>
+              <button
+                onClick={() => setViewMode('map')}
+                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'map'
+                    ? 'text-on-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                style={viewMode === 'map' ? {
+                  background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                  boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+                } : undefined}
+              >
+                Map
+              </button>
+            </div>
+            {/* Location Chip */}
+            <div
+              className="flex items-center rounded-full px-4 py-2 max-w-[200px] md:max-w-[250px]"
+              style={{
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(12px)',
+                border: '1px solid var(--glass-border)',
+              }}
+            >
+              <span className="material-symbols-outlined text-[var(--color-terracotta)] mr-2 text-sm shrink-0">location_on</span>
+              <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
+                {userLocation}
+              </span>
+            </div>
+          </div>
         </div>
-      )}
-    </main>
+
+        {/* Skill-Based Recommendations — only show when no search query */}
+        {!searchQuery && <SkillMatchBanner condensed />}
+
+        <section className="mb-8 overflow-x-auto pb-4 no-scrollbar animate-fade-in-up delay-100">
+          <div className="flex gap-2.5 min-w-max">
+            {categories.map((cat) => {
+              const isActive = filter === cat.name;
+              return (
+                <button
+                  key={cat.name}
+                  onClick={() => setFilter(cat.name)}
+                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300 hover:-translate-y-0.5 font-semibold ${isActive
+                      ? 'text-on-primary'
+                      : 'text-on-surface hover:text-on-surface'
+                    }`}
+                  style={isActive ? {
+                    background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                    boxShadow: '0 3px 12px rgba(59,107,74,0.25)',
+                  } : {
+                    background: 'var(--glass-bg)',
+                    backdropFilter: 'blur(12px)',
+                    border: '1px solid var(--glass-border)',
+                  }}
+                >
+                  {cat.name !== 'All Events' ? cat.name : undefined}
+                  <span className={`material-symbols-outlined text-[16px] ${cat.extraClasses && !isActive ? cat.extraClasses : ''}`}>
+                    {cat.icon}
+                  </span>
+                  {cat.name === 'All Events' ? cat.name : undefined}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {loading || searchLoading ? (
+          <div className="flex flex-col justify-center items-center py-20 gap-3">
+            <div className="relative">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+              <div className="absolute inset-0 rounded-full animate-subtle-pulse" style={{ boxShadow: '0 0 30px rgba(59,107,74,0.15)' }} />
+            </div>
+            {searchLoading && (
+              <p className="text-sm text-on-surface-variant flex items-center gap-2 mt-2">
+                <Sparkles size={14} style={{ color: 'var(--color-warm-amber)' }} />
+                Searching with AI...
+              </p>
+            )}
+          </div>
+        ) : filteredEvents.length === 0 ? (
+          <div
+            className="rounded-2xl p-10 text-center animate-fade-in-up"
+            style={{
+              background: 'var(--glass-bg)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid var(--glass-border)',
+            }}
+          >
+            <span className="material-symbols-outlined text-4xl mb-4 text-primary">event_busy</span>
+            <h3 className="font-headline text-xl font-bold mb-2 text-on-surface">No events found</h3>
+            <p className="text-on-surface-variant">No events are currently scheduled matching this criteria. Be the first to create one!</p>
+          </div>
+        ) : viewMode === 'map' ? (
+          <div
+            className="h-[600px] w-full mt-4 rounded-2xl overflow-hidden animate-fade-in-up"
+            style={{ border: '1px solid var(--glass-border)', boxShadow: 'var(--glass-shadow)' }}
+          >
+            <MapWrapper events={filteredEvents} alerts={alerts} />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredEvents.map((event) => {
+              const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
+
+              const normalizedEvent = {
+                ...event,
+                imageUrl: imageUrl,
+              };
+
+              // Compute overlapping alerts
+              const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
+                if (!event.lat || !event.lng) return false;
+
+                if (alert.polygon && alert.polygon.length > 0) {
+                  return isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon);
+                } else if (alert.coordinates) {
+                  // 30 mile radius for point alerts
+                  const dist = getDistanceMiles(event.lat, event.lng, alert.coordinates.lat, alert.coordinates.lng);
+                  return dist <= 30;
+                }
+                return false;
+              });
+
+              return (
+                <EventCard
+                  key={event.id}
+                  event={normalizedEvent}
+                  sentinelAlerts={intersectingAlerts}
+                />
+              );
+            })}
+          </div>
+        )}
+
+        {hasMore && !loading && !searchQuery && (
+          <div className="mt-12 flex justify-center">
+            <button
+              onClick={loadMore}
+              disabled={loadingMore}
+              className="px-8 py-3 rounded-full font-semibold text-sm transition-all duration-300 disabled:opacity-50 flex items-center gap-2 hover:-translate-y-0.5"
+              style={{
+                background: 'var(--glass-bg)',
+                backdropFilter: 'blur(16px)',
+                border: '1px solid var(--glass-border)',
+                color: 'var(--color-on-surface-base)',
+              }}
+            >
+              {loadingMore ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-current"></div>
+                  Loading...
+                </>
+              ) : (
+                'Load More Events'
+              )}
+            </button>
+          </div>
+        )}
+      </main>
     </div>
   );
 }
