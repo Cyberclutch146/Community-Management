@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { db } from "@/lib/firebase";
-import { collection, getDocs, query, orderBy } from "firebase/firestore";
+import { adminDb } from "@/lib/firebase-admin";
 
 interface SearchableEvent {
   id: string;
@@ -9,13 +8,20 @@ interface SearchableEvent {
   category: string;
   location: string;
   urgency: string;
+  volunteersNeeded?: number;
+  goalAmount?: number;
+  donatedAmount?: number;
 }
 
 // ─── Fetch all events for search ────────────────────────
 async function fetchSearchableEvents(): Promise<SearchableEvent[]> {
-  const snapshot = await getDocs(
-    query(collection(db, "events"), orderBy("createdAt", "desc"))
-  );
+  if (!adminDb) {
+    console.warn("adminDb is not initialized. Returning empty events list.");
+    return [];
+  }
+  
+  const snapshot = await adminDb.collection("events").orderBy("createdAt", "desc").get();
+  
   return snapshot.docs.map((doc) => {
     const data = doc.data();
     return {
@@ -25,6 +31,9 @@ async function fetchSearchableEvents(): Promise<SearchableEvent[]> {
       category: data.category || "",
       location: data.location || "",
       urgency: data.urgency || "normal",
+      volunteersNeeded: data.needs?.volunteers?.goal,
+      goalAmount: data.needs?.funds?.goal,
+      donatedAmount: data.needs?.funds?.current,
     };
   });
 }
@@ -56,7 +65,6 @@ export function keywordSearch(searchQuery: string, events: SearchableEvent[], us
     if (userContext) {
       if (userContext.skills?.some((s: string) => text.includes(s.toLowerCase()))) score += 3;
       if (userContext.equipment?.some((e: string) => text.includes(e.toLowerCase()))) score += 3;
-      // Location boost could be added here if coordinates were available
     }
 
     return { id: event.id, score };
@@ -137,42 +145,73 @@ Example response: ["id1", "id2", "id3"]`;
 
 // ─── RAG Retrieval for AI Chatbot ───────────────────────
 export async function ragRetrieveEvents(userMessage: string, userContext?: any): Promise<any[]> {
-  const snapshot = await getDocs(
-    query(collection(db, "events"), orderBy("createdAt", "desc"))
-  );
-  
-  const allEvents = snapshot.docs.map((doc) => {
-    const data = doc.data();
-    return {
-      id: doc.id,
-      title: data.title || "",
-      description: data.description || "",
-      category: data.category || "",
-      location: data.location || "",
-      urgency: data.urgency || "normal",
-      volunteersNeeded: data.needs?.volunteers?.goal,
-      goalAmount: data.needs?.funds?.goal,
-      donatedAmount: data.needs?.funds?.current,
-    };
-  });
+  const allEvents = await fetchSearchableEvents();
 
   if (allEvents.length === 0) return [];
 
-  // Use the local keyword search with user context to score and rank events
-  const rankedIds = keywordSearch(userMessage, allEvents, userContext);
-  
-  // If the user didn't type much that matched, and we have no context matches, 
-  // just return the 5 most recent events as a baseline.
-  if (rankedIds.length === 0) {
-    return allEvents.slice(0, 5);
+  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+
+  const getFallback = () => {
+    const rankedIds = keywordSearch(userMessage, allEvents, userContext);
+    if (rankedIds.length === 0) return allEvents.slice(0, 5);
+    return rankedIds.slice(0, 5).map(id => allEvents.find(e => e.id === id)).filter(Boolean);
+  };
+
+  // If no API key, fall back to keyword search
+  if (!apiKey) {
+    return getFallback();
   }
 
-  // Map IDs back to full event objects and return the top 5
-  const topEvents = rankedIds
-    .slice(0, 5)
-    .map(id => allEvents.find(e => e.id === id))
-    .filter(Boolean);
+  try {
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
-  return topEvents;
+    const eventSummaries = allEvents
+      .map(
+        (e) =>
+          `ID: ${e.id} | Title: "${e.title}" | Category: ${e.category} | Location: ${e.location} | Urgency: ${e.urgency} | Description: ${e.description.slice(0, 150)}`
+      )
+      .join("\n");
+
+    const prompt = `You are a Retrieval-Augmented Generation (RAG) system for a community volunteering app.
+Given the User's Message, the User's Context, and a list of Available Events, return ONLY a JSON array of up to 5 event IDs that are MOST relevant.
+
+Rank the events based on:
+1. Semantic relevance to the user's message.
+2. Matching the user's skills and equipment.
+3. Matching the user's location/travel radius (if applicable based on location names).
+
+User's Context:
+Skills: ${userContext?.skills?.join(", ") || "None specified"}
+Equipment: ${userContext?.equipment?.join(", ") || "None specified"}
+Travel Radius: ${userContext?.travelRadius ? `${userContext.travelRadius}km` : "Not specified"}
+
+User Message: "${userMessage}"
+
+Available Events:
+${eventSummaries}
+
+Respond with ONLY a JSON array of event IDs (strings). If no events match well, return an empty array [].
+Example: ["id1", "id2", "id3"]`;
+
+    const result = await model.generateContent(prompt);
+    const text = result.response.text().trim();
+
+    const jsonMatch = text.match(/\[[\s\S]*?\]/);
+    if (jsonMatch) {
+      const ids = JSON.parse(jsonMatch[0]) as string[];
+      const topEvents = ids
+        .map(id => allEvents.find(e => e.id === id))
+        .filter(Boolean);
+      
+      if (topEvents.length > 0) {
+        return topEvents.slice(0, 5);
+      }
+    }
+
+    return getFallback();
+  } catch (error) {
+    console.error("RAG retrieval failed, falling back to keyword search:", error);
+    return getFallback();
+  }
 }
-
