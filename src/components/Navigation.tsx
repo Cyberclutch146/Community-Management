@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import Image from 'next/image';
+import { getUserAvatar } from '@/lib/avatar';
 
 export function SideNav() {
   const pathname = usePathname();
@@ -52,7 +53,7 @@ export function SideNav() {
       <div className="px-6 mt-auto">
         <Link href="/profile" className="flex items-center gap-3 pt-4 border-t border-outline-variant/30 hover:opacity-80 transition-opacity">
           {profile?.avatarUrl ? (
-            <Image alt={profile.displayName || 'User'} className="w-10 h-10 rounded-full object-cover" src={profile.avatarUrl} width={40} height={40} />
+            <Image alt={profile.displayName || 'User'} className="w-10 h-10 rounded-full object-cover" src={getUserAvatar(profile.avatarUrl, profile.displayName)} width={40} height={40} />
           ) : (
             <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-sm">
               {(profile?.displayName || 'U').charAt(0).toUpperCase()}

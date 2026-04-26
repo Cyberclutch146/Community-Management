@@ -6,6 +6,7 @@ import { Search, Bell, X, Sun, Moon, User, LogOut, Info } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from 'next-themes'
+import { getUserAvatar } from '@/lib/avatar'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
@@ -145,7 +146,7 @@ export default function NavbarTop() {
             className="w-10 h-10 rounded-full overflow-hidden hover:scale-105 active:scale-95 transition-all duration-200 ease-out border-2 border-transparent hover:border-primary focus:border-primary"
           >
             <img
-              src={profile?.avatarUrl || 'https://i.pravatar.cc/100'}
+              src={getUserAvatar(profile?.avatarUrl, profile?.displayName)}
               alt="Profile"
               className="w-full h-full object-cover"
             />

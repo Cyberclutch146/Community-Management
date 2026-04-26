@@ -6,6 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { updateUserProfile } from '@/services/userService';
 import { uploadImage } from '@/services/storageService';
 import { toast } from 'sonner';
+import { getUserAvatar, DEFAULT_AVATAR } from '@/lib/avatar';
 
 export default function ProfilePage() {
   const { user, profile } = useAuth();
@@ -99,8 +100,7 @@ export default function ProfilePage() {
     }
   };
 
-  const fallbackAvatar = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=800&q=80";
-  const currentAvatar = profile.avatarUrl || fallbackAvatar;
+  const currentAvatar = getUserAvatar(profile?.avatarUrl, profile?.displayName);
 
   if (isEditing) {
     return (
