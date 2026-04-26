@@ -2,10 +2,11 @@
 
 import { Lora } from 'next/font/google'
 import { useRouter, usePathname } from 'next/navigation'
-import { Search, Bell, X, Sun, Moon, User, LogOut, Info } from 'lucide-react'
+import { Search, Bell, X, Sun, Moon, User, LogOut, Info, ChevronDown } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
 import { useState, useRef, useEffect } from 'react'
 import { useTheme } from 'next-themes'
+import { AnimatePresence, motion } from 'framer-motion'
 import { getUserAvatar } from '@/lib/avatar'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
@@ -179,75 +180,142 @@ export default function NavbarTop() {
           <div className="relative" ref={menuRef}>
             <button
               onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-              className={`${scrolled ? 'w-8 h-8' : 'w-9 h-9'} rounded-full overflow-hidden transition-all duration-300 ease-out ring-2 ring-transparent hover:ring-primary/40 focus:ring-primary/40`}
+              className={`${scrolled ? 'w-8 h-8' : 'w-9 h-9'} rounded-full overflow-hidden transition-all duration-300 ease-out ring-2 ring-transparent hover:ring-primary/40 focus:ring-primary/40 flex items-center justify-center`}
               style={{ boxShadow: '0 2px 8px rgba(42, 45, 43, 0.1)' }}
             >
-              <img
-                src={getUserAvatar(profile?.avatarUrl, profile?.displayName)}
-                alt="Profile"
-                className="w-full h-full object-cover"
-              />
+              {profileMenuOpen ? (
+                <ChevronDown size={scrolled ? 18 : 20} className="text-on-surface" />
+              ) : (
+                <img
+                  src={getUserAvatar(profile?.avatarUrl, profile?.displayName)}
+                  alt="Profile"
+                  className="w-full h-full object-cover"
+                />
+              )}
             </button>
 
-            {profileMenuOpen && (
-              <div
-                className="absolute right-0 mt-3 w-56 rounded-2xl py-2 z-50 animate-in fade-in slide-in-from-top-2 duration-200"
+            <AnimatePresence>
+              {profileMenuOpen && (
+              <motion.div
+                initial={{ opacity: 0, y: -10, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                transition={{ duration: 0.18, ease: 'easeOut' }}
+                className="absolute right-0 mt-3 w-[17.5rem] overflow-hidden rounded-[28px] z-50 origin-top-right"
                 style={{
-                  background: 'var(--glass-bg-strong)',
-                  backdropFilter: 'blur(32px) saturate(1.5)',
-                  WebkitBackdropFilter: 'blur(32px) saturate(1.5)',
+                  background: 'var(--color-surface-base)',
                   border: '1px solid var(--glass-border)',
                   boxShadow: 'var(--glass-shadow-lg)',
                 }}
               >
-                <div className="px-4 py-3 mb-2" style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                  <p className="text-sm font-semibold text-on-surface truncate">{profile?.displayName || 'User'}</p>
-                  <p className="text-xs text-on-surface-variant truncate">{profile?.email || ''}</p>
+                <div className="relative z-10 p-3">
+                  <div
+                    className="overflow-hidden rounded-[22px] p-4"
+                    style={{
+                      background: 'linear-gradient(135deg, rgba(59,107,74,0.16), rgba(139,109,46,0.1) 55%, color-mix(in srgb, var(--color-surface-base) 92%, transparent) 100%)',
+                      border: '1px solid var(--glass-border)',
+                    }}
+                  >
+                    <div className="flex items-start gap-3">
+                      <div
+                        className="h-12 w-12 shrink-0 overflow-hidden rounded-2xl"
+                        style={{ boxShadow: '0 6px 18px rgba(42,45,43,0.12)', border: '1px solid var(--glass-border)' }}
+                      >
+                        <img
+                          src={getUserAvatar(profile?.avatarUrl, profile?.displayName)}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-on-surface-variant">Signed in</p>
+                        <p className="mt-1 text-base font-semibold text-on-surface truncate">{profile?.displayName || 'User'}</p>
+                        <p className="text-xs text-on-surface-variant truncate">{profile?.email || ''}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="mt-3 grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
+                      className="col-span-2 rounded-[20px] px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-primary-base) 10%, var(--color-surface-container-high-base) 90%)',
+                        border: '1px solid color-mix(in srgb, var(--color-primary-base) 18%, var(--glass-border) 82%)',
+                      }}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div
+                          className="flex h-9 w-9 items-center justify-center rounded-xl"
+                          style={{ background: 'color-mix(in srgb, var(--color-surface-bright-base) 82%, transparent)', border: '1px solid var(--glass-border)' }}
+                        >
+                          {mounted && resolvedTheme === 'dark' ? <Sun size={17} className="text-on-surface-variant" /> : <Moon size={17} className="text-on-surface-variant" />}
+                        </div>
+                        <div>
+                          <p className="text-sm font-semibold text-on-surface">{mounted && resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}</p>
+                          <p className="text-[11px] text-on-surface-variant">Switch the vibe instantly</p>
+                        </div>
+                      </div>
+                    </button>
+
+                    <button
+                      onClick={() => { setProfileMenuOpen(false); router.push('/profile'); }}
+                      className="rounded-[20px] px-3.5 py-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-surface-container-high-base) 84%, transparent)',
+                        border: '1px solid var(--glass-border)',
+                      }}
+                    >
+                      <User size={17} className="text-on-surface-variant mb-3" />
+                      <p className="text-sm font-semibold text-on-surface">Profile</p>
+                      <p className="text-[11px] text-on-surface-variant mt-0.5">Your public card</p>
+                    </button>
+
+                    <button
+                      onClick={() => { setProfileMenuOpen(false); router.push('/about'); }}
+                      className="rounded-[20px] px-3.5 py-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-surface-container-high-base) 84%, transparent)',
+                        border: '1px solid var(--glass-border)',
+                      }}
+                    >
+                      <Info size={17} className="text-on-surface-variant mb-3" />
+                      <p className="text-sm font-semibold text-on-surface">About</p>
+                      <p className="text-[11px] text-on-surface-variant mt-0.5">Mission and team</p>
+                    </button>
+                  </div>
+
+                  <div className="my-3 mx-1" style={{ height: '1px', background: 'var(--glass-border)' }} />
+
+                  <button
+                    onClick={async () => {
+                      setProfileMenuOpen(false);
+                      await logout();
+                      router.push('/');
+                    }}
+                    className="w-full rounded-[20px] px-4 py-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                    style={{
+                      background: 'color-mix(in srgb, var(--color-error-base) 10%, var(--color-surface-container-high-base) 90%)',
+                      border: '1px solid color-mix(in srgb, var(--color-error-base) 18%, var(--glass-border) 82%)',
+                    }}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="flex h-9 w-9 items-center justify-center rounded-xl"
+                        style={{ background: 'color-mix(in srgb, var(--color-surface-bright-base) 82%, transparent)', border: '1px solid color-mix(in srgb, var(--color-error-base) 15%, var(--glass-border) 85%)' }}
+                      >
+                        <LogOut size={17} className="text-error" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-error">Log Out</p>
+                        <p className="text-[11px] text-on-surface-variant">End this session</p>
+                      </div>
+                    </div>
+                  </button>
                 </div>
-
-                <button
-                  onClick={() => setTheme(resolvedTheme === 'dark' ? 'light' : 'dark')}
-                  className="w-full px-4 py-2.5 text-left text-sm text-on-surface hover:bg-surface-variant/40 transition-colors flex items-center gap-3 rounded-lg mx-1"
-                  style={{ width: 'calc(100% - 8px)' }}
-                >
-                  {mounted && resolvedTheme === 'dark' ? <Sun size={16} className="text-on-surface-variant" /> : <Moon size={16} className="text-on-surface-variant" />}
-                  {mounted && resolvedTheme === 'dark' ? 'Light Mode' : 'Dark Mode'}
-                </button>
-
-                <button
-                  onClick={() => { setProfileMenuOpen(false); router.push('/profile'); }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-on-surface hover:bg-surface-variant/40 transition-colors flex items-center gap-3 rounded-lg mx-1"
-                  style={{ width: 'calc(100% - 8px)' }}
-                >
-                  <User size={16} className="text-on-surface-variant" />
-                  View Profile
-                </button>
-
-                <button
-                  onClick={() => { setProfileMenuOpen(false); router.push('/about'); }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-on-surface hover:bg-surface-variant/40 transition-colors flex items-center gap-3 rounded-lg mx-1"
-                  style={{ width: 'calc(100% - 8px)' }}
-                >
-                  <Info size={16} className="text-on-surface-variant" />
-                  About Us
-                </button>
-
-                <div className="my-2 mx-3" style={{ height: '1px', background: 'var(--glass-border)' }} />
-
-                <button
-                  onClick={async () => {
-                    setProfileMenuOpen(false);
-                    await logout();
-                    router.push('/');
-                  }}
-                  className="w-full px-4 py-2.5 text-left text-sm text-error hover:bg-error-container/20 transition-colors flex items-center gap-3 font-medium rounded-lg mx-1"
-                  style={{ width: 'calc(100% - 8px)' }}
-                >
-                  <LogOut size={16} />
-                  Log Out
-                </button>
-              </div>
+              </motion.div>
             )}
+            </AnimatePresence>
           </div>
         </div>
       </div>
