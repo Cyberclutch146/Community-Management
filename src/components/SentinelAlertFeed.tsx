@@ -1,7 +1,7 @@
 'use client';
 
 import { SentinelAlert } from '@/types/sentinel';
-import { AlertTriangle, CloudRain, Activity, MessageCircle, ExternalLink, Filter } from 'lucide-react';
+import { AlertTriangle, CloudRain, Activity, MessageCircle, ExternalLink, Filter, Newspaper } from 'lucide-react';
 import { useState, useMemo } from 'react';
 
 interface SentinelAlertFeedProps {
@@ -28,6 +28,7 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
       case 'WEATHER': return <CloudRain className={`h-4 w-4 ${severity === 'Extreme' ? 'text-red-600 dark:text-red-400' : 'text-blue-500 dark:text-blue-400'}`} />;
       case 'SEISMIC': return <Activity className="h-4 w-4 text-red-500 dark:text-red-400" />;
       case 'SOCIAL': return <MessageCircle className="h-4 w-4 text-purple-500 dark:text-purple-400" />;
+      case 'NEWS': return <Newspaper className="h-4 w-4 text-amber-600 dark:text-amber-400" />;
       default: return <AlertTriangle className="h-4 w-4 text-amber-500 dark:text-amber-400" />;
     }
   };
@@ -44,35 +45,48 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
 
   if (!alerts || alerts.length === 0) {
     return (
-      <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-sm border border-slate-200/60 dark:border-zinc-800/60 p-10 text-center text-slate-500 dark:text-slate-400">
-        <Activity className="h-10 w-10 mx-auto text-slate-300 dark:text-zinc-600 mb-3" />
-        <p className="font-medium text-slate-700 dark:text-slate-300 text-sm">No active alerts detected.</p>
+      <div className="rounded-[24px] p-10 text-center text-on-surface-variant" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
+        <Activity className="h-10 w-10 mx-auto mb-3" style={{ color: 'var(--color-outline-base)' }} />
+        <p className="font-semibold text-on-surface text-sm">No active alerts detected.</p>
         <p className="text-xs mt-1">The community sentinel is monitoring data streams.</p>
       </div>
     );
   }
 
   return (
-    <div className="bg-transparent overflow-hidden flex flex-col h-full rounded-2xl">
-      <div className="p-3 md:p-4 bg-white dark:bg-zinc-900 flex flex-col gap-3 border-b border-slate-100 dark:border-zinc-800 z-10 relative">
-        <div className="flex items-center justify-between">
-          <h2 className="font-serif text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2 tracking-tight">
-            <Activity className="h-5 w-5 text-emerald-800 dark:text-emerald-500" />
+    <div className="overflow-hidden flex flex-col h-full rounded-[24px]" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
+      <div className="p-4 md:p-5 flex flex-col gap-4 border-b z-10 relative" style={{ borderColor: 'var(--glass-border)', background: 'linear-gradient(180deg, var(--glass-bg-strong), var(--glass-bg))' }}>
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-headline text-xl font-bold text-on-surface flex items-center gap-2 tracking-tight">
+            <Activity className="h-5 w-5" style={{ color: 'var(--color-primary-base)' }} />
             Live Sentinel Feed
-          </h2>
-          <span className="text-[10px] text-emerald-800 dark:text-emerald-400 font-bold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-full border border-emerald-200/50 dark:border-emerald-800/50 shadow-sm uppercase tracking-wider">
+            </h2>
+            <p className="mt-1 text-xs text-on-surface-variant">Curated field signals across weather, seismic, social, and regional news sources.</p>
+          </div>
+          <span className="text-[10px] font-bold px-2.5 py-1 rounded-full shadow-sm uppercase tracking-wider" style={{ color: 'var(--color-primary-base)', background: 'rgba(59,107,74,0.08)', border: '1px solid rgba(59,107,74,0.12)' }}>
             {filteredAlerts.length} Active
           </span>
         </div>
         
         {/* Filters */}
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          <Filter className="h-3 w-3 text-slate-300 dark:text-zinc-600 shrink-0 mr-1" />
-          {['ALL', 'WEATHER', 'SEISMIC', 'SOCIAL'].map(type => (
+          <Filter className="h-3 w-3 shrink-0 mr-1" style={{ color: 'var(--color-outline-base)' }} />
+          {['ALL', 'WEATHER', 'SEISMIC', 'SOCIAL', 'NEWS'].map(type => (
              <button
                key={type}
                onClick={() => { setFilterType(type); setPage(1); }}
-               className={`shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-md transition-all duration-300 border ${filterType === type ? 'bg-emerald-800 dark:bg-emerald-600 text-white border-emerald-800 dark:border-emerald-600 shadow-sm' : 'bg-white dark:bg-zinc-900 text-slate-500 dark:text-slate-400 border-slate-200 dark:border-zinc-700 hover:border-emerald-800/30 dark:hover:border-emerald-500/30 hover:text-emerald-800 dark:hover:text-emerald-400'}`}
+               className="shrink-0 px-3 py-1.5 text-[10px] uppercase tracking-wider font-bold rounded-full transition-all duration-300 border"
+               style={filterType === type ? {
+                 background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                 color: 'var(--color-on-primary-base)',
+                 borderColor: 'transparent',
+                 boxShadow: '0 2px 8px rgba(59,107,74,0.2)',
+               } : {
+                 background: 'var(--glass-bg-strong)',
+                 color: 'var(--color-on-surface-variant-base)',
+                 borderColor: 'var(--glass-border)',
+               }}
              >
                {type}
              </button>
@@ -80,18 +94,30 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
         </div>
       </div>
       
-      <div className="overflow-y-auto flex-1 p-2 md:p-3 space-y-3 bg-slate-50/50 dark:bg-zinc-950/50">
+      <div className="overflow-y-auto flex-1 p-3 md:p-4 space-y-3 bg-transparent">
         {paginatedAlerts.map((alert) => (
-          <div key={alert.id} className="p-4 bg-white dark:bg-zinc-900 rounded-xl shadow-sm border border-slate-200/60 dark:border-zinc-800/60 hover:shadow-md hover:border-emerald-800/30 dark:hover:border-emerald-500/30 transition-all duration-300 group relative overflow-hidden">
-            <div className="absolute top-0 left-0 w-1 h-full bg-emerald-800 dark:bg-emerald-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          <div
+            key={alert.id}
+            className="p-4 rounded-[22px] transition-all duration-300 group relative overflow-hidden hover:-translate-y-0.5"
+            style={{
+              background: 'var(--glass-bg-strong)',
+              border: '1px solid var(--glass-border)',
+              boxShadow: 'var(--glass-shadow)',
+            }}
+          >
+            <div className="absolute inset-x-0 top-0 h-px opacity-70" style={{ background: 'linear-gradient(90deg, transparent, rgba(59,107,74,0.22), transparent)' }} />
             <div className="flex justify-between items-start mb-2 gap-3">
               <div className="flex items-start gap-3">
-                <div className="mt-0.5 text-slate-400 dark:text-zinc-500 group-hover:text-emerald-800 dark:group-hover:text-emerald-500 transition-colors duration-300">
+                <div className="mt-0.5 rounded-xl p-2 transition-colors duration-300" style={{ background: 'rgba(59,107,74,0.06)' }}>
                   {getIcon(alert.type, alert.severity)}
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm text-slate-800 dark:text-slate-200 leading-tight group-hover:text-emerald-800 dark:group-hover:text-emerald-400 transition-colors">{alert.title}</h3>
-                  <p className="text-[10px] uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-1 font-medium">{alert.locationName}</p>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-[0.16em] text-on-surface-variant">{alert.type}</span>
+                    <span className="h-1 w-1 rounded-full bg-on-surface-variant/30" />
+                    <p className="text-[10px] uppercase tracking-[0.16em] text-on-surface-variant font-medium">{alert.locationName}</p>
+                  </div>
+                  <h3 className="mt-1 font-semibold text-sm text-on-surface leading-tight group-hover:text-primary transition-colors">{alert.title}</h3>
                 </div>
               </div>
               <div>
@@ -99,17 +125,23 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
               </div>
             </div>
             
-            <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 line-clamp-2 pl-8 leading-relaxed group-hover:text-slate-800 dark:group-hover:text-slate-300 transition-colors">
+            <p className="text-xs text-on-surface-variant mt-3 line-clamp-2 pl-[3.25rem] leading-relaxed group-hover:text-on-surface transition-colors">
               {alert.description}
             </p>
             
-            <div className="flex items-center justify-between mt-3 pl-8 border-t border-slate-100 dark:border-zinc-800/60 pt-3">
-              <span className="text-[10px] text-slate-400 dark:text-zinc-500 font-bold uppercase tracking-wider">
+            <div className="flex items-center justify-between mt-4 pl-[3.25rem] border-t pt-3" style={{ borderColor: 'rgba(42,45,43,0.08)' }}>
+              <span className="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider">
                 {alert.source} • {new Date(alert.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
               
               {alert.url && (
-                <a href={alert.url} target="_blank" rel="noopener noreferrer" className="text-[10px] text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 flex items-center gap-1 font-semibold transition-colors bg-slate-50 dark:bg-zinc-800/50 px-2 py-1 rounded border border-slate-200/60 dark:border-zinc-700 hover:border-emerald-800/30 dark:hover:border-emerald-500/30">
+                <a
+                  href={alert.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] flex items-center gap-1 font-semibold transition-colors px-2.5 py-1.5 rounded-full border"
+                  style={{ color: 'var(--color-on-surface-variant-base)', background: 'var(--glass-bg)', borderColor: 'var(--glass-border)' }}
+                >
                   Source <ExternalLink className="h-3 w-3" />
                 </a>
               )}
@@ -118,8 +150,8 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
         ))}
         
         {paginatedAlerts.length === 0 && (
-          <div className="text-center py-12 text-slate-500 dark:text-slate-400 text-xs font-medium">
-             <Activity className="h-8 w-8 mx-auto text-slate-300 dark:text-zinc-600 mb-3 opacity-50" />
+          <div className="text-center py-12 text-on-surface-variant text-xs font-medium">
+             <Activity className="h-8 w-8 mx-auto mb-3 opacity-50" style={{ color: 'var(--color-outline-base)' }} />
              No active alerts match the selected filter.
           </div>
         )}
@@ -128,7 +160,12 @@ export default function SentinelAlertFeed({ alerts }: SentinelAlertFeedProps) {
           <div className="pt-2 pb-6 flex justify-center relative z-10">
             <button 
               onClick={() => setPage(p => p + 1)}
-              className="bg-white dark:bg-zinc-900 border border-slate-200 dark:border-zinc-700 text-slate-600 dark:text-slate-400 hover:bg-emerald-800 dark:hover:bg-emerald-600 hover:text-white dark:hover:text-white hover:border-emerald-800 dark:hover:border-emerald-600 font-semibold py-2 px-6 rounded-lg shadow-sm transition-all duration-300 text-xs tracking-wide uppercase"
+              className="font-semibold py-2.5 px-6 rounded-full transition-all duration-300 text-xs tracking-wide uppercase hover:-translate-y-0.5"
+              style={{
+                background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                color: 'var(--color-on-primary-base)',
+                boxShadow: '0 4px 14px rgba(59,107,74,0.22)',
+              }}
             >
               Load More Alerts
             </button>
