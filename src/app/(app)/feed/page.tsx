@@ -305,7 +305,7 @@ function FeedContent() {
         <div className="relative z-30 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8 animate-fade-in-up">
           <div>
             <p className="text-secondary font-semibold mb-1 text-sm uppercase tracking-wider">Local Events Feed</p>
-            <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Discover & Support</h2>
+            <h2 className="text-4xl md:text-5xl font-serif tracking-tight text-gradient-earth">Discover & Support</h2>
             <p className="mt-3 text-on-surface-variant max-w-xl leading-relaxed">
               Find local community events and support neighbors in need.
             </p>

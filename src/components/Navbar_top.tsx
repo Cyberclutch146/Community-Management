@@ -8,8 +8,17 @@ import { useState, useRef, useEffect } from 'react'
 import { useTheme } from 'next-themes'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getUserAvatar } from '@/lib/avatar'
+import { SentinelAlert } from '@/types/sentinel'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
+
+type NavNotification = {
+  id: string
+  title: string
+  body: string
+  path: string
+  tone: 'alert' | 'info' | 'success'
+}
 
 export default function NavbarTop() {
   const router = useRouter()
@@ -20,8 +29,11 @@ export default function NavbarTop() {
   const [searchOpen, setSearchOpen] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
+  const [notificationMenuOpen, setNotificationMenuOpen] = useState(false)
+  const [notifications, setNotifications] = useState<NavNotification[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
+  const notificationRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -40,10 +52,77 @@ export default function NavbarTop() {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setProfileMenuOpen(false)
       }
+      if (notificationRef.current && !notificationRef.current.contains(event.target as Node)) {
+        setNotificationMenuOpen(false)
+      }
     }
     document.addEventListener('mousedown', handleClickOutside)
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    const cancelled = { current: false }
+
+    const loadNotifications = async () => {
+      const nextNotifications: NavNotification[] = []
+
+      if (!profile?.profileComplete) {
+        nextNotifications.push({
+          id: 'complete-profile',
+          title: 'Complete your profile',
+          body: 'Add your skills and location to unlock better event matching.',
+          path: '/profile',
+          tone: 'info',
+        })
+      }
+
+      try {
+        const res = await fetch('/api/sentinel')
+        if (res.ok) {
+          const alerts: SentinelAlert[] = await res.json()
+          alerts
+            .filter((alert) => alert.severity === 'Extreme' || alert.severity === 'Severe')
+            .slice(0, 3)
+            .forEach((alert) => {
+              nextNotifications.push({
+                id: alert.id,
+                title: `${alert.severity} ${alert.type.toLowerCase()} alert`,
+                body: alert.title,
+                path: '/dashboard/sentinel',
+                tone: 'alert',
+              })
+            })
+        }
+      } catch {
+        nextNotifications.push({
+          id: 'sentinel-unavailable',
+          title: 'Sentinel temporarily unavailable',
+          body: 'Live alert data could not be refreshed just now.',
+          path: '/dashboard/sentinel',
+          tone: 'info',
+        })
+      }
+
+      if (nextNotifications.length === 0) {
+        nextNotifications.push({
+          id: 'all-clear',
+          title: 'All quiet for now',
+          body: 'No critical Sentinel alerts and your account is up to date.',
+          path: '/dashboard/sentinel',
+          tone: 'success',
+        })
+      }
+
+      if (!cancelled.current) {
+        setNotifications(nextNotifications)
+      }
+    }
+
+    loadNotifications()
+    return () => {
+      cancelled.current = true
+    }
+  }, [profile?.profileComplete])
 
   const handleSearch = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -82,6 +161,26 @@ export default function NavbarTop() {
   const isLinkActive = (link: typeof navLinks[0]) => {
     if (link.exact) return pathname === link.path
     return pathname.startsWith(link.path)
+  }
+
+  const unreadCount = notifications.filter((notification) => notification.tone !== 'success').length
+
+  const notificationToneStyles: Record<NavNotification['tone'], { accent: string; background: string; border: string }> = {
+    alert: {
+      accent: 'var(--color-error-base)',
+      background: 'rgba(184,50,48,0.08)',
+      border: 'rgba(184,50,48,0.14)',
+    },
+    info: {
+      accent: 'var(--color-primary-base)',
+      background: 'rgba(59,107,74,0.08)',
+      border: 'rgba(59,107,74,0.14)',
+    },
+    success: {
+      accent: 'var(--color-warm-amber)',
+      background: 'rgba(212,168,82,0.1)',
+      border: 'rgba(212,168,82,0.16)',
+    },
   }
 
   return (
@@ -172,10 +271,103 @@ export default function NavbarTop() {
             </button>
           )}
 
-          <button className="p-2 rounded-full hover:bg-surface-container/50 transition-all duration-200 active:scale-95 relative">
-            <Bell size={scrolled ? 16 : 17} />
-            <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[var(--color-terracotta)] ring-2 ring-[var(--glass-bg-strong)]" />
-          </button>
+          <div className="relative" ref={notificationRef}>
+            <button
+              onClick={() => setNotificationMenuOpen((open) => !open)}
+              className="p-2 rounded-full hover:bg-surface-container/50 transition-all duration-200 active:scale-95 relative"
+            >
+              <Bell size={scrolled ? 16 : 17} />
+              {unreadCount > 0 && (
+                <span className="absolute top-1.5 right-1.5 min-w-[0.5rem] h-2 rounded-full bg-[var(--color-terracotta)] ring-2 ring-[var(--glass-bg-strong)] px-1 text-[9px] leading-none flex items-center justify-center text-white font-bold">
+                  {unreadCount > 9 ? '9+' : unreadCount}
+                </span>
+              )}
+            </button>
+
+            <AnimatePresence>
+              {notificationMenuOpen && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10, scale: 0.96 }}
+                  animate={{ opacity: 1, y: 0, scale: 1 }}
+                  exit={{ opacity: 0, y: -8, scale: 0.97 }}
+                  transition={{ duration: 0.18, ease: 'easeOut' }}
+                  className="absolute right-0 mt-3 w-[21rem] overflow-hidden rounded-[28px] z-50 origin-top-right"
+                  style={{
+                    background: 'var(--color-surface-base)',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: 'var(--glass-shadow-lg)',
+                  }}
+                >
+                  <div className="p-3">
+                    <div
+                      className="rounded-[22px] p-4"
+                      style={{
+                        background: 'linear-gradient(135deg, rgba(59,107,74,0.16), rgba(139,109,46,0.1) 55%, color-mix(in srgb, var(--color-surface-base) 92%, transparent) 100%)',
+                        border: '1px solid var(--glass-border)',
+                      }}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-on-surface-variant">Notifications</p>
+                          <p className="mt-1 text-base font-semibold text-on-surface">What needs your attention</p>
+                        </div>
+                        <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ background: 'rgba(59,107,74,0.08)', color: 'var(--color-primary-base)', border: '1px solid rgba(59,107,74,0.12)' }}>
+                          {notifications.length}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="mt-3 space-y-2">
+                      {notifications.map((notification) => {
+                        const tone = notificationToneStyles[notification.tone]
+                        return (
+                          <button
+                            key={notification.id}
+                            onClick={() => {
+                              setNotificationMenuOpen(false)
+                              router.push(notification.path)
+                            }}
+                            className="w-full rounded-[20px] p-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                            style={{
+                              background: tone.background,
+                              border: `1px solid ${tone.border}`,
+                            }}
+                          >
+                            <div className="flex items-start gap-3">
+                              <span
+                                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+                                style={{ background: 'color-mix(in srgb, var(--color-surface-bright-base) 82%, transparent)', color: tone.accent, border: `1px solid ${tone.border}` }}
+                              >
+                                <Bell size={15} />
+                              </span>
+                              <div className="min-w-0">
+                                <p className="text-sm font-semibold text-on-surface">{notification.title}</p>
+                                <p className="mt-1 text-[11px] leading-relaxed text-on-surface-variant">{notification.body}</p>
+                              </div>
+                            </div>
+                          </button>
+                        )
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setNotificationMenuOpen(false)
+                        router.push('/dashboard/sentinel')
+                      }}
+                      className="mt-3 w-full rounded-[20px] px-4 py-3 text-sm font-semibold text-on-primary transition-all duration-200 hover:-translate-y-0.5"
+                      style={{
+                        background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                        boxShadow: '0 4px 14px rgba(59,107,74,0.22)',
+                      }}
+                    >
+                      Open Sentinel Center
+                    </button>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
 
           <div className="relative" ref={menuRef}>
             <button

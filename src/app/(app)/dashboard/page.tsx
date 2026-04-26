@@ -87,7 +87,7 @@ export default function DashboardPage() {
   return (
     <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
       <div className="mb-10 animate-fade-in-up">
-        <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Your Community Impact</h2>
+        <h2 className="text-4xl md:text-5xl font-serif tracking-tight text-gradient-earth">Your Community Impact</h2>
         <p className="text-on-surface-variant font-medium mt-2">
           Welcome back, {profile?.displayName || 'Organizer'}. Here&apos;s a snapshot of your local support efforts.
         </p>

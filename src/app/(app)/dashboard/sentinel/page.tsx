@@ -92,11 +92,11 @@ export default function SentinelDashboardPage() {
               <Radio className="h-3.5 w-3.5" />
               Live monitoring
             </div>
-            <h1 className="mt-4 flex items-center gap-3 text-2xl md:text-4xl font-headline font-bold tracking-tight text-gradient-earth">
+            <h1 className="mt-4 flex items-center gap-3">
               <span className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}>
                 <ShieldAlert className="h-5 w-5 md:h-6 md:w-6" />
               </span>
-              Community Sentinel
+              <span className="text-4xl md:text-5xl font-serif tracking-tight text-gradient-earth">Community Sentinel</span>
             </h1>
             <p className="mt-3 max-w-2xl text-sm md:text-base leading-relaxed text-on-surface-variant">
               Track live safety signals around your community with a premium situational view for organizers, volunteers, and rapid-response teams.
