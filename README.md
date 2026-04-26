@@ -5,7 +5,7 @@
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-1.5_Flash-4285F4?style=for-the-badge&logo=google-gemini)](https://ai.google.dev/)
 
-**Kindred Relief Network** is a professional, community-centric platform engineered to streamline disaster relief, volunteer coordination, and mutual aid. It combines real-time situational awareness with intelligent matchmaking to empower communities when they need it most.
+**Kindred Relief Network** is a comprehensive, professional, community-centric platform engineered to streamline disaster relief, volunteer coordination, and mutual aid. It combines real-time situational awareness with intelligent matchmaking to empower communities when they need it most. Designed with a focus on speed, compassion, and automation, KRN empowers local communities and NGOs to organize efficiently during critical times.
 
 ---
 
@@ -21,33 +21,84 @@
 *   **Match Clarity**: Dynamic "Why it's a match" insights for every recommended event.
 *   **Capacity Handling**: Optimized to show up to 6 high-relevance matches at a glance.
 
+### 📢 Event & Campaign Management
+* **Intelligent Event Creation**: Quickly set up relief campaigns or events with titles, descriptions, and specific needs. Features an AI-powered description generator to formulate compelling campaign messages.
+* **Interactive Resource Tracking**: Real-time progress tracking for funding goals and volunteer registration.
+* **Interactive Mapping**: Integrated geospatial mapping (using Leaflet & OpenStreetMap) displaying real-time proximity of events and "Sentinel" hazard overlays to users.
+
+### 🤖 AI-Native Operations
+*   **24/7 AI Guide**: A persistent Gemini-powered assistant to answer platform questions and guide volunteer signups.
+*   **Generative Event Tools**: AI-assisted generation for professional event descriptions and promotional imagery.
+*   **Smart Skill Matching**: Dynamic banners and feeds that recommend specific volunteering tasks based on user profile skills.
+
+### 💬 Real-Time Coordination & Alerts
+* **Sentinel Alert System**: Active tracking and mapping of emergency/relief zones to send immediate, automated visual notifications across the feed and dashboards.
+* **Community Chat Rooms**: Dedicated Firestore-backed real-time chat spaces for event volunteers to coordinate effectively.
+
+### 🚀 Automated Bulk Communications
+* **Multi-Channel Promos**: Built-in promotion service that supports bulk parsing of `.csv` and `.xlsx` contact files.
+* **Email & SMS Automation**: Delivers automated event invitations and updates utilizing **Nodemailer** (Email) and **Twilio** (SMS) simultaneously.
+* **Firebase Audit Logs**: Ensures every promotion outcome is reliably logged within Firestore.
+
 ### 🔐 Verified Volunteer Ecosystem
 *   **Email OTP Verification**: Secure, real-world verification via **Nodemailer** to ensure valid participants.
 *   **Digital Tickets**: Automated delivery of confirmation emails containing unique **QR codes** for seamless event check-ins.
 *   **Volunteer Leaderboard**: Gamified "Community Heroes" system to recognize top contributors.
 
-### 🤖 AI-Native Operations
-*   **24/7 AI Guide**: A persistent Gemini-powered assistant to answer platform questions and guide volunteer signups.
-*   **Generative Event Tools**: AI-assisted generation for professional event descriptions and promotional imagery.
-*   **Event Promotion**: Integrated **Twilio** support for multi-channel campaign outreach.
+### 💳 Donations & Financial Integrations
+* **Razorpay Integration**: Secure, seamless in-app donation panel for funding campaigns, complete with order creation and fulfillment endpoints.
 
 ---
 
 ## 🛠 Technical Excellence
 
-### Core Stack
-- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router, Turbopack, React 19)
-- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/) with a custom **Glassmorphism Design System**
-- **Database**: [Cloud Firestore](https://firebase.google.com/docs/firestore) (Real-time NoSQL)
-- **Auth**: [Firebase Authentication](https://firebase.google.com/docs/auth)
-- **AI**: [Google Generative AI](https://ai.google.dev/) (Gemini 1.5 Flash)
-- **Payments**: [Razorpay](https://razorpay.com/) integration for secure donations
+| Category         | Technologies Used                                                                                   |
+| ---------------- | --------------------------------------------------------------------------------------------------- |
+| **Framework**    | [Next.js 16](https://nextjs.org/) (App Router, Turbopack) & [React 19](https://react.dev/)          |
+| **Language**     | TypeScript                                                                                          |
+| **Styling**      | [Tailwind CSS 4](https://tailwindcss.com/) & [Framer Motion](https://www.framer.com/motion/)        |
+| **Database**     | [Firebase](https://firebase.google.com/) (Firestore, Auth, Admin SDK)                               |
+| **AI Engines**   | [Google Generative AI (Gemini 1.5+)](https://ai.google.dev/) & [OpenAI API](https://openai.com/)    |
+| **Payments**     | [Razorpay](https://razorpay.com/)                                                                   |
+| **Mapping**      | [Leaflet](https://leafletjs.com/) & [React-Leaflet](https://react-leaflet.js.org/)                  |
+| **Comms/Parser** | [Twilio](https://twilio.com/), [Nodemailer](https://nodemailer.com/), CSV-Parser, Papaparse, XLSX   |
 
-### Supporting Technologies
-- **Animations**: [Framer Motion](https://www.framer.com/motion/) for smooth, premium transitions
-- **Mapping**: [Leaflet](https://leafletjs.com/) & [React Leaflet](https://react-leaflet.js.org/)
-- **Email**: [Nodemailer](https://nodemailer.com/) (Gmail SMTP)
-- **Communication**: [Twilio API](https://www.twilio.com/) for SMS/Voice
+---
+
+## 🏗 Architecture & Process Flows
+
+### High-Level System Architecture
+```mermaid
+graph TD
+    Client[Next.js Frontend Client] -->|API Requests| NextAPI[Next.js Serverless API Routes]
+    Client -->|Direct Read/Write| Firestore[(Firebase Firestore)]
+    Client -->|Auth State| FirebaseAuth[Firebase Authentication]
+    
+    NextAPI -->|Event Data & Logs| FirestoreAdmin[(Firebase Admin SDK)]
+    NextAPI -->|Emails| Nodemailer[Nodemailer Service]
+    NextAPI -->|SMS| Twilio[Twilio Service]
+    NextAPI -->|AI Prompts| LLM[Google Gemini / OpenAI]
+    NextAPI -->|Payments| Razorpay[Razorpay API]
+```
+
+### Event Creation & Bulk Promotion Flow
+```mermaid
+sequenceDiagram
+    participant Organizer
+    participant Frontend
+    participant PromotionAPI
+    participant EmailSMS (Twilio/NodeMailer)
+    participant Database
+
+    Organizer->>Frontend: Creates Event & Uploads CSV/Excel Contacts
+    Frontend->>Frontend: Parses CSV/XLSX locally or via API
+    Frontend->>PromotionAPI: Sends Batch Contacts & Message Templates
+    PromotionAPI->>EmailSMS: Dispatch Bulk Emails & SMS in parallel
+    EmailSMS-->>PromotionAPI: Delivery Status / Callbacks
+    PromotionAPI->>Database: Log successful deliveries & errors
+    Database-->>Frontend: Real-time update on delivery progress
+    Frontend-->>Organizer: Promotion Summary & Success Notifications
+```
 
 ---
 
@@ -55,17 +106,20 @@
 
 ```text
 ├── src/
-│   ├── app/                # Next.js App Router
-│   │   ├── (app)/          # Main App Views (Dashboard, Feed, Home)
-│   │   ├── (auth)/         # Authentication flows
-│   │   └── api/            # Serverless Functions (Sentinel, Payments, AI)
-│   ├── components/         # Premium UI Components (Glassmorphism)
-│   ├── context/            # Global State (AuthContext)
-│   ├── services/           # Backend Logic (Email, Recommendations, Firebase)
+│   ├── app/                # Next.js App Router (Pages, Layouts & APIs)
+│   │   ├── (app)/          # Main App Views (Dashboard, Feed, Profile)
+│   │   ├── (marketing)/    # Public routes (Landing, Login, Register)
+│   │   └── api/            # Serverless Functions (Sentinel, Payments, AI, Promote)
+│   ├── components/         # Reusable Premium UI Components (Glassmorphism, Modals, Maps, AI Widgets)
+│   ├── context/            # Global State (AuthContext, Theme)
+│   ├── lib/                # External library configurations (Firebase, Razorpay, OpenAI)
+│   ├── services/           # Backend Logic (EventService, Email, Recommendation, SMS, AI)
 │   ├── types/              # TypeScript Interfaces
+│   ├── utils/              # Helper functions (Geo-calculations, formatters)
 │   └── styles/             # Global CSS & Tailwind Config
 ├── public/                 # Static Assets & Icons
-└── firebase.json           # Firebase Deployment Config
+├── firebase.json           # Firebase Deployment Config
+└── tailwind.config.ts      # Tailwind styling definitions
 ```
 
 ---
@@ -80,30 +134,32 @@
 - Twilio Account (Optional)
 
 ### 2. Environment Variables
-Create a `.env.local` in the root and configure the following:
+Create a `.env` or `.env.local` file in the root directory and add your credentials. Refer to the expected variables below:
 
 ```env
-# Firebase
-NEXT_PUBLIC_FIREBASE_API_KEY=...
-NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=...
-NEXT_PUBLIC_FIREBASE_PROJECT_ID=...
-NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=...
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=...
-NEXT_PUBLIC_FIREBASE_APP_ID=...
+# Firebase Configuration
+NEXT_PUBLIC_FIREBASE_API_KEY=your_api_key
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=your_project.firebaseapp.com
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=your_project_id
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=your_project.firebasestorage.app
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
+NEXT_PUBLIC_FIREBASE_APP_ID=your_app_id
 
-# AI & Communication
-GEMINI_API_KEY_AI_CHAT_BOT=...
-TWILIO_SID=...
-TWILIO_AUTH=...
-TWILIO_PHONE=...
+# AI Integrations
+GEMINI_API_KEY=your_gemini_api_key
+OPENAI_API_KEY=your_openai_api_key
+GEMINI_API_KEY_AI_CHAT_BOT=your_gemini_api_key_for_bot
 
-# Email (SMTP)
+# Communications (Email / SMS)
 EMAIL=your-email@gmail.com
 EMAIL_PASS=your-google-app-password
+TWILIO_SID=your_twilio_sid
+TWILIO_AUTH=your_twilio_auth_token
+TWILIO_PHONE=your_twilio_phone
 
 # Payments
-RAZORPAY_KEY_ID=...
-RAZORPAY_KEY_SECRET=...
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_secret
 ```
 
 ### 3. Installation
