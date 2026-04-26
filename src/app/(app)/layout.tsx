@@ -4,6 +4,7 @@ import NavbarTop from '@/components/Navbar_top';
 import { Toaster } from 'sonner';
 import DynamicBackground from '@/components/DynamicBackground';
 import AIChatWidget from '@/components/AIChatWidget';
+import AppAccessGate from '@/components/AppAccessGate';
 
 export const metadata: Metadata = {
   title: 'Home - Outreach & Relief',
@@ -26,7 +27,7 @@ export default function AppLayout({
           <div className="md:hidden">
             <MobileHeader />
           </div>
-          {children}
+          <AppAccessGate>{children}</AppAccessGate>
         </div>
         <AIChatWidget />
         <MobileBottomNav />
