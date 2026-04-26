@@ -9,6 +9,8 @@ import SkillMatchBanner from '@/components/SkillMatchBanner';
 import { CommunityEvent } from '@/types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { Sparkles } from 'lucide-react';
+import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
+import { SentinelAlert } from '@/types/sentinel';
 
 const PAGE_SIZE = 12;
 
@@ -46,6 +48,7 @@ function FeedContent() {
   ];
 
   const [events, setEvents] = useState<CommunityEvent[]>([]);
+  const [alerts, setAlerts] = useState<any[]>([]); // Sentinel Alerts
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
@@ -77,19 +80,23 @@ function FeedContent() {
   }, []);
 
   useEffect(() => {
-    const fetchEvents = async () => {
+    const fetchEventsAndAlerts = async () => {
       try {
-        const result = await getEvents(PAGE_SIZE);
-        setEvents(result.events);
-        lastDocRef.current = result.lastDoc;
-        setHasMore(result.hasMore);
+        const [eventsResult, alertsResult] = await Promise.all([
+           getEvents(PAGE_SIZE),
+           fetch('/api/sentinel').then(res => res.ok ? res.json() : [])
+        ]);
+        setEvents(eventsResult.events);
+        setAlerts(alertsResult);
+        lastDocRef.current = eventsResult.lastDoc;
+        setHasMore(eventsResult.hasMore);
       } catch (error) {
-        console.error("Failed to fetch events:", error);
+        console.error("Failed to fetch data:", error);
       } finally {
         setLoading(false);
       }
     };
-    fetchEvents();
+    fetchEventsAndAlerts();
   }, []);
 
   // Semantic search effect with debounce
@@ -283,7 +290,7 @@ function FeedContent() {
         </div>
       ) : viewMode === 'map' ? (
         <div className="h-[600px] w-full mt-4">
-          <MapWrapper events={filteredEvents} />
+          <MapWrapper events={filteredEvents} alerts={alerts} />
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-dense">
@@ -295,6 +302,20 @@ function FeedContent() {
               imageUrl: imageUrl,
             };
 
+            // Compute overlapping alerts
+            const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
+              if (!event.lat || !event.lng) return false;
+              
+              if (alert.polygon && alert.polygon.length > 0) {
+                return isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon);
+              } else if (alert.coordinates) {
+                // 30 mile radius for point alerts
+                const dist = getDistanceMiles(event.lat, event.lng, alert.coordinates.lat, alert.coordinates.lng);
+                return dist <= 30;
+              }
+              return false;
+            });
+
             // Create a neat bento box pattern: stagger the large cards
             const bentoPattern = [0, 4, 7, 11];
             const isFeatured = bentoPattern.includes(index % 12);
@@ -304,6 +325,7 @@ function FeedContent() {
                 key={event.id} 
                 event={normalizedEvent} 
                 featured={isFeatured}
+                sentinelAlerts={intersectingAlerts}
               />
             );
           })}

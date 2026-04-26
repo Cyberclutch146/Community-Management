@@ -2,7 +2,9 @@
 
 import dynamic from 'next/dynamic';
 
-const MapWrapper = dynamic(() => import('./MapArea'), { 
+import { SentinelAlert } from '@/types/sentinel';
+
+const MapAreaComponent = dynamic(() => import('./MapArea'), { 
   ssr: false,
   loading: () => (
     <div className="h-full w-full bg-[#f0eee9] animate-pulse rounded-2xl flex items-center justify-center text-[#1f3d2b]/40 border border-black/5 shadow-sm">
@@ -17,4 +19,6 @@ const MapWrapper = dynamic(() => import('./MapArea'), {
   )
 });
 
-export default MapWrapper;
+export default function MapWrapper(props: any) {
+  return <MapAreaComponent {...props} />;
+}

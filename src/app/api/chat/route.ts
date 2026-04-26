@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { getAllEvents } from "@/services/aiTools";
 import { AI_FUNCTION_DECLARATIONS, executeFunction } from "@/services/aiActions";
+import { getAllSentinelAlerts } from "@/services/sentinelService";
 
 export async function POST(req: Request) {
   try {
@@ -30,7 +31,11 @@ export async function POST(req: Request) {
     }
 
     // Fetch live events to provide context to Gemini
-    const events = await getAllEvents();
+    const [events, sentinelAlerts] = await Promise.all([
+      getAllEvents(),
+      getAllSentinelAlerts().catch(() => []) // fail gracefully
+    ]);
+    
     const eventContext = events
       .map((e) => {
         let needsStr = [];
@@ -53,6 +58,10 @@ export async function POST(req: Request) {
         }`
       : "\nThe user is not logged in.";
 
+    const sentinelContext = sentinelAlerts.length > 0 
+      ? `\nCURRENT SENTINEL SAFETY ALERTS IN EFFECT:\n` + sentinelAlerts.map((a: any) => `- ${a.severity} ${a.type}: ${a.title} (${a.description})`).join("\n") + `\nAlways warn users about these active safety alerts when relevant to events.`
+      : "";
+
     const systemInstruction = `You are the Kindred Relief Network AI Assistant. 
 You are a helpful, empathetic, and encouraging assistant for a community event and volunteering platform.
 Your primary goal is to help users discover events, learn how to volunteer or donate, and guide them on organizing new events.
@@ -61,6 +70,7 @@ ${userContext}
 
 Here is the list of CURRENTLY LIVE events on the platform:
 ${eventContext || "No active events right now."}
+${sentinelContext}
 
 IMPORTANT INSTRUCTIONS:
 - When users ask for events, recommend specific live events. Be conversational and natural.

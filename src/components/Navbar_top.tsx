@@ -106,9 +106,16 @@ export default function NavbarTop() {
 
         <button
           onClick={() => router.push('/dashboard')}
-          className={`pb-1 border-b-2 ${pathname.startsWith('/dashboard') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+          className={`pb-1 border-b-2 ${pathname === '/dashboard' ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
           Dashboard
+        </button>
+
+        <button
+          onClick={() => router.push('/dashboard/sentinel')}
+          className={`pb-1 border-b-2 ${pathname.startsWith('/dashboard/sentinel') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
+        >
+          Sentinel
         </button>
       </div>
 
