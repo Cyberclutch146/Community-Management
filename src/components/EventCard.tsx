@@ -10,9 +10,12 @@ interface EventCardProps {
   event: CommunityEvent;
   featured?: boolean;
   sentinelAlerts?: SentinelAlert[];
+  recommendationScore?: number;
+  recommendationPercentage?: number;
+  matchedSkills?: string[];
 }
 
-export function EventCard({ event, featured = false, sentinelAlerts = [] }: EventCardProps) {
+export function EventCard({ event, featured = false, sentinelAlerts = [], recommendationPercentage, matchedSkills = [] }: EventCardProps) {
   const hasAlerts = sentinelAlerts.length > 0;
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [descriptionLineClamp, setDescriptionLineClamp] = useState(featured ? 3 : 2);
@@ -172,11 +175,54 @@ export function EventCard({ event, featured = false, sentinelAlerts = [] }: Even
         )}
       </div>
       <div className="p-6 flex flex-col gap-4 flex-1">
-        <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
-          <span className="font-semibold text-on-surface">{event.organizer}</span>
-          <span className="opacity-40">•</span>
-          <span>{event.distance}</span>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+            <span className="font-semibold text-on-surface">{event.organizer}</span>
+            <span className="opacity-40">•</span>
+            <span>{event.distance}</span>
+          </div>
+          {recommendationPercentage !== undefined && (
+            <div
+              className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              style={{
+                background: 'linear-gradient(135deg, rgba(59,107,74,0.12), rgba(59,107,74,0.06))',
+                color: 'var(--color-primary-base)',
+                border: '1px solid rgba(59,107,74,0.2)',
+              }}
+            >
+              <span>✓ {recommendationPercentage}% match</span>
+            </div>
+          )}
         </div>
+
+        {matchedSkills.length > 0 && (
+          <div className="flex flex-wrap gap-1.5">
+            {matchedSkills.slice(0, 3).map((skill) => (
+              <span
+                key={skill}
+                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
+                style={{
+                  background: 'rgba(212,168,82,0.12)',
+                  color: 'var(--color-warm-amber)',
+                  border: '1px solid rgba(212,168,82,0.2)',
+                }}
+              >
+                {skill}
+              </span>
+            ))}
+            {matchedSkills.length > 3 && (
+              <span
+                className="rounded-full px-2.5 py-1 text-[11px] font-medium"
+                style={{
+                  background: 'rgba(212,168,82,0.08)',
+                  color: 'var(--color-warm-amber)',
+                }}
+              >
+                +{matchedSkills.length - 3} more
+              </span>
+            )}
+          </div>
+        )}
 
         <div className="space-y-2.5 flex-1">
           <h3 ref={titleRef} className="text-xl font-semibold text-on-surface leading-tight tracking-tight">{event.title}</h3>

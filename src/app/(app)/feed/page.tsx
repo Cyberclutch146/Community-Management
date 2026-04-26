@@ -6,11 +6,13 @@ import { EventCard } from '@/components/EventCard';
 import { getEvents } from '@/services/eventService';
 import MapWrapper from '@/components/MapWrapper';
 import SkillMatchBanner from '@/components/SkillMatchBanner';
+import { useAuth } from '@/context/AuthContext';
 import { CommunityEvent } from '@/types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
-import { ChevronDown, SlidersHorizontal, Sparkles, X } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
 import { SentinelAlert } from '@/types/sentinel';
+import { getRecommendedEvents } from '@/services/recommendationService';
 
 const PAGE_SIZE = 12;
 
@@ -20,6 +22,8 @@ type FilterState = {
   distance: 'all' | 'within-5' | 'within-15' | 'within-30';
   category: string;
 };
+
+type SortOption = 'recommended' | 'recent' | 'urgent' | 'nearest';
 
 const DEFAULT_FILTERS: FilterState = {
   urgency: 'all',
@@ -34,6 +38,21 @@ function parseDistanceMiles(distance: string | undefined) {
   return Number.isFinite(numericDistance) ? numericDistance : null;
 }
 
+function getEventTimestamp(event: CommunityEvent) {
+  const createdAt = event.createdAt;
+
+  if (createdAt && typeof createdAt === 'object' && 'toDate' in createdAt && typeof createdAt.toDate === 'function') {
+    return createdAt.toDate().getTime();
+  }
+
+  if (event.eventDate) {
+    const eventDate = new Date(event.eventDate).getTime();
+    if (Number.isFinite(eventDate)) return eventDate;
+  }
+
+  return 0;
+}
+
 export default function FeedPage() {
   return (
     <Suspense fallback={<div className="flex-1 flex items-center justify-center h-[3.5rem]"><div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div></div>}>
@@ -43,20 +62,31 @@ export default function FeedPage() {
 }
 
 function FeedContent() {
+  const { profile } = useAuth();
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get('q') || '';
   const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [userLocation, setUserLocation] = useState('Detecting location...');
   const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [sortBy, setSortBy] = useState<SortOption>('recommended');
   const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const [sortMenuOpen, setSortMenuOpen] = useState(false);
+  const [sortChanged, setSortChanged] = useState(false); // Animation trigger for sort change
+  const [bannerHiding, setBannerHiding] = useState(false); // Track banner disappear animation
+  const prevSortRef = useRef<SortOption>('recommended');
+  const prevSearchRef = useRef<string>('');
   const filterMenuRef = useRef<HTMLDivElement | null>(null);
+  const sortMenuRef = useRef<HTMLDivElement | null>(null);
 
   // Semantic search state
   const [semanticResults, setSemanticResults] = useState<string[] | null>(null);
   const [isAIPowered, setIsAIPowered] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Recommendation data state: map of event ID to { score, matchedSkills, percentage }
+  const [recommendationData, setRecommendationData] = useState<Record<string, { score: number; matchedSkills: string[]; percentage: number }>>({});
 
   // Sync from URL when it changes (e.g. user searches from navbar)
   useEffect(() => {
@@ -78,6 +108,9 @@ function FeedContent() {
     const handleClickOutside = (event: MouseEvent) => {
       if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
         setFilterMenuOpen(false);
+      }
+      if (sortMenuRef.current && !sortMenuRef.current.contains(event.target as Node)) {
+        setSortMenuOpen(false);
       }
     };
 
@@ -135,6 +168,50 @@ function FeedContent() {
     };
     fetchEventsAndAlerts();
   }, []);
+
+  // Calculate recommendation percentages when sorted by recommended
+  useEffect(() => {
+    if (sortBy === 'recommended' && profile?.skills && events.length > 0) {
+      const recommendedEvents = getRecommendedEvents(profile.skills, events, events.length);
+
+      if (recommendedEvents.length > 0) {
+        // Find max score to calculate percentages
+        const maxScore = Math.max(...recommendedEvents.map(r => r.score), 1);
+
+        const data: Record<string, { score: number; matchedSkills: string[]; percentage: number }> = {};
+        recommendedEvents.forEach(rec => {
+          const percentage = Math.round((rec.score / maxScore) * 100);
+          data[rec.event.id] = {
+            score: rec.score,
+            matchedSkills: rec.matchedSkills,
+            percentage,
+          };
+        });
+
+        setRecommendationData(data);
+      } else {
+        setRecommendationData({});
+      }
+    } else {
+      setRecommendationData({});
+    }
+  }, [sortBy, events, profile?.skills]);
+
+  // Track banner visibility changes with animation
+  useEffect(() => {
+    const shouldShowBanner = sortBy === 'recommended' && !searchQuery;
+    const wasBannerVisible = prevSortRef.current === 'recommended' && !prevSearchRef.current;
+
+    if (wasBannerVisible && !shouldShowBanner) {
+      // Banner is hiding - trigger disappear animation
+      setBannerHiding(true);
+      const timeout = setTimeout(() => setBannerHiding(false), 350);
+      return () => clearTimeout(timeout);
+    }
+
+    prevSortRef.current = sortBy;
+    prevSearchRef.current = searchQuery;
+  }, [sortBy, searchQuery]);
 
   // Semantic search effect with debounce
   const performSemanticSearch = useCallback(async (query: string) => {
@@ -270,6 +347,51 @@ function FeedContent() {
     return result;
   })();
 
+  const sortedEvents = (() => {
+    const result = [...filteredEvents];
+
+    if (sortBy === 'recommended') {
+      const recommendedOrder = new Map(
+        getRecommendedEvents(profile?.skills ?? [], result, result.length).map(({ event }, index) => [event.id, index])
+      );
+
+      return result.sort((a, b) => {
+        const aRank = recommendedOrder.get(a.id);
+        const bRank = recommendedOrder.get(b.id);
+
+        if (aRank !== undefined && bRank !== undefined) return aRank - bRank;
+        if (aRank !== undefined) return -1;
+        if (bRank !== undefined) return 1;
+
+        const aTime = getEventTimestamp(a);
+        const bTime = getEventTimestamp(b);
+        return bTime - aTime;
+      });
+    }
+
+    if (sortBy === 'recent') {
+      return result.sort((a, b) => getEventTimestamp(b) - getEventTimestamp(a));
+    }
+
+    if (sortBy === 'urgent') {
+      return result.sort((a, b) => {
+        if (a.urgency === b.urgency) return getEventTimestamp(b) - getEventTimestamp(a);
+        return a.urgency === 'high' ? -1 : 1;
+      });
+    }
+
+    return result.sort((a, b) => {
+      const aDistance = parseDistanceMiles(a.distance);
+      const bDistance = parseDistanceMiles(b.distance);
+
+      if (aDistance === null && bDistance === null) return getEventTimestamp(b) - getEventTimestamp(a);
+      if (aDistance === null) return 1;
+      if (bDistance === null) return -1;
+
+      return aDistance - bDistance;
+    });
+  })();
+
   const activeFilters = [
     filters.urgency !== 'all' ? {
       key: 'urgency' as const,
@@ -298,6 +420,20 @@ function FeedContent() {
   ].filter(Boolean) as Array<{ key: keyof FilterState; label: string }>;
 
   const activeFilterCount = activeFilters.length;
+  const sortLabel = sortBy === 'recommended'
+    ? 'Recommended'
+    : sortBy === 'recent'
+      ? 'Recent'
+      : sortBy === 'urgent'
+        ? 'Urgent first'
+        : 'Nearest';
+
+  const sortOptions: Array<{ value: SortOption; label: string; description: string }> = [
+    { value: 'recommended', label: 'Recommended', description: 'Best matches based on your profile skills.' },
+    { value: 'recent', label: 'Recent', description: 'Newest event posts first.' },
+    { value: 'urgent', label: 'Urgent first', description: 'High-urgency events rise to the top.' },
+    { value: 'nearest', label: 'Nearest', description: 'Events with the shortest listed distance first.' },
+  ];
 
   return (
     <div className="flex-1 flex flex-col text-on-surface w-full">
@@ -345,8 +481,8 @@ function FeedContent() {
               <button
                 onClick={() => setViewMode('list')}
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'list'
-                    ? 'text-on-primary'
-                    : 'text-on-surface-variant hover:text-on-surface'
+                  ? 'text-on-primary'
+                  : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 style={viewMode === 'list' ? {
                   background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
@@ -358,8 +494,8 @@ function FeedContent() {
               <button
                 onClick={() => setViewMode('map')}
                 className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'map'
-                    ? 'text-on-primary'
-                    : 'text-on-surface-variant hover:text-on-surface'
+                  ? 'text-on-primary'
+                  : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 style={viewMode === 'map' ? {
                   background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
@@ -423,7 +559,8 @@ function FeedContent() {
                 <div
                   className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5"
                   style={{
-                    background: 'var(--glass-bg-strong)',
+                    background: 'rgba(253, 250, 245, 1)',
+                    colorScheme: 'light',
                     backdropFilter: 'blur(28px) saturate(1.5)',
                     WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
                     border: '1px solid var(--glass-border)',
@@ -593,7 +730,7 @@ function FeedContent() {
 
                   <div className="mt-4 flex items-center justify-between rounded-2xl px-3.5 py-3" style={{ background: 'rgba(42,45,43,0.04)' }}>
                     <div>
-                      <p className="text-sm font-semibold text-on-surface">{filteredEvents.length} matching events</p>
+                      <p className="text-sm font-semibold text-on-surface">{sortedEvents.length} matching events</p>
                       <p className="text-xs text-on-surface-variant">Results update instantly as you refine the feed.</p>
                     </div>
                     <button
@@ -610,11 +747,90 @@ function FeedContent() {
                 </div>
               )}
             </div>
+
+            <div className="relative z-40" ref={sortMenuRef}>
+              <button
+                onClick={() => setSortMenuOpen((open) => !open)}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: sortMenuOpen
+                    ? 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))'
+                    : 'var(--glass-bg)',
+                  color: sortMenuOpen
+                    ? 'var(--color-on-primary-base)'
+                    : 'var(--color-on-surface-base)',
+                  backdropFilter: 'blur(12px)',
+                  border: sortMenuOpen
+                    ? '1px solid transparent'
+                    : '1px solid var(--glass-border)',
+                  boxShadow: sortMenuOpen
+                    ? '0 3px 12px rgba(59,107,74,0.25)'
+                    : '0 2px 8px rgba(42,45,43,0.04)',
+                }}
+              >
+                <ArrowUpDown size={16} />
+                Sort: {sortLabel}
+                <ChevronDown size={16} className={`transition-transform duration-300 ${sortMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {sortMenuOpen && (
+                <div
+                  className="absolute right-0 top-full z-50 mt-3 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5 
+             bg-[rgba(253,250,245,1)] dark:bg-[rgba(13,18,16,1)]"
+                  style={{
+                    backdropFilter: 'blur(28px) saturate(1.5)',
+                    WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: 'var(--glass-shadow-lg)',
+                  }}
+                >
+                  <div className="mb-4">
+                    <p className="text-base font-semibold text-on-surface">Sort events</p>
+                    <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">Choose how the feed should be ordered.</p>
+                  </div>
+
+                  <div className="space-y-2">
+                    {sortOptions.map((option) => {
+                      const active = sortBy === option.value;
+
+                      return (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            setSortBy(option.value);
+                            setSortMenuOpen(false);
+                            setSortChanged(true);
+                            setTimeout(() => setSortChanged(false), 500);
+                          }}
+                          className="w-full rounded-[22px] px-4 py-3 text-left transition-all duration-200"
+                          style={active ? {
+                            background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                            color: 'var(--color-on-primary-base)',
+                            boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
+                          } : {
+                            background: 'rgba(255,255,255,0.62)',
+                            color: 'var(--color-on-surface-base)',
+                            border: '1px solid var(--glass-border)',
+                          }}
+                        >
+                          <div className="text-sm font-semibold">{option.label}</div>
+                          <div className={`mt-1 text-xs leading-relaxed ${active ? 'text-on-primary/80' : 'text-on-surface-variant'}`}>{option.description}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
-        {/* Skill-Based Recommendations — only show when no search query */}
-        {!searchQuery && <SkillMatchBanner condensed />}
+        {/* Skill-Based Recommendations — only show when sorting by recommended */}
+        {(sortBy === 'recommended' && !searchQuery) || bannerHiding ? (
+          <div className={bannerHiding ? 'animate-slide-up' : 'animate-slide-down'}>
+            <SkillMatchBanner condensed />
+          </div>
+        ) : null}
 
         {activeFilters.length > 0 && (
           <section className="mb-8 animate-fade-in-up delay-100">
@@ -657,7 +873,7 @@ function FeedContent() {
               </p>
             )}
           </div>
-        ) : filteredEvents.length === 0 ? (
+        ) : sortedEvents.length === 0 ? (
           <div
             className="rounded-2xl p-10 text-center animate-fade-in-up"
             style={{
@@ -675,11 +891,11 @@ function FeedContent() {
             className="h-[600px] w-full mt-4 rounded-2xl overflow-hidden animate-fade-in-up"
             style={{ border: '1px solid var(--glass-border)', boxShadow: 'var(--glass-shadow)' }}
           >
-            <MapWrapper events={filteredEvents} alerts={alerts} />
+            <MapWrapper events={sortedEvents} alerts={alerts} />
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredEvents.map((event) => {
+          <div className={`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 ${sortChanged ? 'animate-cards-reorder' : ''}`}>
+            {sortedEvents.map((event) => {
               const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
 
               const normalizedEvent = {
@@ -706,6 +922,8 @@ function FeedContent() {
                   key={event.id}
                   event={normalizedEvent}
                   sentinelAlerts={intersectingAlerts}
+                  recommendationPercentage={recommendationData[event.id]?.percentage}
+                  matchedSkills={recommendationData[event.id]?.matchedSkills}
                 />
               );
             })}

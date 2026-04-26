@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useState, useEffect } from 'react'
-import { Filter, Plus, Calendar, MapPin, Users, Mail, Loader2 } from 'lucide-react'
+import { Plus, Calendar, MapPin, Users, Mail, Loader2 } from 'lucide-react'
 import { getEvents } from '@/services/eventService'
 import { useAuth } from '@/context/AuthContext'
 import { CommunityEvent } from '@/types'
@@ -10,10 +10,11 @@ import { SentinelAlert } from '@/types/sentinel'
 import MapWrapper from '@/components/MapWrapper'
 import SkillMatchBanner from '@/components/SkillMatchBanner'
 import { EventCard } from '@/components/EventCard'
+import { getRecommendedEvents } from '@/services/recommendationService'
 
 export default function HomePage() {
   const router = useRouter()
-  const { user, profile } = useAuth()
+  const { profile } = useAuth()
 
   const [events, setEvents] = useState<CommunityEvent[]>([])
   const [alerts, setAlerts] = useState<SentinelAlert[]>([])
@@ -40,8 +41,10 @@ export default function HomePage() {
   // Pick a featured event: prefer the first 'high' urgency active event, else the newest
   const featured = events.find(e => e.urgency === 'high' && e.status === 'active') ?? events[0] ?? null
 
-  // Remaining events for the "More Opportunities" section (exclude featured, max 3)
-  const moreEvents = events.filter(e => e.id !== featured?.id).slice(0, 3)
+  const recommendedEvents = getRecommendedEvents(profile?.skills ?? [], events, 4)
+    .map(({ event }) => event)
+    .filter(event => event.id !== featured?.id)
+    .slice(0, 3)
 
   // Helper: format a Firestore Timestamp/Date for display
   const formatDate = (ts: CommunityEvent['createdAt']) => {
@@ -99,16 +102,6 @@ export default function HomePage() {
   const volGoal = featured?.needs?.volunteers?.goal ?? 1
   const volPercent = Math.min(Math.round((volCurrent / volGoal) * 100), 100)
 
-  // Category badge color map
-  const badgeColor = (category: string) => {
-    const lower = category?.toLowerCase() ?? ''
-    if (lower.includes('medical')) return 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-    if (lower.includes('logistics')) return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
-    if (lower.includes('community')) return 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
-    if (lower.includes('supply') || lower.includes('sorting')) return 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-300'
-    return 'bg-gray-200 text-gray-700 dark:bg-gray-800 dark:text-gray-300'
-  }
-
   return (
     <main className="flex-1 flex flex-col text-on-surface w-full pb-32 md:pb-10">
       <div className="max-w-7xl mx-auto w-full">
@@ -123,10 +116,6 @@ export default function HomePage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mt-2 lg:mt-0">
-          <button className="premium-button-muted text-sm tracking-wide gap-2">
-            <Filter size={16} />
-            Filter
-          </button>
           <button 
             onClick={() => router.push('/create')}
             className="premium-button-primary text-sm tracking-wide gap-2"
@@ -138,9 +127,7 @@ export default function HomePage() {
       </div>
 
       {/* Skill-Based Recommendations */}
-      <div className="px-6 md:px-10 mt-8 animate-fade-in-up delay-100">
-        <SkillMatchBanner />
-      </div>
+      
 
       {/* Main Section */}
       <div className="px-6 md:px-10 mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
@@ -242,11 +229,11 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* More Opportunities */}
-      {moreEvents.length > 0 && (
+      {/* Recommended for You */}
+      {recommendedEvents.length > 0 && (
         <div className="px-6 md:px-10 mt-16 pb-10">
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-serif font-semibold text-gradient-earth">More Opportunities</h2>
+            <h2 className="text-2xl font-serif font-semibold text-gradient-earth">Recommended for You</h2>
             <button
               onClick={() => router.push('/feed')}
               className="text-sm font-semibold text-primary hover:text-primary/80 active:scale-95 transition-all duration-200 ease-out"
@@ -256,7 +243,7 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {moreEvents.map((evt) => (
+            {recommendedEvents.map((evt) => (
               <EventCard key={evt.id} event={evt} />
             ))}
           </div>
