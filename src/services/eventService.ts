@@ -96,38 +96,23 @@ export const geocodeLocation = async (address: string): Promise<{lat: number, ln
 // ─── Create ─────────────────────────────────────────────
 export const createEvent = async (data: CommunityEventCreate): Promise<string> => {
   try {
-    let coords = (data.lat !== undefined && data.lng !== undefined) 
-      ? { lat: data.lat, lng: data.lng } 
-      : null;
+    const response = await fetch('/api/events/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
 
-    if (!coords && data.location) {
-      coords = await geocodeLocation(data.location);
+    const result = await response.json();
+
+    if (!response.ok) {
+      throw new Error(result.error || 'Failed to create event');
     }
 
-    const eventData = {
-      ...data,
-      ...(coords ? { lat: coords.lat, lng: coords.lng } : {}),
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      status: 'active',
-      progress: 0,
-      needs: {
-        ...data.needs,
-        funds: {
-          goal: data.needs?.funds?.goal || 0,
-          current: 0
-        },
-        volunteers: {
-          goal: data.needs?.volunteers?.goal || 0,
-          current: 0
-        }
-      }
-    };
-
-    const docRef = await addDoc(collection(db, EVENTS_COLLECTION), eventData);
-    return docRef.id;
+    return result.eventId;
   } catch (error: unknown) {
-    console.error('Failed to create event in Firebase:', error);
+    console.error('Failed to create event:', error);
     throw error;
   }
 };
