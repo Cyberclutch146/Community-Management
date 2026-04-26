@@ -50,7 +50,7 @@ export default function SentinelDashboardPage() {
   return (
     <div className="max-w-7xl mx-auto space-y-4 md:space-y-6 flex flex-col h-[calc(100vh-120px)] md:h-[calc(100vh-140px)] min-h-[600px] md:min-h-[700px] px-2 md:px-0">
       {/* Header section shrink to fit */}
-      <div className="shrink-0 bg-white dark:bg-zinc-900/50 border border-slate-200/60 dark:border-zinc-800/60 rounded-2xl p-4 md:p-6 shadow-sm relative overflow-hidden">
+      <div className="shrink-0 premium-panel p-4 md:p-6 relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <h1 className="text-xl md:text-2xl font-serif font-bold flex items-center gap-2 text-slate-800 dark:text-slate-100 tracking-tight">
@@ -58,30 +58,30 @@ export default function SentinelDashboardPage() {
               Community Sentinel
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1 max-w-2xl text-xs md:text-sm font-medium leading-relaxed">
-              Real-time public data synchronization for environmental and social awareness.
+              Live safety updates and alerts to help event organizers and volunteers stay aware of nearby conditions.
             </p>
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="shrink-0 flex bg-slate-50/80 dark:bg-zinc-900/80 backdrop-blur-md border border-slate-200/60 dark:border-zinc-800 p-1 rounded-xl w-full max-w-xs mx-auto shadow-sm">
+      <div className="shrink-0 flex bg-surface-container-lowest border border-outline-variant/20 p-1 rounded-xl w-full max-w-xs mx-auto shadow-sm">
          <button 
            onClick={() => setActiveTab('map')} 
-           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'map' ? 'bg-white dark:bg-zinc-800 shadow-sm text-emerald-800 dark:text-emerald-400 ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
+           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'map' ? 'bg-surface-container-lowest text-emerald-800 dark:text-emerald-400 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-surface-container-lowest/80 dark:hover:bg-zinc-800/50'}`}
          >
-           <MapIcon className="h-4 w-4" /> Threat Map
+           <MapIcon className="h-4 w-4" /> Safety Map
          </button>
          <button 
            onClick={() => setActiveTab('feed')} 
-           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'feed' ? 'bg-white dark:bg-zinc-800 shadow-sm text-emerald-800 dark:text-emerald-400 ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-white/50 dark:hover:bg-zinc-800/50'}`}
+           className={`flex-1 flex items-center justify-center gap-2 py-2 text-xs font-semibold rounded-lg transition-all duration-300 ${activeTab === 'feed' ? 'bg-surface-container-lowest text-emerald-800 dark:text-emerald-400 shadow-sm ring-1 ring-slate-200 dark:ring-zinc-700' : 'text-slate-500 dark:text-slate-400 hover:text-emerald-800 dark:hover:text-emerald-400 hover:bg-surface-container-lowest/80 dark:hover:bg-zinc-800/50'}`}
          >
-           <Activity className="h-4 w-4" /> Live Feed
+           <Activity className="h-4 w-4" /> Alert Feed
          </button>
       </div>
 
       {/* Content Area flexes to fill available space */}
-      <div className="flex-1 bg-white dark:bg-zinc-900 rounded-2xl md:rounded-[1.5rem] shadow-sm border border-slate-200/60 dark:border-zinc-800/60 p-2 md:p-3 overflow-hidden flex flex-col relative min-h-[500px] md:min-h-0">
+      <div className="flex-1 premium-panel p-2 md:p-3 overflow-hidden flex flex-col relative min-h-[500px] md:min-h-0">
         {activeTab === 'map' && (
           <div className="flex-1 rounded-xl md:rounded-2xl overflow-hidden z-0 bg-slate-50 dark:bg-zinc-950 shadow-inner h-full w-full relative">
              <MapContainer 

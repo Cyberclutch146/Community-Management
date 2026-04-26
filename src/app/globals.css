@@ -113,6 +113,34 @@ body {
   color: var(--color-on-background);
   font-family: var(--font-body);
   overflow-x: hidden;
+  min-height: 100vh;
+}
+
+body {
+  background-image:
+    radial-gradient(circle at top left, rgba(74,124,89,0.06), transparent 26%),
+    radial-gradient(circle at bottom right, rgba(112,92,48,0.05), transparent 20%);
+}
+
+@layer utilities {
+  .premium-panel {
+    @apply bg-surface-container-lowest border border-outline-variant/20 rounded-[32px] shadow-[0_24px_70px_rgba(46,50,48,0.06)];
+  }
+  .premium-card {
+    @apply bg-surface-container-low border border-outline-variant/20 rounded-[28px] shadow-[0_18px_44px_rgba(46,50,48,0.05)];
+  }
+  .premium-card-strong {
+    @apply bg-surface-container-lowest border border-outline-variant/20 rounded-[32px] shadow-[0_24px_70px_rgba(46,50,48,0.06)];
+  }
+  .premium-button-primary {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold transition-all duration-200 bg-primary text-on-primary hover:bg-primary-container/90;
+  }
+  .premium-button-muted {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 font-semibold transition-all duration-200 bg-surface-container text-on-surface hover:bg-surface-container-high;
+  }
+  .premium-input {
+    @apply w-full bg-surface-container rounded-2xl border border-outline-variant/20 px-4 py-3 text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/20;
+  }
 }
 
 /* Material Symbols configuration */

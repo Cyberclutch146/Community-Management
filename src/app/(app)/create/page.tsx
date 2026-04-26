@@ -82,7 +82,7 @@ export default function CreateEventPage() {
         <p className="text-secondary font-medium mt-2">Start a local response initiative to gather volunteers or necessary supplies.</p>
       </div>
 
-      <div className="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30">
+      <div className="premium-panel p-8">
         <p className="text-on-surface-variant mb-6 pb-6 border-b border-outline-variant/30">
           We believe in grassroots organizing. Share your vision and rally your community around local needs.
         </p>
@@ -154,7 +154,7 @@ export default function CreateEventPage() {
             <div className="flex-1">
               <label className="block text-sm font-semibold text-on-surface mb-2">Category</label>
               <select 
-                className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface"
+                className="w-full bg-surface-container-low border border-outline-variant/20 rounded-3xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-on-surface"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
               >
@@ -170,7 +170,7 @@ export default function CreateEventPage() {
                 <button
                   type="button"
                   onClick={() => setUrgency('normal')}
-                  className={`flex-1 py-3 rounded-xl text-sm font-semibold transition-colors ${urgency === 'normal' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface border border-outline-variant/50'}`}
+                  className={`flex-1 py-3 rounded-3xl text-sm font-semibold transition-colors ${urgency === 'normal' ? 'bg-primary text-on-primary' : 'bg-surface-container-low text-on-surface border border-outline-variant/20'}`}
                 >
                   Normal
                 </button>

@@ -65,7 +65,7 @@ export default function AboutPage() {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20">
-        <div className="bg-surface-bright rounded-3xl p-8 border border-outline-variant/30 hover:shadow-md transition-shadow">
+        <div className="premium-panel p-8 hover:shadow-lg transition-shadow">
           <div className="w-14 h-14 rounded-2xl bg-primary-container flex items-center justify-center text-primary mb-6">
             <Users size={28} />
           </div>
@@ -75,7 +75,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="bg-surface-bright rounded-3xl p-8 border border-outline-variant/30 hover:shadow-md transition-shadow">
+        <div className="premium-panel p-8 hover:shadow-lg transition-shadow">
           <div className="w-14 h-14 rounded-2xl bg-secondary-container flex items-center justify-center text-secondary mb-6">
             <Globe size={28} />
           </div>
@@ -85,7 +85,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <div className="bg-surface-bright rounded-3xl p-8 border border-outline-variant/30 hover:shadow-md transition-shadow">
+        <div className="premium-panel p-8 hover:shadow-lg transition-shadow">
           <div className="w-14 h-14 rounded-2xl bg-tertiary-container flex items-center justify-center text-tertiary mb-6">
             <Shield size={28} />
           </div>
@@ -106,7 +106,7 @@ export default function AboutPage() {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {TEAM_MEMBERS.map((member, index) => (
-            <div key={index} className="group relative bg-surface-bright rounded-3xl p-6 border border-outline-variant/30 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
+            <div key={index} className="group relative premium-panel p-6 overflow-hidden hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
               <div className={`absolute inset-0 bg-gradient-to-br ${member.gradient} opacity-0 group-hover:opacity-100 transition-opacity duration-500`} />
 
               <div className="relative z-10 flex flex-col h-full">

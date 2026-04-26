@@ -77,42 +77,42 @@ export default function DashboardPage() {
   return (
     <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
       <div className="mb-10">
-        <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Your Impact Dashboard</h2>
+        <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Your Community Impact</h2>
         <p className="text-secondary font-medium mt-2">
-          Welcome back, {profile?.displayName || 'Organizer'}. Here&apos;s how your events are performing.
+          Welcome back, {profile?.displayName || 'Organizer'}. Here&apos;s a snapshot of your local support efforts.
         </p>
       </div>
 
       {/* ── Stat Cards ── */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-        <div className="bg-primary-container/30 px-6 py-5 rounded-2xl border border-primary-container/20">
+        <div className="premium-panel px-6 py-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-primary bg-primary-container/40 p-2 rounded-xl text-[20px]">campaign</span>
-            <p className="text-xs font-semibold text-primary uppercase tracking-wider">Active Events</p>
+            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">campaign</span>
+            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Active Events</p>
           </div>
           <p className="text-4xl font-bold text-on-surface">{activeCount}</p>
         </div>
 
-        <div className="bg-tertiary-container/30 px-6 py-5 rounded-2xl border border-tertiary-container/20">
+        <div className="premium-panel px-6 py-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-tertiary bg-tertiary-container/40 p-2 rounded-xl text-[20px]">attach_money</span>
-            <p className="text-xs font-semibold text-tertiary uppercase tracking-wider">Total Raised</p>
+            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">attach_money</span>
+            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Total Raised</p>
           </div>
           <p className="text-4xl font-bold text-on-surface">${totalRaised.toLocaleString()}</p>
         </div>
 
-        <div className="bg-secondary-container/30 px-6 py-5 rounded-2xl border border-secondary-container/20">
+        <div className="premium-panel px-6 py-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-secondary bg-secondary-container/40 p-2 rounded-xl text-[20px]">group</span>
-            <p className="text-xs font-semibold text-secondary uppercase tracking-wider">Volunteers Recruited</p>
+            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">group</span>
+            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Volunteers Recruited</p>
           </div>
           <p className="text-4xl font-bold text-on-surface">{totalVolunteers}</p>
         </div>
 
-        <div className="bg-error-container/30 px-6 py-5 rounded-2xl border border-error-container/20">
+        <div className="premium-panel px-6 py-5">
           <div className="flex items-center gap-3 mb-3">
-            <span className="material-symbols-outlined text-error bg-error-container/40 p-2 rounded-xl text-[20px]">warning</span>
-            <p className="text-xs font-semibold text-error uppercase tracking-wider">Severe Alerts</p>
+            <span className="material-symbols-outlined text-on-surface rounded-2xl bg-surface-container px-3 py-2 text-[20px]">warning</span>
+            <p className="text-xs font-semibold uppercase tracking-wider text-on-surface-variant">Severe Alerts</p>
           </div>
           <p className="text-4xl font-bold text-on-surface">{highRiskAlertsCount}</p>
         </div>
@@ -128,7 +128,7 @@ export default function DashboardPage() {
             className="bg-surface-variant text-on-surface-variant px-5 py-2.5 rounded-xl font-semibold text-sm hover:bg-outline-variant transition-colors flex items-center gap-2 disabled:opacity-50"
           >
             <span className="material-symbols-outlined text-[18px]">map</span>
-            {backfilling ? 'Backfilling...' : 'Admin: Backfill Coordinates'}
+            {backfilling ? 'Refreshing...' : 'Refresh Coordinates'}
           </button>
           <button
             onClick={() => router.push('/create')}
@@ -141,7 +141,7 @@ export default function DashboardPage() {
       </div>
 
       {events.length === 0 ? (
-        <div className="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30 flex flex-col items-center justify-center text-center py-20">
+        <div className="premium-panel p-8 flex flex-col items-center justify-center text-center py-20">
           <span className="material-symbols-outlined text-[64px] text-surface-variant mb-4">volunteer_activism</span>
           <h3 className="font-headline text-xl text-on-surface font-bold mb-2">No events yet</h3>
           <p className="text-on-surface-variant max-w-md mb-6">
@@ -166,8 +166,8 @@ export default function DashboardPage() {
       {registeredEvents.length > 0 && (
         <div className="mt-16">
           <div className="mb-6">
-            <h3 className="font-headline text-xl font-bold text-on-surface">Events You&apos;ve Joined</h3>
-            <p className="text-secondary text-sm mt-1">Events you are participating in as a volunteer.</p>
+            <h3 className="font-headline text-xl font-bold text-on-surface">Events You&apos;re Supporting</h3>
+            <p className="text-secondary text-sm mt-1">Local initiatives you&apos;re helping through volunteer support.</p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {registeredEvents.map(event => (
@@ -200,7 +200,7 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
   return (
     <button
       onClick={onClick}
-      className="bg-surface-bright rounded-2xl border border-outline-variant/30 overflow-hidden text-left hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group"
+      className="bg-surface-container-lowest rounded-3xl border border-outline-variant/20 overflow-hidden text-left hover:shadow-[0_18px_44px_rgba(46,50,48,0.05)] hover:-translate-y-0.5 transition-all duration-200 group flex flex-col h-full"
     >
       <div className="relative h-40 w-full overflow-hidden">
         <Image
@@ -223,9 +223,11 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
         </span>
       </div>
 
-      <div className="p-5">
-        <h4 className="font-headline font-bold text-on-surface mb-1 line-clamp-1">{event.title}</h4>
-        <p className="text-secondary text-sm mb-4">{event.category}</p>
+      <div className="p-5 flex flex-col flex-1">
+        <div>
+          <h4 className="font-headline font-bold text-on-surface mb-1 line-clamp-1">{event.title}</h4>
+          <p className="text-secondary text-sm mb-4">{event.category}</p>
+        </div>
 
         {fundPercent !== null && (
           <div className="mb-3">
@@ -240,7 +242,7 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
         )}
 
         {volPercent !== null && (
-          <div>
+          <div className="mb-3">
             <div className="flex justify-between text-xs mb-1">
               <span className="text-on-surface-variant font-medium">Volunteers</span>
               <span className="font-bold text-tertiary">{volPercent}%</span>
@@ -250,6 +252,10 @@ function EventCard({ event, alerts, onClick }: { event: CommunityEvent, alerts: 
             </div>
           </div>
         )}
+
+        <div className="mt-auto pt-4 border-t border-surface-variant/20">
+          <span className="text-primary font-semibold text-sm tracking-[0.08em] uppercase">View details</span>
+        </div>
       </div>
     </button>
   );

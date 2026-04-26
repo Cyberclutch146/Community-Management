@@ -1,7 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { CommunityEvent } from '@/types';
-
 import { SentinelAlert } from '@/types/sentinel';
 
 interface EventCardProps {
@@ -12,155 +11,118 @@ interface EventCardProps {
 
 export function EventCard({ event, featured = false, sentinelAlerts = [] }: EventCardProps) {
   const hasAlerts = sentinelAlerts.length > 0;
-  
+
+  const badge = (
+    <span className="inline-flex items-center gap-1 rounded-full border border-outline-variant/20 bg-surface-container px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.15em] text-on-surface-variant">
+      {event.urgency === 'high' ? 'Urgent' : event.category}
+    </span>
+  );
+
   if (featured) {
     return (
-      <article className="col-span-1 md:col-span-2 lg:col-span-2 bg-surface-bright rounded-2xl overflow-hidden shadow-sm border border-outline-variant/30 flex flex-col md:flex-row group transition-all duration-300 hover:shadow-md hover:-translate-y-1">
-        <div className="w-full md:w-1/2 h-64 md:h-auto min-h-[300px] relative overflow-hidden">
-          <Image 
-            alt={event.title} 
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" 
-            src={event.imageUrl || event.image || '/logo.svg'} 
-            fill 
-            sizes="(max-width: 768px) 100vw, 50vw" 
+      <article className="group overflow-hidden rounded-[32px] border border-outline-variant/20 bg-surface-container-lowest shadow-[0_24px_70px_rgba(46,50,48,0.06)] transition-transform duration-300 hover:-translate-y-1">
+        <div className="relative h-72 overflow-hidden">
+          <Image
+            alt={event.title}
+            src={event.imageUrl || event.image || '/logo.svg'}
+            fill
+            className="object-cover transition-transform duration-700 group-hover:scale-105"
           />
-          {event.urgency === 'high' && (
-            <div className="absolute top-4 left-4 bg-tertiary-container text-on-tertiary-container text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1">
-              <span className="material-symbols-outlined text-[14px]">local_fire_department</span> High Urgency
-            </div>
-          )}
-          {hasAlerts && (
-            <div className={`absolute top-4 ${event.urgency === 'high' ? 'left-36' : 'left-4'} bg-red-100 text-red-800 text-xs font-bold px-3 py-1.5 rounded-full shadow-sm flex items-center gap-1 border border-red-200`}>
-              <span className="material-symbols-outlined text-[14px]">warning</span> Active Alert Zone
-            </div>
-          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-surface/90 via-transparent to-transparent" />
+          <div className="absolute left-6 bottom-6 flex flex-wrap gap-3">
+            {badge}
+            {hasAlerts && (
+              <span className="inline-flex items-center gap-1 rounded-full border border-red-200 bg-red-100/95 px-3 py-1 text-[11px] font-semibold text-red-800">
+                <span className="material-symbols-outlined text-[12px]">warning</span>
+                Alert Zone
+              </span>
+            )}
+          </div>
         </div>
-        <div className="p-6 md:p-8 flex flex-col justify-between flex-1 bg-gradient-to-br from-surface-bright to-surface-container-low">
-          <div>
-            <div className="flex items-center gap-2 mb-3">
-              <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-              <span className="text-sm font-semibold text-secondary">{event.organizer}</span>
-              <span className="text-xs text-outline mx-1">•</span>
-              <span className="text-xs text-outline">{event.distance}</span>
-            </div>
-            <h3 className="font-headline text-2xl font-bold text-on-surface mb-3 leading-tight">{event.title}</h3>
-            <p className="text-on-surface-variant text-base mb-6 line-clamp-3 leading-relaxed">
-              {event.description}
-            </p>
+
+        <div className="p-8 flex flex-col gap-6">
+          <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+            <span className="font-semibold text-on-surface">{event.organizer}</span>
+            <span>•</span>
+            <span>{event.distance}</span>
           </div>
-          <div className="mt-auto">
-            <div className="flex gap-4 mb-5">
-              {event.needs?.goods && (
-                <div className="flex flex-col items-center gap-1" title="Goods Needed">
-                  <div className="w-10 h-10 rounded-full bg-primary-container/30 flex items-center justify-center text-primary">
-                    <span className="material-symbols-outlined">checkroom</span>
-                  </div>
-                </div>
-              )}
-              {event.needs?.volunteers && (
-                <div className="flex flex-col items-center gap-1" title="Volunteers Needed">
-                  <div className="w-10 h-10 rounded-full bg-tertiary-container/30 flex items-center justify-center text-tertiary">
-                    <span className="material-symbols-outlined">volunteer_activism</span>
-                  </div>
-                </div>
-              )}
-              {event.needs?.funds && (
-                <div className={`flex flex-col items-center gap-1 ${event.needs.funds.current >= event.needs.funds.goal ? 'opacity-40' : ''}`} title="Funds Needed">
-                  <div className="w-10 h-10 rounded-full bg-surface-variant flex items-center justify-center text-on-surface-variant">
-                    <span className="material-symbols-outlined">payments</span>
-                  </div>
-                </div>
-              )}
-            </div>
-            <div className="mb-6">
-              <div className="flex justify-between text-xs font-semibold text-secondary mb-1.5">
-                <span>Goal Progress</span>
-                <span>{event.progress}%</span>
+          <div className="space-y-4">
+            <h3 className="text-3xl font-semibold text-on-surface leading-tight">{event.title}</h3>
+            <p className="text-sm leading-relaxed text-on-surface-variant">{event.description}</p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            <div className="rounded-3xl bg-surface border border-outline-variant/20 p-4 text-sm text-on-surface-variant">
+              <div className="font-semibold text-on-surface mb-2">Goal Progress</div>
+              <div className="h-2 w-full rounded-full bg-surface-variant overflow-hidden">
+                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${event.progress}%` }} />
               </div>
-              <div className="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
-                <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${event.progress}%` }}></div>
+              <div className="mt-2 text-xs">{event.progress}% complete</div>
+            </div>
+            <div className="rounded-3xl bg-surface border border-outline-variant/20 p-4 text-sm text-on-surface-variant">
+              <div className="font-semibold text-on-surface mb-2">Needs</div>
+              <div className="flex flex-wrap gap-2">
+                {event.needs?.goods && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Goods</span>}
+                {event.needs?.volunteers && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Volunteers</span>}
+                {event.needs?.funds && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Funds</span>}
               </div>
             </div>
-            <Link href={`/event/${event.id}`} className="w-full md:w-auto bg-primary text-on-primary px-6 py-3 rounded-lg font-semibold shadow-sm hover:bg-primary-container hover:text-on-primary-container transition-colors focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-surface-bright inline-block text-center">
-              View Details
-            </Link>
           </div>
+
+          <Link href={`/event/${event.id}`} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-container">
+            View Details
+          </Link>
         </div>
       </article>
     );
   }
 
   return (
-    <article className="bg-surface-bright rounded-xl shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/20 flex flex-col group transition-all duration-300 hover:shadow-md hover:-translate-y-1 overflow-hidden">
-      <div className="h-40 w-full relative overflow-hidden">
-        <Image 
-          src={event.imageUrl || event.image || '/logo.svg'} 
-          alt={event.title} 
-          fill 
-          className="object-cover group-hover:scale-110 transition-transform duration-500"
+    <article className="group overflow-hidden rounded-[32px] border border-outline-variant/20 bg-surface-container-lowest shadow-[0_24px_70px_rgba(46,50,48,0.06)] transition-transform duration-300 hover:-translate-y-1">
+      <div className="relative h-64 overflow-hidden">
+        <Image
+          src={event.imageUrl || event.image || '/logo.svg'}
+          alt={event.title}
+          fill
+          className="object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        {event.urgency === 'high' && (
-          <div className="absolute top-3 left-3 bg-tertiary-container/90 backdrop-blur-sm text-on-tertiary-container text-[10px] font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1">
-            <span className="material-symbols-outlined text-[12px]">local_fire_department</span> URGENT
-          </div>
-        )}
-        {hasAlerts && (
-          <div className={`absolute top-3 ${event.urgency === 'high' ? 'left-24' : 'left-3'} bg-red-100/90 backdrop-blur-sm text-red-800 text-[10px] font-bold px-2 py-1 rounded-full shadow-sm flex items-center gap-1 border border-red-200`}>
-            <span className="material-symbols-outlined text-[12px]">warning</span> ALERT ZONE
-          </div>
-        )}
+        <div className="absolute inset-0 bg-gradient-to-t from-surface/90 via-transparent to-transparent" />
+        <div className="absolute left-6 top-6">{badge}</div>
       </div>
-      <div className="p-5 flex flex-col flex-grow">
-        <div className="flex items-center gap-2 mb-3">
-        {event.urgency === 'high' ? (
-           <span className="material-symbols-outlined text-primary text-[18px]">verified</span>
-        ) : (
-          <div className="w-5 h-5 rounded-full bg-surface-container flex items-center justify-center">
-            <span className="material-symbols-outlined text-[12px] text-secondary">person</span>
-          </div>
-        )}
-        <span className="text-sm font-semibold text-secondary">{event.organizer}</span>
-        <span className="text-xs text-outline ml-auto">{event.distance}</span>
-      </div>
-      <h3 className="font-headline text-xl font-bold text-on-surface mb-2 leading-tight group-hover:text-primary transition-colors">{event.title}</h3>
-      <p className="text-on-surface-variant text-sm mb-4 line-clamp-2 flex-grow">
-        {event.description}
-      </p>
-      
-      {event.needs?.funds && (
-        <div className="mb-5">
-          <div className="flex justify-between text-xs font-semibold text-secondary mb-1.5">
-            <span>${event.needs.funds.current.toLocaleString()} raised</span>
-            <span>${(event.needs.funds.goal / 1000).toFixed(0)}k goal</span>
-          </div>
-          <div className="h-1.5 w-full bg-surface-variant rounded-full overflow-hidden">
-             <div className="h-full bg-tertiary rounded-full transition-all duration-500" style={{ width: `${event.progress}%` }}></div>
-          </div>
+      <div className="p-8 flex flex-col gap-6">
+        <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+          <span className="font-semibold text-on-surface">{event.organizer}</span>
+          <span>•</span>
+          <span>{event.distance}</span>
         </div>
-      )}
 
-      <div className="flex justify-between items-end mt-auto">
-        <div className="flex gap-2">
-          {event.needs?.volunteers && (
-            <div className={`w-8 h-8 rounded-full ${event.category === 'Volunteers' ? 'bg-tertiary-container/30 text-tertiary' : 'bg-primary-container/30 text-primary'} flex items-center justify-center`} title="Volunteers Needed">
-              <span className="material-symbols-outlined text-[18px]">group</span>
-            </div>
-          )}
-          {event.needs?.goods && (
-            <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" title="Goods/Food Donations">
-              <span className="material-symbols-outlined text-[18px]">restaurant</span>
-            </div>
-          )}
-          {event.needs?.funds && !event.needs?.volunteers && !event.needs?.goods && (
-            <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant" title="Funds Needed">
-              <span className="material-symbols-outlined text-[18px]">payments</span>
-            </div>
-          )}
+        <div className="space-y-4">
+          <h3 className="text-3xl font-semibold text-on-surface leading-tight">{event.title}</h3>
+          <p className="text-sm leading-relaxed text-on-surface-variant">{event.description}</p>
         </div>
-        <Link href={`/event/${event.id}`} className="text-primary font-semibold text-sm hover:underline flex items-center gap-1">
-          View Details <span className="material-symbols-outlined text-[16px]">arrow_forward</span>
+
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="rounded-3xl bg-surface border border-outline-variant/20 p-4 text-sm text-on-surface-variant">
+            <div className="font-semibold text-on-surface mb-2">Goal Progress</div>
+            <div className="h-2 w-full rounded-full bg-surface-variant overflow-hidden">
+              <div className="h-full bg-primary rounded-full transition-all duration-500" style={{ width: `${event.progress}%` }} />
+            </div>
+            <div className="mt-2 text-xs">{event.progress ?? 0}% complete</div>
+          </div>
+          <div className="rounded-3xl bg-surface border border-outline-variant/20 p-4 text-sm text-on-surface-variant">
+            <div className="font-semibold text-on-surface mb-2">Needs</div>
+            <div className="flex flex-wrap gap-2">
+              {event.needs?.goods && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Goods</span>}
+              {event.needs?.volunteers && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Volunteers</span>}
+              {event.needs?.funds && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Funds</span>}
+              {!event.needs && <span className="rounded-full bg-surface-container px-3 py-1 text-xs">Needs review</span>}
+            </div>
+          </div>
+        </div>
+
+        <Link href={`/event/${event.id}`} className="inline-flex items-center justify-center rounded-full bg-primary px-6 py-3 text-sm font-semibold text-on-primary transition hover:bg-primary-container">
+          View Details
         </Link>
-      </div>
       </div>
     </article>
   );

@@ -202,10 +202,13 @@ function FeedContent() {
   return (
     <div className="flex-1 flex flex-col text-[#1f3d2b] w-full">
       <main className="flex-1 p-6 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
+      <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-10">
         <div>
           <p className="text-secondary font-medium mb-1">Local Events Feed</p>
           <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Discover & Support</h2>
+          <p className="mt-3 text-on-surface-variant max-w-xl leading-relaxed">
+            Find local community events and support neighbors in need.
+          </p>
           {searchQuery && (
             <div className="mt-3 flex items-center gap-2">
               <span className="text-sm text-gray-500">Showing results for</span>
@@ -221,7 +224,7 @@ function FeedContent() {
           )}
         </div>
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex bg-white rounded-full p-1 border border-black/5 shadow-sm">
+          <div className="flex bg-surface-container-lowest rounded-full p-1 border border-outline-variant/20 shadow-sm">
             <button
               onClick={() => setViewMode('list')}
               className={`px-4 py-1.5 rounded-full text-sm font-medium transition-all ${viewMode === 'list' ? 'bg-[#1f3d2b] text-white shadow-sm' : 'text-gray-500 hover:text-black'}`}
@@ -235,7 +238,7 @@ function FeedContent() {
               Map
             </button>
           </div>
-          <div className="flex items-center bg-surface-container rounded-full px-4 py-2 border border-outline-variant/50 max-w-[200px] md:max-w-[250px]">
+          <div className="flex items-center bg-surface-container-lowest rounded-full px-4 py-2 border border-outline-variant/20 max-w-[200px] md:max-w-[250px]">
             <span className="material-symbols-outlined text-secondary mr-2 text-sm shrink-0">location_on</span>
             <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
               {userLocation}
@@ -293,7 +296,7 @@ function FeedContent() {
           <MapWrapper events={filteredEvents} alerts={alerts} />
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 grid-flow-dense">
+        <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6 items-start">
           {filteredEvents.map((event, index) => {
             const imageUrl = event.imageUrl || '/images/event-placeholder.jpg';
 

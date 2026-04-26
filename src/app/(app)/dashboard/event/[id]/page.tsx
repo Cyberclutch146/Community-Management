@@ -196,7 +196,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-gray-100/80">
           <button 
             onClick={() => router.push(`/dashboard/event/${eventId}/edit`)}
-            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
             <Pencil size={16} />
             Edit Event
@@ -212,7 +212,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={handleEmailAll}
-            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
             <Mail size={16} />
             Email All
@@ -220,7 +220,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           
           <button 
             onClick={handleExportCSV}
-            className="bg-white hover:bg-gray-50 text-[#1f3d2b] border border-gray-200 px-4 py-2.5 rounded-xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
+            className="bg-surface-container-lowest text-on-surface border border-outline-variant/20 px-4 py-2.5 rounded-3xl font-semibold flex items-center gap-2 transition-all shadow-sm text-sm"
           >
             <Download size={16} />
             Export CSV
@@ -239,7 +239,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
       </div>
 
       {intersectingAlerts.length > 0 && (
-        <div className="mb-8 p-5 rounded-2xl bg-amber-50/80 border border-amber-200/60 shadow-sm">
+        <div className="mb-8 p-5 rounded-3xl bg-surface-container-lowest border border-outline-variant/20 shadow-sm">
           <div className="flex items-center gap-2 text-amber-800 font-bold mb-3">
             <AlertTriangle size={20} className="text-amber-600" />
             <h3 className="text-lg">Sentinel Safety Awareness</h3>
@@ -279,7 +279,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
         {/* Left Column: Stats */}
         <div className="md:col-span-1 space-y-6">
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+          <div className="premium-panel p-6">
             <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
               <Users size={20} className="text-[#1f3d2b]" />
               Volunteer Progress
@@ -295,13 +295,13 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
             </div>
           </div>
 
-          <div className="bg-white rounded-2xl p-6 border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+          <div className="premium-panel p-6">
             <h3 className="font-serif text-lg font-bold mb-4 flex items-center gap-2">
               <CheckCircle size={20} className="text-[#1f3d2b]" />
               Checked In
             </h3>
             <div className="text-3xl font-bold text-[#1f3d2b] mb-2">
-              {volunteers.filter(v => v.attended).length} <span className="text-sm font-normal text-gray-500">/ {volunteers.length}</span>
+              {volunteers.filter(v => v.attended).length} <span className="text-sm font-normal text-on-surface-variant">/ {volunteers.length}</span>
             </div>
             <div className="w-full h-2.5 bg-gray-100 rounded-full overflow-hidden">
               <div 
@@ -314,7 +314,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
         {/* Right Column: Volunteer List */}
         <div className="md:col-span-3">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-[0_4px_20px_rgba(0,0,0,0.04)] overflow-hidden">
+          <div className="premium-panel overflow-hidden">
             <div className="p-6 border-b border-gray-100 flex justify-between items-center">
               <h3 className="font-serif text-xl font-bold">Volunteer Roster</h3>
               <span className="bg-[#1f3d2b]/10 text-[#1f3d2b] px-3 py-1 rounded-full text-sm font-medium">

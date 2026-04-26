@@ -70,20 +70,24 @@ export default function NavbarTop() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [scrolled])
 
+  const navbarClasses = scrolled
+    ? 'top-4 mx-4 rounded-[28px] bg-surface-container/72 backdrop-blur-3xl border border-outline-variant/30 shadow-[0_24px_80px_rgba(46,50,48,0.18)]'
+    : 'top-0 bg-surface-container/100 border-b border-outline-variant/20'
+
+  // Adjust glass opacity when scrolled: swap /72 for /70 to increase transparency or /90 to make it richer.
+  const navbarPadding = scrolled ? 'px-5 py-2.5 gap-4' : 'px-10 py-4 gap-6'
+  const logoClasses = scrolled ? 'text-lg tracking-tight' : 'text-2xl'
+
   return (
     <div
-      className={`flex items-center justify-between px-10 ${scrolled ? 'py-2' : 'py-4'} transition-all duration-200
-  ${scrolled
-    ? 'bg-surface-container/80 backdrop-blur-md border-b border-outline-variant/30'
-    : 'bg-surface-container rounded-full mx-6 mt-4'
-  }`}
+      className={`fixed inset-x-0 z-50 transition-all duration-200 ${navbarClasses}`}
     >
-      {/* Logo */}
-      <div className={`text-xl font-semibold ${lora.className} text-on-surface`}>ReliefConnect</div>
+      <div className={`mx-auto flex items-center justify-between ${navbarPadding} max-w-7xl`}>
+        {/* Logo */}
+        <div className={`${logoClasses} font-semibold ${lora.className} text-on-surface`}>ReliefConnect</div>
 
       {/* Nav Links */}
-      <div className="flex gap-8 text-sm text-on-surface">
-        <button
+      <div className={`flex ${scrolled ? 'gap-6' : 'gap-8'} text-sm text-on-surface`}>        <button
           onClick={() => router.push('/home')}
           className={`pb-1 border-b-2 ${pathname.startsWith('/home') ? 'border-primary' : 'border-transparent opacity-60'} hover:opacity-100 active:scale-95 transition-all duration-200 ease-out`}
         >
@@ -120,7 +124,7 @@ export default function NavbarTop() {
       </div>
 
       {/* Right Section */}
-      <div className="flex items-center gap-5 text-on-surface">
+      <div className={`flex items-center ${scrolled ? 'gap-4' : 'gap-5'} text-on-surface`}> 
         {searchOpen ? (
           <div className="flex items-center gap-2 bg-surface rounded-full px-3 py-1.5 shadow-sm border border-outline-variant animate-in fade-in duration-200">
             <Search size={16} className="text-on-surface-variant" />
@@ -131,7 +135,7 @@ export default function NavbarTop() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={handleSearch}
-              className="bg-transparent outline-none text-sm w-44 text-on-surface placeholder:text-on-surface-variant"
+              className="bg-transparent outline-none text-sm w-40 text-on-surface placeholder:text-on-surface-variant"
             />
             <button onClick={() => { setSearchOpen(false); setSearchQuery('') }} className="hover:scale-110 active:scale-95 transition-all">
               <X size={14} className="text-on-surface-variant" />
@@ -139,18 +143,18 @@ export default function NavbarTop() {
           </div>
         ) : (
           <button onClick={() => setSearchOpen(true)} className="hover:scale-110 active:scale-95 transition-all duration-200 ease-out">
-            <Search size={18} />
+            <Search size={scrolled ? 16 : 18} />
           </button>
         )}
 
         <button className="hover:scale-110 active:scale-95 transition-all duration-200 ease-out">
-          <Bell size={18} />
+          <Bell size={scrolled ? 16 : 18} />
         </button>
         
         <div className="relative" ref={menuRef}>
           <button
             onClick={() => setProfileMenuOpen(!profileMenuOpen)}
-            className="w-10 h-10 rounded-full overflow-hidden hover:scale-105 active:scale-95 transition-all duration-200 ease-out border-2 border-transparent hover:border-primary focus:border-primary"
+            className={`${scrolled ? 'w-9 h-9' : 'w-10 h-10'} rounded-full overflow-hidden hover:scale-105 active:scale-95 transition-all duration-200 ease-out border-2 border-transparent hover:border-primary focus:border-primary`}
           >
             <img
               src={getUserAvatar(profile?.avatarUrl, profile?.displayName)}
@@ -208,6 +212,6 @@ export default function NavbarTop() {
         </div>
       </div>
     </div>
+  </div>
   )
-
 }

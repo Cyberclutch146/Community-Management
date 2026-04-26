@@ -9,6 +9,7 @@ import { CommunityEvent } from '@/types'
 import { SentinelAlert } from '@/types/sentinel'
 import MapWrapper from '@/components/MapWrapper'
 import SkillMatchBanner from '@/components/SkillMatchBanner'
+import { EventCard } from '@/components/EventCard'
 
 export default function HomePage() {
   const router = useRouter()
@@ -108,22 +109,22 @@ export default function HomePage() {
       <div className="max-w-7xl mx-auto w-full">
 
       {/* Header */}
-      <div className="px-10 mt-12 flex justify-between items-start border-b border-outline-variant/20 pb-8">
-        <div>
+      <div className="px-8 mt-12 flex flex-col gap-8 lg:flex-row lg:items-center justify-between border-b border-outline-variant/20 pb-8">
+        <div className="max-w-3xl">
           <h1 className="text-5xl font-serif tracking-tight">Upcoming Events</h1>
           <p className="mt-3 text-on-surface-variant leading-relaxed max-w-xl">
             Join local community efforts and coordination meetings. Your participation makes a tangible difference.
           </p>
         </div>
 
-        <div className="flex gap-4 mt-6">
-          <button className="flex items-center gap-2 px-5 py-2 rounded-lg bg-surface-variant hover:bg-surface-dim hover:-translate-y-[1px] hover:shadow-sm active:scale-95 transition-all duration-200 ease-out font-medium tracking-wide">
+        <div className="flex flex-wrap items-center gap-4 mt-2 lg:mt-0">
+          <button className="premium-button-muted text-sm tracking-wide">
             <Filter size={16} />
             Filter
           </button>
           <button 
             onClick={() => router.push('/create')}
-            className="flex items-center gap-2 px-5 py-2.5 rounded-lg bg-primary text-on-primary font-medium tracking-wide hover:-translate-y-[1px] hover:shadow-lg active:scale-95 transition-all duration-200 ease-out"
+            className="premium-button-primary text-sm tracking-wide"
           >
             <Plus size={16} />
             Create Event
@@ -137,39 +138,18 @@ export default function HomePage() {
       </div>
 
       {/* Main Section */}
-      <div className="px-10 mt-4 grid grid-cols-3 gap-6">
+      <div className="px-10 mt-4 grid grid-cols-3 gap-6 items-start">
 
         {/* Large Featured Card — links to the event detail page */}
-        <div
-          onClick={() => router.push(`/event/${featured!.id}`)}
-          className="col-span-2 rounded-2xl overflow-hidden relative bg-gradient-to-br from-primary to-primary/80 text-on-primary p-8 flex flex-col justify-end h-[420px] hover:-translate-y-[3px] hover:shadow-[0_20px_40px_rgba(0,0,0,0.15)] transition-all duration-300 cursor-pointer group"
-        >
-          {(featured!.imageUrl || featured!.image) && (
-            <img
-              src={featured!.imageUrl || featured!.image}
-              alt={featured!.title}
-              className="absolute inset-0 w-full h-full object-cover opacity-30 group-hover:opacity-40 transition-opacity"
-            />
-          )}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-          <div className="relative z-10">
-            <div className="flex gap-2 mb-2">
-              {featured!.urgency === 'high' && (
-                <span className="bg-yellow-300 text-black text-xs px-3 py-1 rounded-full font-medium">Critical Need</span>
-              )}
-              <span className="bg-on-primary/20 text-on-primary text-xs px-3 py-1 rounded-full">{featured!.category}</span>
-            </div>
-
-            <h2 className="text-3xl font-serif">{featured!.title}</h2>
-            <p className="text-sm mt-2 opacity-90 max-w-lg line-clamp-2">{featured!.description}</p>
-          </div>
+        <div className="col-span-2">
+          <EventCard event={featured!} featured />
         </div>
 
         {/* Details Card */}
         <div className="flex flex-col gap-4">
 
           {/* Main Details */}
-          <div className="bg-surface/90 backdrop-blur-md rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-outline-variant/20 hover:shadow-[0_12px_40px_rgba(0,0,0,0.12)] transition-all duration-200">
+          <div className="premium-panel p-6">
             <h3 className="text-xl font-serif mb-5">Event Details</h3>
 
             <div className="space-y-5 text-sm">
@@ -217,7 +197,7 @@ export default function HomePage() {
           </div>
 
           {/* Organizer Card */}
-          <div className="bg-surface/70 backdrop-blur-md rounded-2xl p-4 flex items-center justify-between border border-outline-variant/20 hover:shadow-md transition-all duration-200">
+          <div className="premium-panel p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-full bg-primary/20"></div>
               <div>
@@ -257,24 +237,9 @@ export default function HomePage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {moreEvents.map((evt) => (
-              <div
-                key={evt.id}
-                onClick={() => router.push(`/event/${evt.id}`)}
-                className="bg-surface-container rounded-xl overflow-hidden cursor-pointer shadow-[0_4px_20px_rgba(0,0,0,0.06)] border border-outline-variant/20 hover:-translate-y-[2px] hover:shadow-lg transition-all duration-200"
-              >
-                <div className="h-32 w-full relative">
-                  <img src={evt.imageUrl || evt.image || '/logo.svg'} alt={evt.title} className="w-full h-full object-cover" />
-                  <div className="absolute top-2 left-2">
-                    <span className={`text-[10px] px-2 py-0.5 rounded-full ${badgeColor(evt.category)}`}>{evt.category}</span>
-                  </div>
-                </div>
-                <div className="p-4">
-                <h3 className="mt-3 font-serif text-lg">{evt.title}</h3>
-                <p className="text-sm text-on-surface-variant mt-2 line-clamp-2">{evt.description}</p>
-                </div>
-              </div>
+              <EventCard key={evt.id} event={evt} />
             ))}
           </div>
         </div>

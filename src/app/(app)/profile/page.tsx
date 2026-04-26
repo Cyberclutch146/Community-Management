@@ -115,10 +115,9 @@ export default function ProfilePage() {
 
         <div className="hidden md:block mb-10 text-center">
           <h1 className="text-4xl font-bold text-on-surface mb-2 font-headline">Edit Profile</h1>
-          <p className="text-on-surface-variant text-lg">Update your personal information to help the community connect with you.</p>
+          <p className="text-on-surface-variant text-lg">Keep your profile current so neighbors can find and trust your support.</p>
         </div>
-        
-        <form onSubmit={handleSave} className="space-y-8 bg-surface-container-lowest p-6 md:p-10 rounded-2xl shadow-[0_4px_20px_rgba(46,50,48,0.06)] border border-outline-variant/30">
+        <form onSubmit={handleSave} className="space-y-8 premium-panel p-6 md:p-10">
           {/* Profile Photo Section */}
           <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6 border-b border-surface-variant pb-8">
             <div className="relative group">
@@ -132,7 +131,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-center sm:text-left flex-1 mt-2 sm:mt-0">
               <h2 className="text-lg font-bold text-on-surface mb-1">Profile Photo</h2>
-              <p className="text-sm text-on-surface-variant mb-4 max-w-sm">A clear, friendly photo helps build trust within the Terra Relief community. Max size 5MB.</p>
+              <p className="text-sm text-on-surface-variant mb-4 max-w-sm">A clear, friendly photo helps build trust within the Kindred Relief community. Max size 5MB.</p>
               <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                 <label className="px-4 py-2 bg-secondary-container text-on-secondary-container rounded-lg text-sm font-medium hover:bg-surface-variant transition-colors cursor-pointer">
                   Upload New

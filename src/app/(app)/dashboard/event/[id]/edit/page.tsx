@@ -122,10 +122,10 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
 
       <div className="mb-10">
         <h2 className="font-headline text-3xl md:text-4xl text-on-surface font-bold">Edit Event</h2>
-        <p className="text-secondary font-medium mt-2">Update the details of your community initiative.</p>
+        <p className="text-secondary font-medium mt-2">Update the event details and keep your support efforts on track.</p>
       </div>
 
-      <div className="bg-surface-bright rounded-2xl p-8 border border-outline-variant/30">
+      <div className="premium-panel p-8">
         <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
           <div>
             <label className="block text-sm font-semibold text-on-surface mb-2">Event Title</label>
