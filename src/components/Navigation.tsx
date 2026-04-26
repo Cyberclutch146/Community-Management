@@ -116,7 +116,7 @@ export function MobileHeader() {
       <div className="flex gap-2">
         <button aria-label="Notifications" className="text-primary hover:bg-surface-container/40 rounded-full p-2 transition-colors active:opacity-80 duration-150 relative">
           <span className="material-symbols-outlined">notifications</span>
-          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--color-terracotta)] ring-2" style={{ ringColor: 'var(--glass-bg-strong)' }} />
+          <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-[var(--color-terracotta)] ring-2" style={{ boxShadow: '0 0 0 2px var(--glass-bg-strong)' }} />
         </button>
         <button aria-label="Location" className="text-primary hover:bg-surface-container/40 rounded-full p-2 transition-colors active:opacity-80 duration-150">
           <span className="material-symbols-outlined">location_on</span>

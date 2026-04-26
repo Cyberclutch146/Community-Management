@@ -65,6 +65,8 @@ export interface Signup {
   id: string;
   userId: string;
   userName: string;
+  userEmail?: string;
+  ticketId?: string;
   signedUpAt: Timestamp | null;
 }
 

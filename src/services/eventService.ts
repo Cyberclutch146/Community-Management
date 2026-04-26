@@ -195,7 +195,7 @@ export const updateDonation = async (eventId: string, amount: number): Promise<v
 };
 
 // ─── Volunteer signup (transactional) ───────────────────
-export const addVolunteerSignup = async (eventId: string, userId: string, userName: string, userEmail: string = ''): Promise<void> => {
+export const addVolunteerSignup = async (eventId: string, userId: string, userName: string, userEmail: string = '', ticketId: string = ''): Promise<void> => {
   const eventRef = doc(db, EVENTS_COLLECTION, eventId);
 
   await runTransaction(db, async (transaction) => {
@@ -218,6 +218,7 @@ export const addVolunteerSignup = async (eventId: string, userId: string, userNa
     userId,
     userName,
     userEmail,
+    ticketId,
     signedUpAt: new Date()
   });
 
@@ -225,6 +226,7 @@ export const addVolunteerSignup = async (eventId: string, userId: string, userNa
   const userRegistrationRef = doc(db, `users/${userId}/registrations`, eventId);
   await setDoc(userRegistrationRef, {
     eventId,
+    ticketId,
     signedUpAt: new Date(),
     status: 'registered'
   });

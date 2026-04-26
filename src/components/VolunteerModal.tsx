@@ -1,12 +1,13 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { toast } from 'sonner';
+import { useAuth } from '@/context/AuthContext';
 
 interface VolunteerModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onRegister: (name: string, email: string) => Promise<void>;
+  onRegister: (name: string, email: string, ticketId: string) => Promise<void>;
   eventTitle: string;
   eventDescription: string;
   eventLocation: string;
@@ -24,9 +25,11 @@ export function VolunteerModal({
   eventTime,
   enrolledCount
 }: VolunteerModalProps) {
+  const { profile } = useAuth();
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [loading, setLoading] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
+  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -34,22 +37,56 @@ export function VolunteerModal({
   });
   const [ticketId, setTicketId] = useState('');
 
+  // Pre-fill user data
+  useEffect(() => {
+    if (profile && isOpen) {
+      setFormData(prev => ({
+        ...prev,
+        name: prev.name || profile.displayName || '',
+        email: prev.email || profile.email || ''
+      }));
+    }
+  }, [profile, isOpen]);
+
   if (!isOpen) return null;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
+    
     if (!formData.name || !formData.email || !formData.otp) {
       toast.error('Please fill all fields');
       return;
     }
 
+    if (formData.otp !== generatedOtp) {
+      toast.error('Invalid OTP. Please check the code sent to your email.');
+      return;
+    }
+
     setLoading(true);
     try {
-      await onRegister(formData.name, formData.email);
-      const randomId = Math.random().toString(36).substring(2, 12).toUpperCase();
-      setTicketId(randomId);
+      const newTicketId = Math.random().toString(36).substring(2, 12).toUpperCase();
+      await onRegister(formData.name, formData.email, newTicketId);
+      
+      // Send confirmation email with QR code
+      try {
+        await fetch('/api/auth/confirm-registration', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: formData.email,
+            eventTitle,
+            ticketId: newTicketId
+          }),
+        });
+      } catch (emailErr) {
+        console.error("Failed to send confirmation email:", emailErr);
+        // We don't block the success UI if just the email fails
+      }
+
+      setTicketId(newTicketId);
       setStep('success');
-      toast.success('Successfully registered!');
+      toast.success('Successfully registered! Digital ticket sent to your email.');
     } catch (err) {
       console.error(err);
       toast.error('Registration failed. Please try again.');
@@ -63,27 +100,58 @@ export function VolunteerModal({
       toast.error('Please enter your email first');
       return;
     }
+    
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
     setSendingOtp(true);
     try {
-      // Simulate sending OTP
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      toast.success(`OTP sent to ${formData.email}`);
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      setGeneratedOtp(code);
+      
+      const response = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          code,
+          eventTitle
+        }),
+      });
+
+      if (!response.ok) throw new Error("Failed to send verification email");
+
+      toast.success("Verification Code Sent!", {
+        description: `Check your email (${formData.email}) for the code.`,
+      });
     } catch (err) {
-      toast.error('Failed to send OTP');
+      console.error("OTP Error:", err);
+      toast.error('Failed to send OTP. Please try again.');
     } finally {
       setSendingOtp(false);
     }
   };
 
-  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(ticketId)}`;
+  const copyTicketId = () => {
+    navigator.clipboard.writeText(ticketId);
+    toast.success('Ticket ID copied to clipboard');
+  };
+
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(ticketId)}`;
 
   const calendarUrl = (() => {
     const baseUrl = 'https://www.google.com/calendar/render?action=TEMPLATE';
     const text = encodeURIComponent(`Volunteer: ${eventTitle}`);
     const details = encodeURIComponent(eventDescription);
     const location = encodeURIComponent(eventLocation);
-    const startDate = new Date().toISOString().replace(/-|:|\.\d\d\d/g, "");
-    const endDate = new Date(Date.now() + 2 * 60 * 60 * 1000).toISOString().replace(/-|:|\.\d\d\d/g, "");
+    // Use a real date if possible, fallback to tomorrow
+    const date = new Date();
+    date.setDate(date.getDate() + 1);
+    const startDate = date.toISOString().replace(/-|:|\.\d\d\d/g, "");
+    const endDate = new Date(date.getTime() + 2 * 60 * 60 * 1000).toISOString().replace(/-|:|\.\d\d\d/g, "");
     const dates = `${startDate}/${endDate}`;
     return `${baseUrl}&text=${text}&details=${details}&location=${location}&dates=${dates}`;
   })();
@@ -91,148 +159,184 @@ export function VolunteerModal({
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div 
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/60 backdrop-blur-md animate-in fade-in duration-300"
         onClick={onClose}
       />
       
-      <div className="relative bg-surface-bright w-full max-w-md rounded-3xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="p-6 md:p-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="font-headline text-2xl font-bold text-on-surface">
-              {step === 'form' ? 'Volunteer Registration' : 'Registration Complete'}
+      <div className="relative bg-surface-bright w-full max-w-md rounded-[32px] shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-300">
+        {/* Header decoration */}
+        <div className="h-2 bg-gradient-to-r from-primary via-tertiary to-secondary" />
+        
+        <div className="p-8 md:p-10">
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="font-headline text-2xl md:text-3xl font-bold text-on-surface tracking-tight">
+              {step === 'form' ? 'Be a Hero' : 'You\'re All Set!'}
             </h2>
             <button 
               onClick={onClose}
-              className="p-2 hover:bg-surface-variant rounded-full transition-colors"
+              className="p-2 hover:bg-surface-variant rounded-full transition-all hover:rotate-90 active:scale-90"
             >
-              <span className="material-symbols-outlined">close</span>
+              <span className="material-symbols-outlined text-2xl">close</span>
             </button>
           </div>
 
           {step === 'form' ? (
             <form onSubmit={handleRegister} className="space-y-6">
-              <div>
-                <label className="block text-sm font-bold text-secondary mb-2" htmlFor="name">
-                  Name
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-secondary uppercase tracking-widest ml-1" htmlFor="name">
+                  Full Name
                 </label>
-                <input
-                  id="name"
-                  type="text"
-                  required
-                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors"
-                  placeholder="Your full name"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                />
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">person</span>
+                  <input
+                    id="name"
+                    type="text"
+                    required
+                    className="w-full bg-surface-container-low border border-outline-variant/50 rounded-2xl pl-12 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                    placeholder="John Doe"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-secondary mb-2" htmlFor="email">
-                  Email
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-secondary uppercase tracking-widest ml-1" htmlFor="email">
+                  Email Address
                 </label>
                 <div className="flex gap-2">
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    className="flex-1 bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors"
-                    placeholder="your@email.com"
-                    value={formData.email}
-                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  />
+                  <div className="relative flex-1 group">
+                    <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">mail</span>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      className="w-full bg-surface-container-low border border-outline-variant/50 rounded-2xl pl-12 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-medium"
+                      placeholder="john@example.com"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    />
+                  </div>
                   <button
                     type="button"
                     onClick={handleSendOtp}
                     disabled={sendingOtp || !formData.email}
-                    className="whitespace-nowrap px-4 bg-secondary text-on-secondary rounded-xl font-bold text-xs hover:opacity-90 transition-all disabled:opacity-50 active:scale-95"
+                    className="px-5 bg-secondary text-on-secondary rounded-2xl font-bold text-sm hover:opacity-90 transition-all disabled:opacity-50 active:scale-95 whitespace-nowrap shadow-sm shadow-secondary/20"
                   >
-                    {sendingOtp ? 'Sending...' : 'Send OTP'}
+                    {sendingOtp ? '...' : 'Verify'}
                   </button>
                 </div>
               </div>
 
-              <div>
-                <label className="block text-sm font-bold text-secondary mb-2" htmlFor="otp">
-                  OTP Verification
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-secondary uppercase tracking-widest ml-1" htmlFor="otp">
+                  Verification Code
                 </label>
-                <input
-                  id="otp"
-                  type="text"
-                  required
-                  className="w-full bg-surface-container-low border border-outline-variant/50 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors"
-                  placeholder="Enter OTP"
-                  value={formData.otp}
-                  onChange={(e) => setFormData({ ...formData, otp: e.target.value })}
-                />
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant group-focus-within:text-primary transition-colors">lock</span>
+                  <input
+                    id="otp"
+                    type="text"
+                    required
+                    maxLength={6}
+                    className="w-full bg-surface-container-low border border-outline-variant/50 rounded-2xl pl-12 pr-4 py-3.5 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all font-mono tracking-[0.5em] text-center text-lg"
+                    placeholder="000000"
+                    value={formData.otp}
+                    onChange={(e) => setFormData({ ...formData, otp: e.target.value.replace(/\D/g, '') })}
+                  />
+                </div>
+                {generatedOtp && (
+                  <p className="text-[10px] text-primary font-bold uppercase tracking-wider mt-1 ml-1 animate-pulse">
+                    Code sent! Check your email inbox.
+                  </p>
+                )}
               </div>
 
               <button
                 type="submit"
-                disabled={loading}
-                className="w-full bg-primary text-on-primary py-4 rounded-xl font-bold shadow-lg hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-[0.98] disabled:opacity-50"
+                disabled={loading || !generatedOtp}
+                className="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold shadow-xl shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale mt-4 flex items-center justify-center gap-2"
               >
-                {loading ? 'Registering...' : 'Register as Volunteer'}
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <span className="material-symbols-outlined">volunteer_activism</span>
+                    Confirm Registration
+                  </>
+                )}
               </button>
             </form>
           ) : (
-            <div className="text-center">
-              <div className="mb-6 flex justify-center">
-                <div className="bg-primary-fixed text-on-primary-fixed p-4 rounded-full">
-                  <span className="material-symbols-outlined text-4xl">check_circle</span>
+            <div className="text-center animate-in fade-in slide-in-from-bottom-4 duration-500">
+              <div className="mb-8 relative inline-block">
+                <div className="bg-primary/10 p-5 rounded-full relative z-10">
+                  <span className="material-symbols-outlined text-5xl text-primary animate-bounce">verified_user</span>
                 </div>
+                <div className="absolute inset-0 bg-primary/20 rounded-full animate-ping scale-125 opacity-20" />
               </div>
               
-              <h3 className="text-xl font-bold text-on-surface mb-2">My Ticket</h3>
-              <p className="text-on-surface-variant text-sm mb-4">
-                Thank you for volunteering for <br />
-                <span className="font-bold text-primary">{eventTitle}</span>
+              <h3 className="text-2xl font-bold text-on-surface mb-3 tracking-tight">Registration Confirmed</h3>
+              <p className="text-on-surface-variant text-base mb-8 leading-relaxed">
+                Thank you for joining <br />
+                <span className="font-bold text-primary text-lg">{eventTitle}</span>
               </p>
 
-              <div className="grid grid-cols-2 gap-4 mb-6 bg-surface-container-low p-4 rounded-2xl border border-outline-variant/30 text-left">
-                <div>
-                  <span className="block text-[10px] uppercase tracking-wider font-bold text-secondary mb-1">Enrolled</span>
-                  <span className="text-lg font-bold text-on-surface">{enrolledCount + 1} People</span>
+              <div className="bg-surface-container-low p-6 rounded-[24px] border border-outline-variant/30 mb-8 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-3 opacity-10 group-hover:opacity-20 transition-opacity">
+                  <span className="material-symbols-outlined text-6xl">qr_code_2</span>
                 </div>
-                <div className="text-right">
-                  <span className="block text-[10px] uppercase tracking-wider font-bold text-secondary mb-1">Event Time</span>
-                  <span className="text-sm font-bold text-on-surface line-clamp-2 leading-tight">{eventTime}</span>
+                
+                <div className="grid grid-cols-2 gap-4 mb-6 relative z-10">
+                  <div className="text-left">
+                    <span className="block text-[10px] uppercase tracking-widest font-black text-secondary mb-1">Queue Pos</span>
+                    <span className="text-xl font-bold text-on-surface">#{enrolledCount + 1}</span>
+                  </div>
+                  <div className="text-right">
+                    <span className="block text-[10px] uppercase tracking-widest font-black text-secondary mb-1">Time</span>
+                    <span className="text-sm font-bold text-on-surface leading-tight block">{eventTime}</span>
+                  </div>
                 </div>
-              </div>
 
-              <div className="bg-white p-4 rounded-2xl inline-block shadow-md mb-6 border border-outline-variant/30">
-                <img src={qrUrl} alt="Ticket QR Code" className="w-40 h-40" />
-                <div className="mt-3 font-mono text-sm font-bold text-secondary tracking-widest uppercase mb-3">
-                  {ticketId}
+                <div className="bg-white p-5 rounded-2xl inline-block shadow-lg mb-4 border border-outline-variant/10 hover:scale-105 transition-transform cursor-pointer">
+                  <img src={qrUrl} alt="Ticket QR Code" className="w-36 h-36" />
                 </div>
-                <a 
-                  href={calendarUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 py-2 px-3 bg-surface-container-low hover:bg-surface-container-high rounded-xl text-[10px] font-bold text-primary transition-colors border border-outline-variant/20"
-                >
-                  <span className="material-symbols-outlined text-[16px]">calendar_add_on</span>
-                  ADD TO CALENDAR
-                </a>
+
+                <div className="flex items-center justify-center gap-2">
+                  <code className="bg-surface-container-high px-4 py-2 rounded-xl text-primary font-mono font-bold tracking-widest text-sm">
+                    {ticketId}
+                  </code>
+                  <button 
+                    onClick={copyTicketId}
+                    className="p-2 hover:bg-surface-container-high rounded-lg text-secondary transition-colors"
+                    title="Copy ID"
+                  >
+                    <span className="material-symbols-outlined text-lg">content_copy</span>
+                  </button>
+                </div>
               </div>
 
               <div className="space-y-3">
                 <a 
                   href={qrUrl} 
-                  download={`ticket-${ticketId}.png`}
-                  className="flex items-center justify-center gap-2 w-full bg-primary text-on-primary py-3.5 rounded-xl font-bold shadow hover:bg-primary-container transition-colors"
+                  download={`volunteer-ticket-${ticketId}.png`}
+                  className="flex items-center justify-center gap-2 w-full bg-primary text-on-primary py-4 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container transition-all"
                 >
                   <span className="material-symbols-outlined">download</span>
-                  Download Ticket
+                  Save Digital Ticket
                 </a>
 
                 <a 
                   href={calendarUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-2 w-full bg-surface-container-high text-on-surface py-3.5 rounded-xl font-bold hover:bg-surface-variant transition-colors"
+                  className="flex items-center justify-center gap-2 w-full bg-surface-container-high text-on-surface-variant py-4 rounded-2xl font-bold hover:bg-surface-variant hover:text-on-surface transition-all"
                 >
                   <span className="material-symbols-outlined">calendar_add_on</span>
-                  Add to Google Calendar
+                  Sync to Calendar
                 </a>
               </div>
             </div>
@@ -242,3 +346,4 @@ export function VolunteerModal({
     </div>
   );
 }
+

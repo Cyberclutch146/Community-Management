@@ -128,9 +128,9 @@ export function DonationPanel({
     setIsVolunteerModalOpen(true);
   };
 
-  const handleVolunteerRegister = async (name: string, email: string) => {
+  const handleVolunteerRegister = async (name: string, email: string, ticketId: string) => {
     if (!user) return;
-    await addVolunteerSignup(eventId, user.uid, name, email);
+    await addVolunteerSignup(eventId, user.uid, name, email, ticketId);
     setPledged(true);
     onActionComplete?.();
   };
