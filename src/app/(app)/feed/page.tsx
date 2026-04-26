@@ -467,106 +467,106 @@ function FeedContent() {
               </div>
             )}
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {/* View Toggle */}
-            <div
-              className="flex rounded-full p-1"
-              style={{
-                background: 'var(--glass-bg)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid var(--glass-border)',
-                boxShadow: '0 2px 8px rgba(42,45,43,0.04)',
-              }}
-            >
-              <button
-                onClick={() => setViewMode('list')}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'list'
-                  ? 'text-on-primary'
-                  : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-                style={viewMode === 'list' ? {
-                  background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
-                  boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
-                } : undefined}
-              >
-                List
-              </button>
-              <button
-                onClick={() => setViewMode('map')}
-                className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'map'
-                  ? 'text-on-primary'
-                  : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-                style={viewMode === 'map' ? {
-                  background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
-                  boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
-                } : undefined}
-              >
-                Map
-              </button>
-            </div>
-            {/* Location Chip */}
-            <div
-              className="flex items-center rounded-full px-4 py-2 max-w-[200px] md:max-w-[250px]"
-              style={{
-                background: 'var(--glass-bg)',
-                backdropFilter: 'blur(12px)',
-                border: '1px solid var(--glass-border)',
-              }}
-            >
-              <span className="material-symbols-outlined text-[var(--color-terracotta)] mr-2 text-sm shrink-0">location_on</span>
-              <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
-                {userLocation}
-              </span>
-            </div>
-
-            <div className="relative z-40" ref={filterMenuRef}>
-              <button
-                onClick={() => setFilterMenuOpen((open) => !open)}
-                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+          <div className="flex w-full flex-col gap-3 lg:w-auto lg:items-end">
+            <div className="flex flex-wrap items-center gap-3 lg:justify-end">
+              {/* View Toggle */}
+              <div
+                className="flex rounded-full p-1"
                 style={{
-                  background: filterMenuOpen || activeFilterCount > 0
-                    ? 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))'
-                    : 'var(--glass-bg)',
-                  color: filterMenuOpen || activeFilterCount > 0
-                    ? 'var(--color-on-primary-base)'
-                    : 'var(--color-on-surface-base)',
+                  background: 'var(--glass-bg)',
                   backdropFilter: 'blur(12px)',
-                  border: filterMenuOpen || activeFilterCount > 0
-                    ? '1px solid transparent'
-                    : '1px solid var(--glass-border)',
-                  boxShadow: filterMenuOpen || activeFilterCount > 0
-                    ? '0 3px 12px rgba(59,107,74,0.25)'
-                    : '0 2px 8px rgba(42,45,43,0.04)',
+                  border: '1px solid var(--glass-border)',
+                  boxShadow: '0 2px 8px rgba(42,45,43,0.04)',
                 }}
               >
-                <SlidersHorizontal size={16} />
-                Filters
-                {activeFilterCount > 0 && (
-                  <span
-                    className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold"
-                    style={{
-                      background: filterMenuOpen || activeFilterCount > 0 ? 'rgba(255,255,255,0.18)' : 'rgba(59,107,74,0.08)',
-                    }}
-                  >
-                    {activeFilterCount}
-                  </span>
-                )}
-                <ChevronDown size={16} className={`transition-transform duration-300 ${filterMenuOpen ? 'rotate-180' : ''}`} />
-              </button>
+                <button
+                  onClick={() => setViewMode('list')}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'list'
+                    ? 'text-on-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                  style={viewMode === 'list' ? {
+                    background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                    boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+                  } : undefined}
+                >
+                  List
+                </button>
+                <button
+                  onClick={() => setViewMode('map')}
+                  className={`px-4 py-1.5 rounded-full text-sm font-semibold transition-all duration-300 ${viewMode === 'map'
+                    ? 'text-on-primary'
+                    : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                  style={viewMode === 'map' ? {
+                    background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                    boxShadow: '0 2px 8px rgba(59,107,74,0.25)',
+                  } : undefined}
+                >
+                  Map
+                </button>
+              </div>
+              {/* Location Chip */}
+              <div
+                className="flex items-center rounded-full px-4 py-2 max-w-[200px] md:max-w-[250px]"
+                style={{
+                  background: 'var(--glass-bg)',
+                  backdropFilter: 'blur(12px)',
+                  border: '1px solid var(--glass-border)',
+                }}
+              >
+                <span className="material-symbols-outlined text-[var(--color-terracotta)] mr-2 text-sm shrink-0">location_on</span>
+                <span className="text-sm font-medium text-on-surface truncate" title={userLocation}>
+                  {userLocation}
+                </span>
+              </div>
 
-              {filterMenuOpen && (
-                <div
-                  className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5"
+              <div className={`relative ${filterMenuOpen ? 'z-50' : 'z-40'}`} ref={filterMenuRef}>
+                <button
+                  onClick={() => setFilterMenuOpen((open) => !open)}
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
                   style={{
-                    background: 'rgba(253, 250, 245, 1)',
-                    colorScheme: 'light',
-                    backdropFilter: 'blur(28px) saturate(1.5)',
-                    WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
-                    border: '1px solid var(--glass-border)',
-                    boxShadow: 'var(--glass-shadow-lg)',
+                    background: filterMenuOpen || activeFilterCount > 0
+                      ? 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))'
+                      : 'var(--glass-bg)',
+                    color: filterMenuOpen || activeFilterCount > 0
+                      ? 'var(--color-on-primary-base)'
+                      : 'var(--color-on-surface-base)',
+                    backdropFilter: 'blur(12px)',
+                    border: filterMenuOpen || activeFilterCount > 0
+                      ? '1px solid transparent'
+                      : '1px solid var(--glass-border)',
+                    boxShadow: filterMenuOpen || activeFilterCount > 0
+                      ? '0 3px 12px rgba(59,107,74,0.25)'
+                      : '0 2px 8px rgba(42,45,43,0.04)',
                   }}
                 >
+                  <SlidersHorizontal size={16} />
+                  Filters
+                  {activeFilterCount > 0 && (
+                    <span
+                      className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold"
+                      style={{
+                        background: filterMenuOpen || activeFilterCount > 0 ? 'rgba(255,255,255,0.18)' : 'rgba(59,107,74,0.08)',
+                      }}
+                    >
+                      {activeFilterCount}
+                    </span>
+                  )}
+                  <ChevronDown size={16} className={`transition-transform duration-300 ${filterMenuOpen ? 'rotate-180' : ''}`} />
+                </button>
+
+                {filterMenuOpen && (
+                  <div
+                    className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5"
+                    style={{
+                      background: 'var(--color-surface-base)',
+                      backdropFilter: 'blur(28px) saturate(1.5)',
+                      WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
+                      border: '1px solid var(--glass-border)',
+                      boxShadow: 'var(--glass-shadow-lg)',
+                    }}
+                  >
                   <div className="mb-4 flex items-start justify-between gap-3">
                     <div>
                       <p className="text-base font-semibold text-on-surface">Filter events</p>
@@ -575,7 +575,10 @@ function FeedContent() {
                     <button
                       onClick={() => setFilters(DEFAULT_FILTERS)}
                       className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:text-primary"
-                      style={{ background: 'rgba(59,107,74,0.08)' }}
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-primary-base) 10%, var(--color-surface-container-low-base) 90%)',
+                        border: '1px solid color-mix(in srgb, var(--color-primary-base) 14%, var(--glass-border) 86%)',
+                      }}
                     >
                       Reset
                     </button>
@@ -584,7 +587,10 @@ function FeedContent() {
                   {activeFilters.length > 0 && (
                     <div
                       className="mb-4 rounded-2xl p-3"
-                      style={{ background: 'rgba(59,107,74,0.06)', border: '1px solid rgba(59,107,74,0.12)' }}
+                      style={{
+                        background: 'color-mix(in srgb, var(--color-primary-base) 7%, var(--color-surface-container-low-base) 93%)',
+                        border: '1px solid color-mix(in srgb, var(--color-primary-base) 12%, var(--glass-border) 88%)',
+                      }}
                     >
                       <div className="mb-2 flex items-center justify-between gap-2">
                         <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant">Active filters</span>
@@ -595,7 +601,10 @@ function FeedContent() {
                           <span
                             key={filterItem.key}
                             className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
-                            style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid var(--glass-border)' }}
+                            style={{
+                              background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 88%, transparent)',
+                              border: '1px solid var(--glass-border)',
+                            }}
                           >
                             {filterItem.label}
                           </span>
@@ -627,7 +636,7 @@ function FeedContent() {
                                 color: 'var(--color-on-primary-base)',
                                 boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
                               } : {
-                                background: 'rgba(255,255,255,0.62)',
+                                background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 92%, transparent)',
                                 color: 'var(--color-on-surface-base)',
                                 border: '1px solid var(--glass-border)',
                               }}
@@ -662,7 +671,7 @@ function FeedContent() {
                                 color: 'var(--color-on-primary-base)',
                                 boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
                               } : {
-                                background: 'rgba(255,255,255,0.62)',
+                                background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 92%, transparent)',
                                 color: 'var(--color-on-surface-base)',
                                 border: '1px solid var(--glass-border)',
                               }}
@@ -697,7 +706,7 @@ function FeedContent() {
                                 color: 'var(--color-on-primary-base)',
                                 boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
                               } : {
-                                background: 'rgba(255,255,255,0.62)',
+                                background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 92%, transparent)',
                                 color: 'var(--color-on-surface-base)',
                                 border: '1px solid var(--glass-border)',
                               }}
@@ -718,7 +727,11 @@ function FeedContent() {
                         value={filters.category}
                         onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))}
                         className="w-full rounded-2xl px-4 py-3 text-sm outline-none"
-                        style={{ background: 'rgba(255,255,255,0.62)', border: '1px solid var(--glass-border)' }}
+                        style={{
+                          background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 92%, transparent)',
+                          color: 'var(--color-on-surface-base)',
+                          border: '1px solid var(--glass-border)',
+                        }}
                       >
                         <option value="all">All categories</option>
                         {categoryOptions.map((category) => (
@@ -728,7 +741,10 @@ function FeedContent() {
                     </label>
                   </div>
 
-                  <div className="mt-4 flex items-center justify-between rounded-2xl px-3.5 py-3" style={{ background: 'rgba(42,45,43,0.04)' }}>
+                  <div
+                    className="mt-4 flex items-center justify-between rounded-2xl px-3.5 py-3"
+                    style={{ background: 'color-mix(in srgb, var(--color-surface-container-high-base) 78%, transparent)' }}
+                  >
                     <div>
                       <p className="text-sm font-semibold text-on-surface">{sortedEvents.length} matching events</p>
                       <p className="text-xs text-on-surface-variant">Results update instantly as you refine the feed.</p>
@@ -744,11 +760,12 @@ function FeedContent() {
                       Done
                     </button>
                   </div>
-                </div>
-              )}
+                  </div>
+                )}
+              </div>
             </div>
 
-            <div className="relative z-40" ref={sortMenuRef}>
+            <div className={`relative self-start lg:self-end ${filterMenuOpen ? 'z-30' : 'z-40'}`} ref={sortMenuRef}>
               <button
                 onClick={() => setSortMenuOpen((open) => !open)}
                 className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
@@ -775,9 +792,9 @@ function FeedContent() {
 
               {sortMenuOpen && (
                 <div
-                  className="absolute right-0 top-full z-50 mt-3 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5 
-             bg-[rgba(253,250,245,1)] dark:bg-[rgba(13,18,16,1)]"
+                  className="absolute right-0 top-full z-50 mt-3 w-[min(21rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5"
                   style={{
+                    background: 'var(--color-surface-base)',
                     backdropFilter: 'blur(28px) saturate(1.5)',
                     WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
                     border: '1px solid var(--glass-border)',
@@ -808,7 +825,7 @@ function FeedContent() {
                             color: 'var(--color-on-primary-base)',
                             boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
                           } : {
-                            background: 'rgba(255,255,255,0.62)',
+                            background: 'color-mix(in srgb, var(--color-surface-container-lowest-base) 92%, transparent)',
                             color: 'var(--color-on-surface-base)',
                             border: '1px solid var(--glass-border)',
                           }}
