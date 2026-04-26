@@ -15,15 +15,23 @@ if (!admin.apps.length) {
       });
     } else {
       // Fallback: Try to use the local serviceAccountKey.json if it exists
-      const serviceAccount = require('../../../serviceAccountKey.json');
-      admin.initializeApp({
-        credential: admin.credential.cert(serviceAccount)
-      });
+      // We use fs to check for existence and JSON.parse to load it to avoid build-time "Module not found" errors
+      const fs = require('fs');
+      const path = require('path');
+      const serviceAccountPath = path.join(process.cwd(), 'serviceAccountKey.json');
+
+      if (fs.existsSync(serviceAccountPath)) {
+        const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
+        admin.initializeApp({
+          credential: admin.credential.cert(serviceAccount)
+        });
+      } else {
+        console.warn("⚠️ No serviceAccountKey.json found at root and no environment variables set.");
+      }
     }
   } catch (error: any) {
-    console.warn("⚠️ Firebase Admin initialization failed! Please set environment variables or provide serviceAccountKey.json.");
+    console.warn("⚠️ Firebase Admin initialization failed:", error.message);
     console.warn("API routes performing writes will fail.");
-    // We do not throw here to allow the app to build/start, but DB operations will fail later.
   }
 }
 
