@@ -8,11 +8,31 @@ import MapWrapper from '@/components/MapWrapper';
 import SkillMatchBanner from '@/components/SkillMatchBanner';
 import { CommunityEvent } from '@/types';
 import { QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
-import { Sparkles } from 'lucide-react';
+import { ChevronDown, SlidersHorizontal, Sparkles, X } from 'lucide-react';
 import { isPointInPolygon, getDistanceMiles } from '@/utils/geo';
 import { SentinelAlert } from '@/types/sentinel';
 
 const PAGE_SIZE = 12;
+
+type FilterState = {
+  urgency: 'all' | 'high' | 'normal';
+  need: 'all' | 'volunteers' | 'funds' | 'goods';
+  distance: 'all' | 'within-5' | 'within-15' | 'within-30';
+  category: string;
+};
+
+const DEFAULT_FILTERS: FilterState = {
+  urgency: 'all',
+  need: 'all',
+  distance: 'all',
+  category: 'all',
+};
+
+function parseDistanceMiles(distance: string | undefined) {
+  if (!distance) return null;
+  const numericDistance = Number.parseFloat(distance.replace(/[^0-9.]/g, ''));
+  return Number.isFinite(numericDistance) ? numericDistance : null;
+}
 
 export default function FeedPage() {
   return (
@@ -25,10 +45,12 @@ export default function FeedPage() {
 function FeedContent() {
   const searchParams = useSearchParams();
   const urlQuery = searchParams.get('q') || '';
-  const [filter, setFilter] = useState('All Events');
   const [searchQuery, setSearchQuery] = useState(urlQuery);
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list');
   const [userLocation, setUserLocation] = useState('Detecting location...');
+  const [filters, setFilters] = useState<FilterState>(DEFAULT_FILTERS);
+  const [filterMenuOpen, setFilterMenuOpen] = useState(false);
+  const filterMenuRef = useRef<HTMLDivElement | null>(null);
 
   // Semantic search state
   const [semanticResults, setSemanticResults] = useState<string[] | null>(null);
@@ -37,22 +59,33 @@ function FeedContent() {
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Sync from URL when it changes (e.g. user searches from navbar)
-  useEffect(() => { setSearchQuery(urlQuery) }, [urlQuery]);
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setSearchQuery(urlQuery);
+    });
 
-  const categories = [
-    { name: 'All Events', icon: 'tune' },
-    { name: 'Urgent Needs', icon: 'emergency', extraClasses: 'text-error' },
-    { name: 'Within 5 miles', icon: 'expand_more' },
-    { name: 'Food Drive', icon: 'restaurant' },
-    { name: 'Volunteers', icon: 'group' },
-  ];
+    return () => window.cancelAnimationFrame(frame);
+  }, [urlQuery]);
 
   const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [alerts, setAlerts] = useState<any[]>([]); // Sentinel Alerts
+  const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(false);
   const lastDocRef = useRef<QueryDocumentSnapshot<DocumentData> | null>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterMenuRef.current && !filterMenuRef.current.contains(event.target as Node)) {
+        setFilterMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     if ('geolocation' in navigator) {
@@ -65,7 +98,7 @@ function FeedContent() {
             const city = data.address?.city || data.address?.town || data.address?.village || data.address?.county || 'Current Location';
             const state = data.address?.state || '';
             setUserLocation(state ? `${city}, ${state}` : city);
-          } catch (error) {
+          } catch {
             setUserLocation('Location unavailable');
           }
         },
@@ -75,7 +108,11 @@ function FeedContent() {
         }
       );
     } else {
-      setUserLocation('Location not supported');
+      const frame = window.requestAnimationFrame(() => {
+        setUserLocation('Location not supported');
+      });
+
+      return () => window.cancelAnimationFrame(frame);
     }
   }, []);
 
@@ -141,14 +178,19 @@ function FeedContent() {
     }
 
     if (searchQuery.trim()) {
-      setSearchLoading(true);
       searchTimeoutRef.current = setTimeout(() => {
         performSemanticSearch(searchQuery);
       }, 500);
     } else {
-      setSemanticResults(null);
-      setIsAIPowered(false);
-      setSearchLoading(false);
+      const frame = window.requestAnimationFrame(() => {
+        setSemanticResults(null);
+        setIsAIPowered(false);
+        setSearchLoading(false);
+      });
+
+      return () => {
+        window.cancelAnimationFrame(frame);
+      };
     }
 
     return () => {
@@ -173,6 +215,10 @@ function FeedContent() {
     }
   };
 
+  const categoryOptions = Array.from(
+    new Set(events.map((event) => event.category).filter(Boolean))
+  ).sort((a, b) => a.localeCompare(b));
+
   // Smart filtering: use semantic results if available, otherwise fallback to client-side
   const filteredEvents = (() => {
     let result = events;
@@ -191,18 +237,72 @@ function FeedContent() {
       );
     }
 
-    // Category filter (applied on top of search)
-    if (filter !== 'All Events') {
-      result = result.filter(e => e.category === filter);
+    if (filters.urgency !== 'all') {
+      result = result.filter((event) => event.urgency === filters.urgency);
+    }
+
+    if (filters.need !== 'all') {
+      result = result.filter((event) => {
+        if (filters.need === 'volunteers') return Boolean(event.needs?.volunteers?.goal);
+        if (filters.need === 'funds') return Boolean(event.needs?.funds?.goal);
+        if (filters.need === 'goods') return Boolean(event.needs?.goods?.length);
+        return true;
+      });
+    }
+
+    if (filters.distance !== 'all') {
+      const maxDistance = filters.distance === 'within-5'
+        ? 5
+        : filters.distance === 'within-15'
+          ? 15
+          : 30;
+
+      result = result.filter((event) => {
+        const distanceMiles = parseDistanceMiles(event.distance);
+        return distanceMiles !== null && distanceMiles <= maxDistance;
+      });
+    }
+
+    if (filters.category !== 'all') {
+      result = result.filter((event) => event.category === filters.category);
     }
 
     return result;
   })();
 
+  const activeFilters = [
+    filters.urgency !== 'all' ? {
+      key: 'urgency' as const,
+      label: filters.urgency === 'high' ? 'Urgent' : 'Normal urgency',
+    } : null,
+    filters.need !== 'all' ? {
+      key: 'need' as const,
+      label: filters.need === 'goods'
+        ? 'Needs goods'
+        : filters.need === 'funds'
+          ? 'Needs funds'
+          : 'Needs volunteers',
+    } : null,
+    filters.distance !== 'all' ? {
+      key: 'distance' as const,
+      label: filters.distance === 'within-5'
+        ? 'Within 5 miles'
+        : filters.distance === 'within-15'
+          ? 'Within 15 miles'
+          : 'Within 30 miles',
+    } : null,
+    filters.category !== 'all' ? {
+      key: 'category' as const,
+      label: filters.category,
+    } : null,
+  ].filter(Boolean) as Array<{ key: keyof FilterState; label: string }>;
+
+  const activeFilterCount = activeFilters.length;
+
   return (
     <div className="flex-1 flex flex-col text-on-surface w-full">
       <main className="flex-1 p-4 md:p-10 max-w-7xl mx-auto w-full pb-32 md:pb-10">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8 animate-fade-in-up">
+        <div className="relative z-30 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between mb-8 animate-fade-in-up">
           <div>
             <p className="text-secondary font-semibold mb-1 text-sm uppercase tracking-wider">Local Events Feed</p>
             <h2 className="font-headline text-3xl md:text-4xl font-bold text-gradient-earth">Discover & Support</h2>
@@ -283,43 +383,266 @@ function FeedContent() {
                 {userLocation}
               </span>
             </div>
+
+            <div className="relative z-40" ref={filterMenuRef}>
+              <button
+                onClick={() => setFilterMenuOpen((open) => !open)}
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+                style={{
+                  background: filterMenuOpen || activeFilterCount > 0
+                    ? 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))'
+                    : 'var(--glass-bg)',
+                  color: filterMenuOpen || activeFilterCount > 0
+                    ? 'var(--color-on-primary-base)'
+                    : 'var(--color-on-surface-base)',
+                  backdropFilter: 'blur(12px)',
+                  border: filterMenuOpen || activeFilterCount > 0
+                    ? '1px solid transparent'
+                    : '1px solid var(--glass-border)',
+                  boxShadow: filterMenuOpen || activeFilterCount > 0
+                    ? '0 3px 12px rgba(59,107,74,0.25)'
+                    : '0 2px 8px rgba(42,45,43,0.04)',
+                }}
+              >
+                <SlidersHorizontal size={16} />
+                Filters
+                {activeFilterCount > 0 && (
+                  <span
+                    className="inline-flex min-w-5 items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-bold"
+                    style={{
+                      background: filterMenuOpen || activeFilterCount > 0 ? 'rgba(255,255,255,0.18)' : 'rgba(59,107,74,0.08)',
+                    }}
+                  >
+                    {activeFilterCount}
+                  </span>
+                )}
+                <ChevronDown size={16} className={`transition-transform duration-300 ${filterMenuOpen ? 'rotate-180' : ''}`} />
+              </button>
+
+              {filterMenuOpen && (
+                <div
+                  className="absolute right-0 top-full z-50 mt-3 w-[min(24rem,calc(100vw-2rem))] overflow-hidden rounded-[28px] p-4 md:p-5"
+                  style={{
+                    background: 'var(--glass-bg-strong)',
+                    backdropFilter: 'blur(28px) saturate(1.5)',
+                    WebkitBackdropFilter: 'blur(28px) saturate(1.5)',
+                    border: '1px solid var(--glass-border)',
+                    boxShadow: 'var(--glass-shadow-lg)',
+                  }}
+                >
+                  <div className="mb-4 flex items-start justify-between gap-3">
+                    <div>
+                      <p className="text-base font-semibold text-on-surface">Filter events</p>
+                      <p className="mt-1 text-xs leading-relaxed text-on-surface-variant">Narrow the feed by urgency, support type, distance, and category.</p>
+                    </div>
+                    <button
+                      onClick={() => setFilters(DEFAULT_FILTERS)}
+                      className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors hover:text-primary"
+                      style={{ background: 'rgba(59,107,74,0.08)' }}
+                    >
+                      Reset
+                    </button>
+                  </div>
+
+                  {activeFilters.length > 0 && (
+                    <div
+                      className="mb-4 rounded-2xl p-3"
+                      style={{ background: 'rgba(59,107,74,0.06)', border: '1px solid rgba(59,107,74,0.12)' }}
+                    >
+                      <div className="mb-2 flex items-center justify-between gap-2">
+                        <span className="text-[11px] font-bold uppercase tracking-[0.14em] text-on-surface-variant">Active filters</span>
+                        <span className="text-xs font-medium text-primary">{activeFilterCount} applied</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {activeFilters.map((filterItem) => (
+                          <span
+                            key={filterItem.key}
+                            className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold"
+                            style={{ background: 'rgba(255,255,255,0.7)', border: '1px solid var(--glass-border)' }}
+                          >
+                            {filterItem.label}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="space-y-3">
+                    <div
+                      className="rounded-[22px] p-3.5"
+                      style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
+                    >
+                      <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Urgency</span>
+                      <div className="grid grid-cols-3 gap-2">
+                        {[
+                          { value: 'all', label: 'All' },
+                          { value: 'high', label: 'Urgent' },
+                          { value: 'normal', label: 'Normal' },
+                        ].map((option) => {
+                          const active = filters.urgency === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              onClick={() => setFilters((current) => ({ ...current, urgency: option.value as FilterState['urgency'] }))}
+                              className="rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all duration-200"
+                              style={active ? {
+                                background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                                color: 'var(--color-on-primary-base)',
+                                boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
+                              } : {
+                                background: 'rgba(255,255,255,0.62)',
+                                color: 'var(--color-on-surface-base)',
+                                border: '1px solid var(--glass-border)',
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div
+                      className="rounded-[22px] p-3.5"
+                      style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
+                    >
+                      <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Support Needed</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'all', label: 'Any' },
+                          { value: 'volunteers', label: 'Volunteers' },
+                          { value: 'funds', label: 'Funds' },
+                          { value: 'goods', label: 'Goods' },
+                        ].map((option) => {
+                          const active = filters.need === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              onClick={() => setFilters((current) => ({ ...current, need: option.value as FilterState['need'] }))}
+                              className="rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all duration-200"
+                              style={active ? {
+                                background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                                color: 'var(--color-on-primary-base)',
+                                boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
+                              } : {
+                                background: 'rgba(255,255,255,0.62)',
+                                color: 'var(--color-on-surface-base)',
+                                border: '1px solid var(--glass-border)',
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <div
+                      className="rounded-[22px] p-3.5"
+                      style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
+                    >
+                      <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Distance</span>
+                      <div className="grid grid-cols-2 gap-2">
+                        {[
+                          { value: 'all', label: 'Any distance' },
+                          { value: 'within-5', label: 'Within 5 mi' },
+                          { value: 'within-15', label: 'Within 15 mi' },
+                          { value: 'within-30', label: 'Within 30 mi' },
+                        ].map((option) => {
+                          const active = filters.distance === option.value;
+                          return (
+                            <button
+                              key={option.value}
+                              onClick={() => setFilters((current) => ({ ...current, distance: option.value as FilterState['distance'] }))}
+                              className="rounded-2xl px-3 py-2.5 text-sm font-semibold transition-all duration-200"
+                              style={active ? {
+                                background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                                color: 'var(--color-on-primary-base)',
+                                boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
+                              } : {
+                                background: 'rgba(255,255,255,0.62)',
+                                color: 'var(--color-on-surface-base)',
+                                border: '1px solid var(--glass-border)',
+                              }}
+                            >
+                              {option.label}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    <label
+                      className="block rounded-[22px] p-3.5"
+                      style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
+                    >
+                      <span className="mb-2 block text-xs font-bold uppercase tracking-wider text-on-surface-variant">Category</span>
+                      <select
+                        value={filters.category}
+                        onChange={(event) => setFilters((current) => ({ ...current, category: event.target.value }))}
+                        className="w-full rounded-2xl px-4 py-3 text-sm outline-none"
+                        style={{ background: 'rgba(255,255,255,0.62)', border: '1px solid var(--glass-border)' }}
+                      >
+                        <option value="all">All categories</option>
+                        {categoryOptions.map((category) => (
+                          <option key={category} value={category}>{category}</option>
+                        ))}
+                      </select>
+                    </label>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between rounded-2xl px-3.5 py-3" style={{ background: 'rgba(42,45,43,0.04)' }}>
+                    <div>
+                      <p className="text-sm font-semibold text-on-surface">{filteredEvents.length} matching events</p>
+                      <p className="text-xs text-on-surface-variant">Results update instantly as you refine the feed.</p>
+                    </div>
+                    <button
+                      onClick={() => setFilterMenuOpen(false)}
+                      className="rounded-full px-4 py-2 text-sm font-semibold text-on-primary transition-all duration-200 hover:-translate-y-0.5"
+                      style={{
+                        background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+                        boxShadow: '0 3px 10px rgba(59,107,74,0.22)',
+                      }}
+                    >
+                      Done
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
         {/* Skill-Based Recommendations — only show when no search query */}
         {!searchQuery && <SkillMatchBanner condensed />}
 
-        <section className="mb-8 overflow-x-auto pb-4 no-scrollbar animate-fade-in-up delay-100">
-          <div className="flex gap-2.5 min-w-max">
-            {categories.map((cat) => {
-              const isActive = filter === cat.name;
-              return (
+        {activeFilters.length > 0 && (
+          <section className="mb-8 animate-fade-in-up delay-100">
+            <div className="flex flex-wrap items-center gap-2.5">
+              {activeFilters.map((filterItem) => (
                 <button
-                  key={cat.name}
-                  onClick={() => setFilter(cat.name)}
-                  className={`flex items-center gap-2 px-5 py-2.5 rounded-full text-sm transition-all duration-300 hover:-translate-y-0.5 font-semibold ${isActive
-                      ? 'text-on-primary'
-                      : 'text-on-surface hover:text-on-surface'
-                    }`}
-                  style={isActive ? {
-                    background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
-                    boxShadow: '0 3px 12px rgba(59,107,74,0.25)',
-                  } : {
+                  key={filterItem.key}
+                  onClick={() => setFilters((current) => ({ ...current, [filterItem.key]: DEFAULT_FILTERS[filterItem.key] }))}
+                  className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition-all duration-300 hover:-translate-y-0.5"
+                  style={{
                     background: 'var(--glass-bg)',
                     backdropFilter: 'blur(12px)',
                     border: '1px solid var(--glass-border)',
                   }}
                 >
-                  {cat.name !== 'All Events' ? cat.name : undefined}
-                  <span className={`material-symbols-outlined text-[16px] ${cat.extraClasses && !isActive ? cat.extraClasses : ''}`}>
-                    {cat.icon}
-                  </span>
-                  {cat.name === 'All Events' ? cat.name : undefined}
+                  {filterItem.label}
+                  <X size={14} className="text-on-surface-variant" />
                 </button>
-              );
-            })}
-          </div>
-        </section>
+              ))}
+              <button
+                onClick={() => setFilters(DEFAULT_FILTERS)}
+                className="text-sm font-semibold text-on-surface-variant transition-colors hover:text-primary"
+              >
+                Clear all
+              </button>
+            </div>
+          </section>
+        )}
 
         {loading || searchLoading ? (
           <div className="flex flex-col justify-center items-center py-20 gap-3">
