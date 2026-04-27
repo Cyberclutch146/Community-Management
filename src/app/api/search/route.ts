@@ -22,9 +22,18 @@ export async function POST(req: Request) {
     });
   } catch (error: any) {
     console.error("Search API error:", error);
+    
+    // Check for rate limit / quota errors
+    const errorMessage = error.message || "";
+    const isRateLimit = 
+      errorMessage.includes("429") || 
+      errorMessage.toLowerCase().includes("quota") || 
+      errorMessage.toLowerCase().includes("rate limit") ||
+      errorMessage.toLowerCase().includes("exhausted");
+
     return NextResponse.json(
-      { success: false, error: error.message || "Search failed." },
-      { status: 500 }
+      { success: false, error: isRateLimit ? "Rate limits hit. Using basic search instead." : (errorMessage || "Search failed.") },
+      { status: isRateLimit ? 429 : 500 }
     );
   }
 }

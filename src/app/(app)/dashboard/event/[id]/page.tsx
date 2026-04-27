@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, Info } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, Info, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
 import PromotionModal from '@/components/PromotionModal';
 import { SentinelAlert } from '@/types/sentinel';
@@ -201,6 +201,19 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           >
             <Pencil size={16} />
             Edit Event
+          </button>
+          
+          <button 
+            onClick={() => router.push(`/dashboard/event/${eventId}/scan`)}
+            className="px-4 py-2.5 rounded-full font-semibold flex items-center gap-2 transition-all text-sm hover:-translate-y-0.5"
+            style={{
+              background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
+              color: 'var(--color-on-primary-base)',
+              boxShadow: '0 3px 12px rgba(59, 107, 74, 0.25)',
+            }}
+          >
+            <QrCode size={16} />
+            Scan QR
           </button>
           
           <button 

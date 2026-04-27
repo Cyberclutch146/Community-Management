@@ -96,7 +96,7 @@ export async function semanticSearch(searchQuery: string): Promise<{
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const eventSummaries = events
       .map(
@@ -164,7 +164,7 @@ export async function ragRetrieveEvents(userMessage: string, userContext?: any):
 
   try {
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const eventSummaries = allEvents
       .map(

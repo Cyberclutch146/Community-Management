@@ -129,7 +129,12 @@ export default function AIChatWidget() {
         });
       }
     } catch (error: any) {
-      console.error('Chat error:', error);
+      const isRateLimit = error.message?.includes('Rate limits hit');
+      
+      if (!isRateLimit) {
+        console.error('Chat error:', error);
+      }
+
       setMessages(prev => [...prev, {
         role: 'assistant',
         content: error.message || 'Sorry, I\'m having trouble connecting right now. Please try again later.'

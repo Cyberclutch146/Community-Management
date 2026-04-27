@@ -29,7 +29,7 @@ export function VolunteerModal({
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [loading, setLoading] = useState(false);
   const [sendingOtp, setSendingOtp] = useState(false);
-  const [generatedOtp, setGeneratedOtp] = useState<string | null>(null);
+  const [otpSent, setOtpSent] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -58,13 +58,31 @@ export function VolunteerModal({
       return;
     }
 
-    if (formData.otp !== generatedOtp) {
-      toast.error('Invalid OTP. Please check the code sent to your email.');
+    if (!otpSent) {
+      toast.error('Please verify your email first by clicking the Verify button.');
       return;
     }
 
     setLoading(true);
     try {
+      // Verify OTP on the server
+      const verifyRes = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          code: formData.otp,
+        }),
+      });
+
+      const verifyData = await verifyRes.json();
+
+      if (!verifyRes.ok) {
+        toast.error(verifyData.error || 'Invalid verification code.');
+        setLoading(false);
+        return;
+      }
+
       const newTicketId = Math.random().toString(36).substring(2, 12).toUpperCase();
       await onRegister(formData.name, formData.email, newTicketId);
       
@@ -109,21 +127,19 @@ export function VolunteerModal({
 
     setSendingOtp(true);
     try {
-      const code = Math.floor(100000 + Math.random() * 900000).toString();
-      setGeneratedOtp(code);
-      
+      // OTP is now generated entirely on the server
       const response = await fetch('/api/auth/send-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           email: formData.email,
-          code,
           eventTitle
         }),
       });
 
       if (!response.ok) throw new Error("Failed to send verification email");
 
+      setOtpSent(true);
       toast.success("Verification Code Sent!", {
         description: `Check your email (${formData.email}) for the code.`,
       });
@@ -245,7 +261,7 @@ export function VolunteerModal({
                     onChange={(e) => setFormData({ ...formData, otp: e.target.value.replace(/\D/g, '') })}
                   />
                 </div>
-                {generatedOtp && (
+                {otpSent && (
                   <p className="text-[10px] text-primary font-bold uppercase tracking-wider mt-1 ml-1 animate-pulse">
                     Code sent! Check your email inbox.
                   </p>
@@ -254,7 +270,7 @@ export function VolunteerModal({
 
               <button
                 type="submit"
-                disabled={loading || !generatedOtp}
+                disabled={loading || !otpSent}
                 className="w-full bg-primary text-on-primary py-4 rounded-2xl font-bold shadow-xl shadow-primary/20 hover:bg-primary-container hover:text-on-primary-container transition-all active:scale-[0.98] disabled:opacity-50 disabled:grayscale mt-4 flex items-center justify-center gap-2"
               >
                 {loading ? (
@@ -346,4 +362,3 @@ export function VolunteerModal({
     </div>
   );
 }
-

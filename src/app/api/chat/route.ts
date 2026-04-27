@@ -115,7 +115,7 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
 
     // Try models with function calling support
     const modelsToTry = [
-      "gemini-2.5-flash",
+      "gemini-1.5-flash",
       "gemini-2.0-flash",
       "gemini-2.0-flash-lite",
     ];
@@ -218,14 +218,21 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
     });
   } catch (error: any) {
     console.error("Chat API error:", error);
+    
+    // Check for rate limit / quota errors
+    const errorMessage = error.message || "";
+    const isRateLimit = 
+      errorMessage.includes("429") || 
+      errorMessage.toLowerCase().includes("quota") || 
+      errorMessage.toLowerCase().includes("rate limit") ||
+      errorMessage.toLowerCase().includes("exhausted");
+
     return NextResponse.json(
       {
         success: false,
-        error:
-          error.message ||
-          "Something went wrong while generating a response.",
+        error: isRateLimit ? "Rate limits hit. Please try again in a few minutes." : (errorMessage || "Something went wrong while generating a response."),
       },
-      { status: 500 }
+      { status: isRateLimit ? 429 : 500 }
     );
   }
 }
