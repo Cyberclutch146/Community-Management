@@ -8,7 +8,6 @@ export default function MarketingLayout({
 }>) {
   return (
     <>
-      <MarketingNav />
       <main className="flex-grow">
         {children}
       </main>

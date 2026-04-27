@@ -53,7 +53,17 @@ export default function LoginPage() {
     <div className="min-h-[calc(100vh-80px)] flex items-center justify-center p-6 bg-background text-on-background selection:bg-primary/20">
       <div className="w-full max-w-5xl bg-surface border border-outline-variant/30 grid grid-cols-1 md:grid-cols-2 rounded-[20px] overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.08)] hover:shadow-[0_30px_80px_rgba(0,0,0,0.12)] dark:shadow-none transition-shadow duration-500">
         
-        {/* Left Side */}
+        {/* Left Side (Image) */}
+        <div className="relative hidden md:block h-full">
+          <img 
+            className="w-full h-full object-cover brightness-90 dark:brightness-75"
+            src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80" 
+            alt="Volunteers"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
+        </div>
+
+        {/* Right Side (Form) */}
         <div className="flex flex-col justify-start p-12 md:p-16 lg:p-24">
           <h1 className="font-serif text-5xl font-light leading-tight mb-3 text-on-surface">Welcome back.</h1>
           <p className="font-serif text-[34px] italic text-primary mb-6">
@@ -110,16 +120,6 @@ export default function LoginPage() {
           <div className="mt-8 text-[13px] text-on-surface-variant">
             New here? <Link href="/register" className="text-on-surface underline hover:text-primary transition-colors">Create an account</Link>
           </div>
-        </div>
-
-        {/* Right Side */}
-        <div className="relative hidden md:block h-full">
-          <img 
-            className="w-full h-full object-cover brightness-90 dark:brightness-75"
-            src="https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?auto=format&fit=crop&q=80" 
-            alt="Volunteers"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/80 to-transparent"></div>
         </div>
 
       </div>

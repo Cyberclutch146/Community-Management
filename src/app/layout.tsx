@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${literata.variable} ${nunitoSans.variable}`} suppressHydrationWarning>
+    <html lang="en" className={`${literata.variable} ${nunitoSans.variable} scroll-smooth`} suppressHydrationWarning>
       <head>
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL,GRAD,opsz@100..700,0..1,0..1,20..48&display=swap"
