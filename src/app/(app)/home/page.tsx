@@ -78,7 +78,7 @@ export default function HomePage() {
               Join local community efforts and coordination meetings. Your participation makes a tangible difference.
             </p>
           </div>
-          <div className="flex gap-4 mt-6">
+          <div className="mt-6 flex gap-4">
             <button onClick={() => router.push('/create')} className="premium-button-primary text-sm tracking-wide gap-2">
               <Plus size={16} />
               Create Event
@@ -115,7 +115,7 @@ export default function HomePage() {
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-3 mt-2 lg:mt-0">
+        <div className="mt-2 flex w-full justify-end gap-3 lg:mt-0 lg:w-auto lg:flex-wrap lg:items-center">
           <button 
             onClick={() => router.push('/create')}
             className="premium-button-primary text-sm tracking-wide gap-2"
@@ -130,7 +130,7 @@ export default function HomePage() {
       
 
       {/* Main Section */}
-      <div className="px-6 md:px-10 mt-4 grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
+      <div className="px-6 md:px-10 mt-4 grid grid-cols-1 gap-6 items-start lg:grid-cols-3">
 
         {/* Large Featured Card — links to the event detail page */}
         <div className="lg:col-span-2 animate-fade-in-up delay-200">
@@ -242,7 +242,7 @@ export default function HomePage() {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4 min-[560px]:grid-cols-2 md:gap-6 lg:grid-cols-3">
             {recommendedEvents.map((evt) => (
               <EventCard key={evt.id} event={evt} />
             ))}

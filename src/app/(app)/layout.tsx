@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { SideNav, MobileHeader, MobileBottomNav } from '@/components/Navigation';
+import { MobileBottomNav, MobileHeader } from '@/components/Navigation';
 import NavbarTop from '@/components/Navbar_top';
 import { Toaster } from 'sonner';
 import DynamicBackground from '@/components/DynamicBackground';
@@ -24,9 +24,7 @@ export default function AppLayout({
           <NavbarTop />
         </div>
         <div className="flex-1 flex flex-col min-w-0 md:pt-24 pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
-          <div className="md:hidden">
-            <MobileHeader />
-          </div>
+          <MobileHeader />
           <AppAccessGate>{children}</AppAccessGate>
         </div>
         <AIChatWidget />
