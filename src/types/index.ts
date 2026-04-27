@@ -92,3 +92,18 @@ export interface GoodsPledge {
   otherItems: string;     // custom items typed by the user
   pledgedAt: Timestamp | null;
 }
+
+// ─── Notification ───────────────────────────────────────
+export type NotificationType = 'event_join' | 'goods_pledge' | 'event_update' | 'sentinel' | 'profile' | 'general';
+export type NotificationTone = 'alert' | 'info' | 'success';
+
+export interface NotificationData {
+  id: string;
+  title: string;
+  body: string;
+  path: string;           // destination when clicked
+  type: NotificationType;
+  tone: NotificationTone;
+  read: boolean;
+  createdAt: Timestamp | null;
+}

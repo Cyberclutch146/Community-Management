@@ -2,22 +2,30 @@
 
 import { Lora } from 'next/font/google'
 import { useRouter, usePathname } from 'next/navigation'
-import { Search, Bell, X, Sun, Moon, User, LogOut, Info, ChevronDown } from 'lucide-react'
+import { Search, Bell, X, Sun, Moon, User, LogOut, Info, ChevronDown, CheckCheck } from 'lucide-react'
 import { useAuth } from '@/context/AuthContext'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import { useTheme } from 'next-themes'
 import { AnimatePresence, motion } from 'framer-motion'
 import { getUserAvatar } from '@/lib/avatar'
+import { NotificationData } from '@/types'
+import { subscribeToNotifications, markAsRead, markAllAsRead } from '@/services/notificationService'
 import { SentinelAlert } from '@/types/sentinel'
 
 const lora = Lora({ subsets: ['latin'], weight: ['400', '600', '700'] })
 
-type NavNotification = {
-  id: string
-  title: string
-  body: string
-  path: string
-  tone: 'alert' | 'info' | 'success'
+/** Format a Firestore timestamp into a human-readable "time ago" string */
+function timeAgo(ts: any): string {
+  if (!ts) return ''
+  const date = ts.toDate ? ts.toDate() : new Date(ts)
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000)
+  if (seconds < 60) return 'just now'
+  const minutes = Math.floor(seconds / 60)
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  if (hours < 24) return `${hours}h ago`
+  const days = Math.floor(hours / 24)
+  return `${days}d ago`
 }
 
 export default function NavbarTop() {
@@ -30,7 +38,8 @@ export default function NavbarTop() {
   const [searchQuery, setSearchQuery] = useState('')
   const [profileMenuOpen, setProfileMenuOpen] = useState(false)
   const [notificationMenuOpen, setNotificationMenuOpen] = useState(false)
-  const [notifications, setNotifications] = useState<NavNotification[]>([])
+  const [notifications, setNotifications] = useState<NotificationData[]>([])
+  const [localNotifications, setLocalNotifications] = useState<NotificationData[]>([])
   const inputRef = useRef<HTMLInputElement>(null)
   const menuRef = useRef<HTMLDivElement>(null)
   const notificationRef = useRef<HTMLDivElement>(null)
@@ -60,19 +69,37 @@ export default function NavbarTop() {
     return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [])
 
+  // ── Real-time Firestore notifications ──
+  useEffect(() => {
+    if (!profile?.id) {
+      setNotifications([])
+      return
+    }
+
+    const unsubscribe = subscribeToNotifications(profile.id, (firestoreNotifs) => {
+      setNotifications(firestoreNotifs)
+    })
+
+    return () => unsubscribe()
+  }, [profile?.id])
+
+  // ── Local / ephemeral notifications (sentinel + profile) ──
   useEffect(() => {
     const cancelled = { current: false }
 
-    const loadNotifications = async () => {
-      const nextNotifications: NavNotification[] = []
+    const loadLocal = async () => {
+      const items: NotificationData[] = []
 
       if (!profile?.profileComplete) {
-        nextNotifications.push({
+        items.push({
           id: 'complete-profile',
           title: 'Complete your profile',
           body: 'Add your skills and location to unlock better event matching.',
           path: '/profile',
+          type: 'profile',
           tone: 'info',
+          read: false,
+          createdAt: null,
         })
       }
 
@@ -81,48 +108,34 @@ export default function NavbarTop() {
         if (res.ok) {
           const alerts: SentinelAlert[] = await res.json()
           alerts
-            .filter((alert) => alert.severity === 'Extreme' || alert.severity === 'Severe')
-            .slice(0, 3)
+            .filter((a) => a.severity === 'Extreme' || a.severity === 'Severe')
+            .slice(0, 2)
             .forEach((alert) => {
-              nextNotifications.push({
-                id: alert.id,
+              items.push({
+                id: `sentinel-${alert.id}`,
                 title: `${alert.severity} ${alert.type.toLowerCase()} alert`,
                 body: alert.title,
                 path: '/dashboard/sentinel',
+                type: 'sentinel',
                 tone: 'alert',
+                read: false,
+                createdAt: null,
               })
             })
         }
       } catch {
-        nextNotifications.push({
-          id: 'sentinel-unavailable',
-          title: 'Sentinel temporarily unavailable',
-          body: 'Live alert data could not be refreshed just now.',
-          path: '/dashboard/sentinel',
-          tone: 'info',
-        })
+        // sentinel unavailable — skip silently
       }
 
-      if (nextNotifications.length === 0) {
-        nextNotifications.push({
-          id: 'all-clear',
-          title: 'All quiet for now',
-          body: 'No critical Sentinel alerts and your account is up to date.',
-          path: '/dashboard/sentinel',
-          tone: 'success',
-        })
-      }
-
-      if (!cancelled.current) {
-        setNotifications(nextNotifications)
-      }
+      if (!cancelled.current) setLocalNotifications(items)
     }
 
-    loadNotifications()
-    return () => {
-      cancelled.current = true
-    }
+    loadLocal()
+    return () => { cancelled.current = true }
   }, [profile?.profileComplete])
+
+  // ── Merge: persistent first, then local ──
+  const allNotifications = [...notifications, ...localNotifications]
 
   const handleSearch = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && searchQuery.trim()) {
@@ -164,9 +177,25 @@ export default function NavbarTop() {
     return pathname.startsWith(link.path)
   }
 
-  const unreadCount = notifications.filter((notification) => notification.tone !== 'success').length
+  const unreadCount = allNotifications.filter((n) => !n.read).length
 
-  const notificationToneStyles: Record<NavNotification['tone'], { accent: string; background: string; border: string }> = {
+  const handleMarkAllRead = useCallback(async () => {
+    if (!profile?.id) return
+    await markAllAsRead(profile.id)
+    // Also clear local unread flags
+    setLocalNotifications((prev) => prev.map((n) => ({ ...n, read: true })))
+  }, [profile?.id])
+
+  const handleNotificationClick = useCallback(async (notification: NotificationData) => {
+    setNotificationMenuOpen(false)
+    // Mark persistent ones as read
+    if (profile?.id && !notification.id.startsWith('complete-profile') && !notification.id.startsWith('sentinel-')) {
+      markAsRead(profile.id, notification.id)
+    }
+    router.push(notification.path)
+  }, [profile?.id, router])
+
+  const notificationToneStyles: Record<NotificationData['tone'], { accent: string; background: string; border: string }> = {
     alert: {
       accent: 'var(--color-error-base)',
       background: 'rgba(184,50,48,0.08)',
@@ -312,43 +341,68 @@ export default function NavbarTop() {
                           <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-on-surface-variant">Notifications</p>
                           <p className="mt-1 text-base font-semibold text-on-surface">What needs your attention</p>
                         </div>
-                        <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ background: 'rgba(59,107,74,0.08)', color: 'var(--color-primary-base)', border: '1px solid rgba(59,107,74,0.12)' }}>
-                          {notifications.length}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {unreadCount > 0 && (
+                            <button
+                              onClick={(e) => { e.stopPropagation(); handleMarkAllRead(); }}
+                              className="rounded-full p-1.5 transition-all duration-200 hover:scale-110 active:scale-95"
+                              style={{ background: 'rgba(59,107,74,0.12)', color: 'var(--color-primary-base)' }}
+                              title="Mark all as read"
+                            >
+                              <CheckCheck size={14} />
+                            </button>
+                          )}
+                          <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ background: 'rgba(59,107,74,0.08)', color: 'var(--color-primary-base)', border: '1px solid rgba(59,107,74,0.12)' }}>
+                            {allNotifications.length}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="mt-3 space-y-2">
-                      {notifications.map((notification) => {
-                        const tone = notificationToneStyles[notification.tone]
-                        return (
-                          <button
-                            key={notification.id}
-                            onClick={() => {
-                              setNotificationMenuOpen(false)
-                              router.push(notification.path)
-                            }}
-                            className="w-full rounded-[20px] p-3 text-left transition-all duration-200 hover:-translate-y-0.5"
-                            style={{
-                              background: tone.background,
-                              border: `1px solid ${tone.border}`,
-                            }}
-                          >
-                            <div className="flex items-start gap-3">
-                              <span
-                                className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
-                                style={{ background: 'color-mix(in srgb, var(--color-surface-bright-base) 82%, transparent)', color: tone.accent, border: `1px solid ${tone.border}` }}
-                              >
-                                <Bell size={15} />
-                              </span>
-                              <div className="min-w-0">
-                                <p className="text-sm font-semibold text-on-surface">{notification.title}</p>
-                                <p className="mt-1 text-[11px] leading-relaxed text-on-surface-variant">{notification.body}</p>
+                    <div className="mt-3 space-y-2 max-h-[320px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
+                      {allNotifications.length === 0 ? (
+                        <div className="rounded-[20px] p-4 text-center" style={{ background: 'rgba(212,168,82,0.1)', border: '1px solid rgba(212,168,82,0.16)' }}>
+                          <p className="text-sm font-semibold text-on-surface">All quiet for now</p>
+                          <p className="mt-1 text-[11px] text-on-surface-variant">No new notifications. You&apos;re all caught up!</p>
+                        </div>
+                      ) : (
+                        allNotifications.map((notification) => {
+                          const tone = notificationToneStyles[notification.tone]
+                          return (
+                            <button
+                              key={notification.id}
+                              onClick={() => handleNotificationClick(notification)}
+                              className="w-full rounded-[20px] p-3 text-left transition-all duration-200 hover:-translate-y-0.5"
+                              style={{
+                                background: tone.background,
+                                border: `1px solid ${tone.border}`,
+                                opacity: notification.read ? 0.65 : 1,
+                              }}
+                            >
+                              <div className="flex items-start gap-3">
+                                <span
+                                  className="relative mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-xl"
+                                  style={{ background: 'color-mix(in srgb, var(--color-surface-bright-base) 82%, transparent)', color: tone.accent, border: `1px solid ${tone.border}` }}
+                                >
+                                  <Bell size={15} />
+                                  {!notification.read && (
+                                    <span className="absolute -top-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[var(--color-terracotta)] ring-2 ring-[var(--color-surface-base)]" />
+                                  )}
+                                </span>
+                                <div className="min-w-0 flex-1">
+                                  <div className="flex items-baseline justify-between gap-2">
+                                    <p className="text-sm font-semibold text-on-surface truncate">{notification.title}</p>
+                                    {notification.createdAt && (
+                                      <span className="shrink-0 text-[10px] text-on-surface-variant">{timeAgo(notification.createdAt)}</span>
+                                    )}
+                                  </div>
+                                  <p className="mt-1 text-[11px] leading-relaxed text-on-surface-variant">{notification.body}</p>
+                                </div>
                               </div>
-                            </div>
-                          </button>
-                        )
-                      })}
+                            </button>
+                          )
+                        })
+                      )}
                     </div>
 
                     <button

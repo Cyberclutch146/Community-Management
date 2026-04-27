@@ -1,6 +1,7 @@
 import { db } from '@/lib/firebase';
 import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
+import { createNotification } from './notificationService';
 
 const EVENTS_COLLECTION = 'events';
 export const ADMIN_EMAIL = 'ece2024033@rcciit.org.in';
@@ -200,6 +201,36 @@ export const addVolunteerSignup = async (eventId: string, userId: string, userNa
       const errorData = await response.json();
       throw new Error(errorData.error || 'Failed to sign up for event');
     }
+
+    // ── Fire notifications (best-effort, don't block the flow) ──
+    try {
+      const event = await getEventById(eventId);
+      if (event) {
+        // Notify the volunteer
+        await createNotification(userId, {
+          title: `You joined "${event.title}"!`,
+          body: ticketId
+            ? `Your ticket ID is ${ticketId}. See you there!`
+            : 'You\'re all set. See you at the event!',
+          path: `/event/${eventId}`,
+          type: 'event_join',
+          tone: 'success',
+        });
+
+        // Notify the organizer
+        if (event.organizerId && event.organizerId !== userId) {
+          await createNotification(event.organizerId, {
+            title: `New volunteer: ${userName}`,
+            body: `${userName} just signed up for "${event.title}".`,
+            path: `/dashboard/event/${eventId}`,
+            type: 'event_join',
+            tone: 'info',
+          });
+        }
+      }
+    } catch (notifError) {
+      console.warn('Non-critical: notification dispatch failed', notifError);
+    }
   } catch (error) {
     console.error('API /events/join Error:', error);
     throw error;
@@ -300,6 +331,37 @@ export const pledgeGoods = async (
     otherItems,
     pledgedAt: new Date(),
   });
+
+  // ── Fire notifications (best-effort) ──
+  try {
+    const event = await getEventById(eventId);
+    if (event) {
+      const allItems = [...items, ...(otherItems ? [otherItems] : [])];
+      const itemSummary = allItems.slice(0, 3).join(', ') + (allItems.length > 3 ? ` +${allItems.length - 3} more` : '');
+
+      // Notify the volunteer
+      await createNotification(userId, {
+        title: `Pledge confirmed for "${event.title}"`,
+        body: `You're bringing: ${itemSummary}. Thank you!`,
+        path: `/event/${eventId}`,
+        type: 'goods_pledge',
+        tone: 'success',
+      });
+
+      // Notify the organizer
+      if (event.organizerId && event.organizerId !== userId) {
+        await createNotification(event.organizerId, {
+          title: `New goods pledge from ${userName}`,
+          body: `${userName} is bringing: ${itemSummary} to "${event.title}".`,
+          path: `/dashboard/event/${eventId}`,
+          type: 'goods_pledge',
+          tone: 'info',
+        });
+      }
+    }
+  } catch (notifError) {
+    console.warn('Non-critical: notification dispatch failed', notifError);
+  }
 };
 
 export const getUserPledge = async (eventId: string, userId: string) => {
