@@ -3,7 +3,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { SentinelAlert } from '@/types/sentinel';
 import SentinelAlertFeed from '@/components/SentinelAlertFeed';
-import { Activity, Map as MapIcon, Loader2, ShieldAlert, Radio, TriangleAlert, Waves } from 'lucide-react';
+import { Activity, Map as MapIcon, Loader2, ShieldAlert, Radio, TriangleAlert, Waves, RefreshCw } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import dynamic from 'next/dynamic';
 import 'leaflet/dist/leaflet.css';
 
@@ -25,27 +26,33 @@ export default function SentinelDashboardPage() {
   const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'map' | 'feed'>('map');
+  const { resolvedTheme } = useTheme();
 
-  useEffect(() => {
-    async function fetchAlerts() {
-      try {
-        const res = await fetch('/api/sentinel');
-        if (res.ok) {
-          const data = await res.json();
-          setAlerts(data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch Sentinel data", error);
-      } finally {
-        setLoading(false);
+  const fetchAlerts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch('/api/sentinel');
+      if (res.ok) {
+        const data = await res.json();
+        setAlerts(data);
       }
+    } catch (error) {
+      console.error("Failed to fetch Sentinel data", error);
+    } finally {
+      setLoading(false);
     }
+  };
+  useEffect(() => {
     fetchAlerts();
     
     // Poll every 5 minutes
     const interval = setInterval(fetchAlerts, 300000);
     return () => clearInterval(interval);
   }, []);
+
+  const tileUrl = resolvedTheme === 'dark' 
+    ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+    : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
 
   const metrics = useMemo(() => {
     const total = alerts.length;
@@ -93,10 +100,10 @@ export default function SentinelDashboardPage() {
               Live monitoring
             </div>
             <h1 className="mt-4 flex items-center gap-3">
-              <span className="flex h-11 w-11 items-center justify-center rounded-2xl" style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}>
+              <span className="flex h-10 w-10 md:h-11 md:w-11 items-center justify-center rounded-2xl shrink-0" style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}>
                 <ShieldAlert className="h-5 w-5 md:h-6 md:w-6" />
               </span>
-              <span className="text-4xl md:text-5xl font-serif tracking-tight text-gradient-earth">Community Sentinel</span>
+              <span className="text-3xl md:text-5xl font-serif tracking-tight text-gradient-earth">Community Sentinel</span>
             </h1>
             <p className="mt-3 max-w-2xl text-sm md:text-base leading-relaxed text-on-surface-variant">
               Track live safety signals around your community with a premium situational view for organizers, volunteers, and rapid-response teams.
@@ -179,10 +186,15 @@ export default function SentinelDashboardPage() {
         </div>
 
         <div className="flex flex-wrap gap-2.5">
-          <span className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-            <span className="h-2 w-2 rounded-full" style={{ background: 'var(--color-primary-base)', boxShadow: '0 0 0 4px rgba(59,107,74,0.12)' }} />
-            Auto-refresh every 5 min
-          </span>
+          <button 
+            onClick={fetchAlerts}
+            disabled={loading}
+            className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold hover:bg-black/5 dark:hover:bg-white/5 transition-colors" 
+            style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? 'animate-spin' : ''}`} style={{ color: 'var(--color-primary-base)' }} />
+            {loading ? 'Syncing...' : 'Sync Now'}
+          </button>
           <span className="inline-flex items-center gap-2 rounded-full px-3.5 py-2 text-xs font-semibold" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
             <ShieldAlert className="h-3.5 w-3.5" style={{ color: 'var(--color-warm-amber)' }} />
             Route-aware monitoring
@@ -219,7 +231,7 @@ export default function SentinelDashboardPage() {
             >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                url="https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png"
+                url={tileUrl}
               />
               <SentinelMapOverlay alerts={alerts} />
             </MapContainer>

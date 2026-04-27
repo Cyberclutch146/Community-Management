@@ -27,6 +27,13 @@ const SocialIcon = L.divIcon({
   iconAnchor: [7, 7]
 });
 
+const NewsIcon = L.divIcon({
+  html: `<div style="background-color:#f59e0b;width:14px;height:14px;border-radius:50%;border:2px solid white;box-shadow:0 0 4px rgba(0,0,0,0.5);"></div>`,
+  className: 'sentinel-news-marker',
+  iconSize: [14, 14],
+  iconAnchor: [7, 7]
+});
+
 export default function SentinelMapOverlay({ alerts }: { alerts: SentinelAlert[] }) {
   
   // Weather alerts often have polygons.
@@ -54,6 +61,7 @@ export default function SentinelMapOverlay({ alerts }: { alerts: SentinelAlert[]
        case 'WEATHER': return WeatherIcon;
        case 'SEISMIC': return SeismicIcon;
        case 'SOCIAL': return SocialIcon;
+       case 'NEWS': return NewsIcon;
        default: return WeatherIcon;
      }
   };
