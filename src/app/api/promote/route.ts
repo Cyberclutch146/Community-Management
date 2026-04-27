@@ -2,14 +2,20 @@ import { NextRequest, NextResponse } from "next/server";
 import * as XLSX from "xlsx";
 import { sendEmail } from "@/services/emailService";
 import { sendSMS } from "@/services/smsService";
-// eslint-disable-next-line @typescript-eslint/no-require-imports, @typescript-eslint/no-explicit-any
-const firestoreDb: any = require("../../../../config/firebase");
+import { adminDb } from "@/lib/firebase-admin";
 
 const isValidEmail = (email: string) =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 
 export async function POST(req: NextRequest) {
   try {
+    if (!adminDb) {
+      return NextResponse.json(
+        { error: "Server configuration error: Firebase Admin not initialized." },
+        { status: 500 }
+      );
+    }
+    const db = adminDb;
     const formData = await req.formData();
     const message = formData.get("message") as string;
     const campaignId = formData.get("campaignId") as string;
@@ -106,7 +112,7 @@ export async function POST(req: NextRequest) {
           await Promise.all(tasks);
           
           try {
-            await firestoreDb.collection("promotion_logs").add({
+            await db.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               contact,
               status: "sent",
@@ -119,7 +125,7 @@ export async function POST(req: NextRequest) {
           return contact;
         } catch (error: any) {
           try {
-            await firestoreDb.collection("promotion_logs").add({
+            await db.collection("promotion_logs").add({
               campaignId: campaignId || "unknown",
               contact,
               status: "failed",
@@ -139,7 +145,7 @@ export async function POST(req: NextRequest) {
 
     // 🔥 Save master summary log in Firestore
     try {
-      await firestoreDb.collection("promotions").add({
+      await db.collection("promotions").add({
         campaignId: campaignId || "unknown",
         total: contacts.length,
         success,

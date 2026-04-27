@@ -499,7 +499,7 @@ export async function fetchIndiaNews(): Promise<SentinelAlert[]> {
 }
 
 export async function getAllSentinelAlerts(): Promise<SentinelAlert[]> {
-  const [noaa, usgs, reddit, gdacs, reliefweb, nasa, sachet, inNews] = await Promise.all([
+  const results = await Promise.allSettled([
     fetchNoaaAlerts(),
     fetchUsgsEarthquakes(),
     fetchRedditSocialAlerts(),
@@ -510,17 +510,19 @@ export async function getAllSentinelAlerts(): Promise<SentinelAlert[]> {
     fetchIndiaNews()
   ]);
 
-  // Combine and sort by newest first
-  const allAlerts = [
-    ...noaa, 
-    ...usgs, 
-    ...gdacs, 
-    ...reddit, 
-    ...reliefweb, 
-    ...nasa,
-    ...sachet,
-    ...inNews
-  ];
+  const sourceNames = ['NOAA', 'USGS', 'Reddit', 'GDACS', 'ReliefWeb', 'NASA EONET', 'Sachet', 'India News'];
+
+  // Collect successful results and log failures
+  const allAlerts: SentinelAlert[] = [];
+  results.forEach((result, index) => {
+    if (result.status === 'fulfilled') {
+      allAlerts.push(...result.value);
+    } else {
+      console.error(`Sentinel source "${sourceNames[index]}" failed:`, result.reason);
+    }
+  });
+
+  // Sort by newest first
   allAlerts.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
 
   return allAlerts;

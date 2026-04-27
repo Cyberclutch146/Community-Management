@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { doc, getDoc, setDoc, updateDoc, onSnapshot, collection, getDocs, query, orderBy, limit } from 'firebase/firestore';
+import { doc, getDoc, onSnapshot, collection, getDocs } from 'firebase/firestore';
 import { UserProfile, UserProfileCreate } from '@/types';
 
 const USERS_COLLECTION = 'users';
@@ -27,20 +27,29 @@ export const subscribeToUserProfile = (userId: string, callback: (profile: UserP
 };
 
 export const createUserProfile = async (userId: string, data: UserProfileCreate): Promise<void> => {
-  const userDocRef = doc(db, USERS_COLLECTION, userId);
-  await setDoc(userDocRef, {
-    ...data,
-    createdAt: new Date(),
-    updatedAt: new Date()
+  const response = await fetch('/api/user/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'create', userId, data }),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to create profile');
+  }
 };
 
 export const updateUserProfile = async (userId: string, data: Partial<UserProfile>): Promise<void> => {
-  const userDocRef = doc(db, USERS_COLLECTION, userId);
-  await updateDoc(userDocRef, {
-    ...data,
-    updatedAt: new Date()
+  const response = await fetch('/api/user/profile', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ action: 'update', userId, data }),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to update profile');
+  }
 };
 
 // ─── Global Leaderboard ──────────────────────────────────

@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
+import { collection, doc, getDoc, getDocs, setDoc, updateDoc, deleteDoc, query, orderBy, runTransaction, where, limit, startAfter, documentId, QueryDocumentSnapshot, DocumentData } from 'firebase/firestore';
 import { CommunityEvent, CommunityEventCreate } from '@/types';
 import { createNotification } from './notificationService';
 
@@ -259,11 +259,16 @@ export const getEventVolunteers = async (eventId: string): Promise<EventVoluntee
 };
 
 export const updateVolunteerStatus = async (eventId: string, volunteerId: string, attended: boolean): Promise<void> => {
-  const volunteerRef = doc(db, `${EVENTS_COLLECTION}/${eventId}/volunteers`, volunteerId);
-  await updateDoc(volunteerRef, {
-    attended,
-    updatedAt: new Date()
+  const response = await fetch('/api/events/scan', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ eventId, volunteerId, attended }),
   });
+
+  if (!response.ok) {
+    const errorData = await response.json();
+    throw new Error(errorData.error || 'Failed to update volunteer status');
+  }
 };
 
 export const getRegisteredEvents = async (userId: string): Promise<CommunityEvent[]> => {
