@@ -6,8 +6,8 @@ import { ArrowLeft, Users, Globe, Shield, Code, Briefcase, HeartHandshake, Spark
 const TEAM_MEMBERS = [
   {
     name: 'Swagata Ganguly',
-    role: 'Full Stack Web Developer',
-    summary: 'Leads backend architecture, managing databases, APIs, and map integrations to ensure scalable and reliable system performance.',
+    role: 'Full Stack Web and MLOps Engineer',
+    summary: 'Leads backend architecture, managing databases, APIs, and map integrations to ensure scalable AI powered features and Automated systems for reliable system performance.',
     linkedin: 'https://www.linkedin.com/in/swagata-ganguly-453aa6327',
     github: 'https://github.com/Cyberclutch146',
     gradient: 'linear-gradient(135deg, rgba(59,107,74,0.18), rgba(96,160,118,0.08))',
