@@ -18,7 +18,10 @@ export async function POST(req: Request) {
 
     if (!accountSid || !authToken || !fromNumber) {
       return NextResponse.json(
-        { error: "Twilio credentials missing in .env.local." },
+        {
+          error:
+            "Twilio credentials missing. Check TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_PHONE_NUMBER in .env.local.",
+        },
         { status: 500 }
       );
     }
@@ -27,18 +30,28 @@ export async function POST(req: Request) {
 
     const sms = await client.messages.create({
       body: message,
-      to,
       from: fromNumber,
+      to,
     });
 
     return NextResponse.json({
       success: true,
       sid: sms.sid,
     });
-  } catch (error) {
-    console.error("SMS error:", error);
+  } catch (error: any) {
+    console.error("TWILIO SMS ERROR:", {
+      message: error.message,
+      code: error.code,
+      status: error.status,
+      moreInfo: error.moreInfo,
+    });
+
     return NextResponse.json(
-      { error: "Failed to send SMS." },
+      {
+        error: error.message || "Failed to send SMS.",
+        code: error.code || null,
+        moreInfo: error.moreInfo || null,
+      },
       { status: 500 }
     );
   }

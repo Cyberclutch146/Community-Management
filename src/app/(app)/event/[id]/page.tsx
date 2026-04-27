@@ -1,6 +1,5 @@
 'use client';
-
-import { notFound, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { ProgressBar } from '@/components/ProgressBar';
 import { DonationPanel } from '@/components/DonationPanel';
 import { ChatBox } from '@/components/ai/ChatBox';
@@ -43,7 +42,11 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             .catch(() => []),
         ]);
 
-        if (!eventData) notFound();
+        if (!eventData) {
+          toast.error("Event not found.");
+          router.push("/feed");
+           return;
+          }
 
         setEvent(eventData);
         setAlerts(alertsData);
