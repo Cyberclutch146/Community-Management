@@ -34,19 +34,21 @@
 ### 💬 Real-Time Coordination & Alerts
 * **Sentinel Alert System**: Active tracking and mapping of emergency/relief zones to send immediate, automated visual notifications across the feed and dashboards.
 * **Community Chat Rooms**: Dedicated Firestore-backed real-time chat spaces for event volunteers to coordinate effectively.
+* **Centralized Notification Service**: Robust internal notification system to keep users informed about event updates, chat messages, and administrative alerts.
 
 ### 🚀 Automated Bulk Communications
 * **Multi-Channel Promos**: Built-in promotion service that supports bulk parsing of `.csv` and `.xlsx` contact files.
 * **Email & SMS Automation**: Delivers automated event invitations and updates utilizing **Nodemailer** (Email) and **Twilio** (SMS) simultaneously.
 * **Firebase Audit Logs**: Ensures every promotion outcome is reliably logged within Firestore.
 
-### 🔐 Verified Volunteer Ecosystem
-*   **Email OTP Verification**: Secure, real-world verification via **Nodemailer** to ensure valid participants.
-*   **Digital Tickets**: Automated delivery of confirmation emails containing unique **QR codes** for seamless event check-ins.
-*   **Volunteer Leaderboard**: Gamified "Community Heroes" system to recognize top contributors.
+### 🔐 Verified Volunteer Ecosystem & Profiles
+*   **Email OTP Verification**: Secure, real-world verification via **Nodemailer** and dedicated backend APIs to ensure valid participants.
+*   **Event Check-In Scanner**: Built-in QR scanner interface allowing organizers to seamlessly scan and validate volunteer digital tickets directly at the event.
+*   **Volunteer Leaderboards & Profiles**: A dedicated user profile system and a gamified "Community Heroes" leaderboard to recognize and track top contributors.
 
-### 💳 Donations & Financial Integrations
+### 💳 Donations & Material Pledging
 * **Razorpay Integration**: Secure, seamless in-app donation panel for funding campaigns, complete with order creation and fulfillment endpoints.
+* **Goods & Material Pledging**: Interactive forms and modals allowing users to formally pledge physical goods, supplies, or materials for specific relief events.
 
 ---
 
