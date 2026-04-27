@@ -94,31 +94,31 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Stat Cards ── */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-10">
+      <div className="grid grid-cols-2 gap-3 sm:gap-5 lg:grid-cols-4 mb-10">
         {statCards.map((stat, i) => (
           <div
             key={stat.label}
-            className="premium-glass p-5 animate-fade-in-up"
+            className="premium-glass p-4 min-[430px]:p-5 animate-fade-in-up"
             style={{ animationDelay: `${i * 80}ms` }}
           >
-            <div className="flex items-center gap-3 mb-3">
+            <div className="mb-3 flex items-center gap-2.5 min-[430px]:gap-3">
               <span
-                className="material-symbols-outlined rounded-xl px-2.5 py-2 text-[20px]"
+                className="material-symbols-outlined rounded-xl px-2 py-1.5 text-[18px] min-[430px]:px-2.5 min-[430px]:py-2 min-[430px]:text-[20px]"
                 style={{ background: stat.color, color: stat.iconColor }}
               >
                 {stat.icon}
               </span>
-              <p className="text-xs font-bold uppercase tracking-wider text-on-surface-variant">{stat.label}</p>
+              <p className="text-[11px] font-bold uppercase tracking-[0.12em] text-on-surface-variant min-[430px]:text-xs min-[430px]:tracking-wider">{stat.label}</p>
             </div>
-            <p className="text-3xl md:text-4xl font-bold text-on-surface">{stat.value}</p>
+            <p className="text-2xl font-bold text-on-surface min-[430px]:text-3xl md:text-4xl">{stat.value}</p>
           </div>
         ))}
       </div>
 
       {/* ── Events Grid ── */}
-      <div className="mb-6 flex items-center justify-between animate-fade-in-up delay-300">
+      <div className="mb-6 flex flex-col gap-3 min-[560px]:flex-row min-[560px]:items-center min-[560px]:justify-between animate-fade-in-up delay-300">
         <h3 className="font-headline text-xl font-bold text-on-surface">Your Events</h3>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-3 min-[430px]:flex-row min-[430px]:items-center">
           <button
             onClick={handleBackfill}
             disabled={backfilling}
@@ -152,7 +152,7 @@ export default function DashboardPage() {
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 min-[560px]:grid-cols-2 md:gap-6 lg:grid-cols-3">
           {events.map(event => (
             <EventCard key={event.id} event={event} alerts={alerts} onClick={() => router.push(`/dashboard/event/${event.id}`)} />
           ))}
@@ -166,7 +166,7 @@ export default function DashboardPage() {
             <h3 className="font-headline text-xl font-bold text-on-surface">Events You&apos;re Supporting</h3>
             <p className="text-on-surface-variant text-sm mt-1">Local initiatives you&apos;re helping through volunteer support.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-4 min-[560px]:grid-cols-2 md:gap-6 lg:grid-cols-3">
             {registeredEvents.map(event => (
               <EventCard key={event.id} event={event} alerts={alerts} onClick={() => router.push(`/event/${event.id}`)} />
             ))}

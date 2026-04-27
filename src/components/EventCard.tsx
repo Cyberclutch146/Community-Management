@@ -15,7 +15,13 @@ interface EventCardProps {
   matchedSkills?: string[];
 }
 
-export function EventCard({ event, featured = false, sentinelAlerts = [], recommendationPercentage, matchedSkills = [] }: EventCardProps) {
+export function EventCard({
+  event,
+  featured = false,
+  sentinelAlerts = [],
+  recommendationPercentage,
+  matchedSkills = [],
+}: EventCardProps) {
   const hasAlerts = sentinelAlerts.length > 0;
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const [descriptionLineClamp, setDescriptionLineClamp] = useState(featured ? 3 : 2);
@@ -52,7 +58,7 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
 
   const badge = (
     <span
-      className="inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em]"
+      className="inline-flex max-w-full items-center gap-1.5 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.12em]"
       style={{
         background: 'var(--glass-bg)',
         backdropFilter: 'blur(12px)',
@@ -60,7 +66,7 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
         color: 'var(--color-on-surface-variant-base)',
       }}
     >
-      {event.urgency === 'high' ? '🔴 Urgent' : event.category}
+      <span className="truncate">{event.urgency === 'high' ? 'Urgent' : event.category}</span>
     </span>
   );
 
@@ -76,15 +82,15 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
           boxShadow: 'var(--glass-shadow)',
         }}
       >
-        <div className="relative h-72 overflow-hidden">
+        <div className="relative h-56 overflow-hidden sm:h-64 md:h-72">
           <Image
             alt={event.title}
             src={event.imageUrl || event.image || '/logo.svg'}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className="object-cover transition-transform duration-700 will-change-transform group-hover:scale-105"
+            style={{ transform: 'translateZ(0)' }}
           />
-          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--color-surface-base) 0%, rgba(0,0,0,0.1) 40%, transparent 70%)' }} />
-          <div className="absolute left-6 bottom-6 flex flex-wrap gap-2.5">
+          <div className="absolute bottom-4 left-4 flex flex-wrap gap-2 sm:bottom-6 sm:left-6 sm:gap-2.5">
             {badge}
             {hasAlerts && (
               <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 px-3 py-1 text-[11px] font-bold text-white" style={{ boxShadow: '0 2px 8px rgba(239, 68, 68, 0.3)' }}>
@@ -95,51 +101,17 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
           </div>
         </div>
 
-        <div className="p-7 flex flex-col gap-5">
-          <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+        <div className="relative -mt-6 flex flex-col gap-4 px-4 pb-5 pt-8 sm:-mt-10 sm:gap-5 sm:px-7 sm:pb-7 sm:pt-12">
+          <div className="flex flex-wrap items-center gap-2 text-sm text-on-surface-variant sm:gap-3">
             <span className="font-semibold text-on-surface">{event.organizer}</span>
             <span className="opacity-40">•</span>
             <span>{event.distance}</span>
           </div>
           <div className="space-y-3">
-            <h3 className="text-2xl md:text-3xl font-semibold text-on-surface leading-tight tracking-tight">{event.title}</h3>
-            <p className="text-sm leading-relaxed text-on-surface-variant line-clamp-3">{event.description}</p>
+            <h3 className="text-xl font-semibold leading-tight tracking-tight text-on-surface sm:text-2xl md:text-3xl">{event.title}</h3>
+            <p className="line-clamp-3 text-sm leading-relaxed text-on-surface-variant">{event.description}</p>
           </div>
 
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div
-              className="rounded-2xl p-4 text-sm text-on-surface-variant"
-              style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
-            >
-              <div className="font-semibold text-on-surface mb-2.5 text-xs uppercase tracking-wider">Goal Progress</div>
-              <div className="h-2.5 w-full rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
-                <div className="h-full rounded-full transition-all duration-700 ease-out progress-glow" style={{ width: `${event.progress}%`, background: 'linear-gradient(90deg, var(--color-primary-base), var(--color-sage))' }} />
-              </div>
-              <div className="mt-2 text-xs font-medium">{event.progress}% complete</div>
-            </div>
-            <div
-              className="rounded-2xl p-4 text-sm text-on-surface-variant"
-              style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}
-            >
-              <div className="font-semibold text-on-surface mb-2.5 text-xs uppercase tracking-wider">Needs</div>
-              <div className="flex flex-wrap gap-2">
-                {event.needs?.goods && <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ background: 'rgba(194, 113, 91, 0.12)', color: 'var(--color-terracotta)' }}>Goods</span>}
-                {event.needs?.volunteers && <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ background: 'rgba(59, 107, 74, 0.12)', color: 'var(--color-primary-base)' }}>Volunteers</span>}
-                {event.needs?.funds && <span className="rounded-full px-3 py-1 text-xs font-medium" style={{ background: 'rgba(139, 109, 46, 0.12)', color: 'var(--color-tertiary-base)' }}>Funds</span>}
-              </div>
-            </div>
-          </div>
-
-          <Link
-            href={`/event/${event.id}`}
-            className="inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold text-on-primary transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
-            style={{
-              background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
-              boxShadow: '0 4px 14px rgba(59, 107, 74, 0.25), 0 1px 3px rgba(59, 107, 74, 0.1)',
-            }}
-          >
-            View Details
-          </Link>
         </div>
       </article>
     );
@@ -147,7 +119,7 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
 
   return (
     <article
-      className="group overflow-hidden rounded-[24px] transition-all duration-500 ease-out hover:-translate-y-1.5 h-full flex flex-col"
+      className="group flex h-full flex-col overflow-hidden rounded-[22px] transition-all duration-500 ease-out hover:-translate-y-1.5 sm:rounded-[24px]"
       style={{
         background: 'var(--glass-bg-strong)',
         backdropFilter: 'blur(20px) saturate(1.3)',
@@ -156,17 +128,17 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
         boxShadow: 'var(--glass-shadow)',
       }}
     >
-      <div className="relative h-56 overflow-hidden">
+      <div className="relative h-40 overflow-hidden min-[430px]:h-44 sm:h-56">
         <Image
           src={event.imageUrl || event.image || '/logo.svg'}
           alt={event.title}
           fill
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
+          className="object-cover transition-transform duration-500 will-change-transform group-hover:scale-105"
+          style={{ transform: 'translateZ(0)' }}
         />
-        <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--color-surface-base) 0%, rgba(0,0,0,0.05) 45%, transparent 70%)' }} />
-        <div className="absolute left-5 top-5">{badge}</div>
+        <div className="absolute left-4 right-14 top-4 sm:left-5 sm:top-5">{badge}</div>
         {hasAlerts && (
-          <div className="absolute right-5 top-5">
+          <div className="absolute right-4 top-4 sm:right-5 sm:top-5">
             <span className="inline-flex items-center gap-1 rounded-full bg-red-500/90 px-2.5 py-1 text-[10px] font-bold text-white" style={{ boxShadow: '0 2px 8px rgba(239,68,68,0.3)' }}>
               <span className="material-symbols-outlined text-[11px]">warning</span>
               Alert
@@ -174,23 +146,23 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
           </div>
         )}
       </div>
-      <div className="p-6 flex flex-col gap-4 flex-1">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3 text-sm text-on-surface-variant">
+      <div className="relative -mt-4 flex flex-1 flex-col gap-3 px-3.5 pb-3.5 pt-5 min-[430px]:-mt-6 min-[430px]:px-4 min-[430px]:pb-4 min-[430px]:pt-6 sm:-mt-8 sm:gap-4 sm:px-6 sm:pb-6 sm:pt-10">
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+          <div className="min-w-0 flex flex-wrap items-center gap-2 text-sm text-on-surface-variant sm:gap-3">
             <span className="font-semibold text-on-surface">{event.organizer}</span>
             <span className="opacity-40">•</span>
             <span>{event.distance}</span>
           </div>
           {recommendationPercentage !== undefined && (
             <div
-              className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
+              className="inline-flex w-fit items-center gap-2 rounded-full px-3 py-1.5 text-xs font-bold"
               style={{
                 background: 'linear-gradient(135deg, rgba(59,107,74,0.12), rgba(59,107,74,0.06))',
                 color: 'var(--color-primary-base)',
                 border: '1px solid rgba(59,107,74,0.2)',
               }}
             >
-              <span>✓ {recommendationPercentage}% match</span>
+              <span>{recommendationPercentage}% match</span>
             </div>
           )}
         </div>
@@ -224,8 +196,8 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
           </div>
         )}
 
-        <div className="space-y-2.5 flex-1">
-          <h3 ref={titleRef} className="text-xl font-semibold text-on-surface leading-tight tracking-tight">{event.title}</h3>
+        <div className="flex-1 space-y-2">
+          <h3 ref={titleRef} className="text-lg font-semibold leading-tight tracking-tight text-on-surface sm:text-xl">{event.title}</h3>
           <p
             className="overflow-hidden text-sm leading-relaxed text-on-surface-variant"
             style={{
@@ -238,16 +210,16 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-xl p-3.5 text-sm text-on-surface-variant" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-            <div className="font-semibold text-on-surface mb-2 text-xs uppercase tracking-wider">Goal Progress</div>
-            <div className="h-2 w-full rounded-full overflow-hidden" style={{ background: 'var(--color-surface-variant-base)' }}>
-              <div className="h-full rounded-full transition-all duration-700 ease-out progress-glow" style={{ width: `${event.progress}%`, background: 'linear-gradient(90deg, var(--color-primary-base), var(--color-sage))' }} />
+        <div className="grid gap-2.5 min-[430px]:gap-3 sm:grid-cols-2">
+          <div className="rounded-xl p-3 text-sm text-on-surface-variant min-[430px]:p-3.5" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-on-surface">Goal Progress</div>
+            <div className="h-2 w-full overflow-hidden rounded-full" style={{ background: 'var(--color-surface-variant-base)' }}>
+              <div className="progress-glow h-full rounded-full transition-all duration-700 ease-out" style={{ width: `${event.progress}%`, background: 'linear-gradient(90deg, var(--color-primary-base), var(--color-sage))' }} />
             </div>
             <div className="mt-1.5 text-xs font-medium">{event.progress ?? 0}% complete</div>
           </div>
-          <div className="rounded-xl p-3.5 text-sm text-on-surface-variant" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
-            <div className="font-semibold text-on-surface mb-2 text-xs uppercase tracking-wider">Needs</div>
+          <div className="rounded-xl p-3 text-sm text-on-surface-variant min-[430px]:p-3.5" style={{ background: 'var(--glass-bg)', border: '1px solid var(--glass-border)' }}>
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-on-surface">Needs</div>
             <div className="flex flex-wrap gap-1.5">
               {event.needs?.goods && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-medium" style={{ background: 'rgba(194,113,91,0.12)', color: 'var(--color-terracotta)' }}>Goods</span>}
               {event.needs?.volunteers && <span className="rounded-full px-2.5 py-0.5 text-[11px] font-medium" style={{ background: 'rgba(59,107,74,0.12)', color: 'var(--color-primary-base)' }}>Volunteers</span>}
@@ -259,7 +231,7 @@ export function EventCard({ event, featured = false, sentinelAlerts = [], recomm
 
         <Link
           href={`/event/${event.id}`}
-          className="inline-flex items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-on-primary transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
+          className="inline-flex w-full items-center justify-center rounded-full px-6 py-2.5 text-sm font-semibold text-on-primary transition-all duration-300 hover:-translate-y-0.5 active:scale-[0.97]"
           style={{
             background: 'linear-gradient(135deg, var(--color-primary-base) 0%, var(--color-moss) 100%)',
             boxShadow: '0 4px 14px rgba(59, 107, 74, 0.25), 0 1px 3px rgba(59, 107, 74, 0.1)',

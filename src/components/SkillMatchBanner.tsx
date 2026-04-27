@@ -36,7 +36,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
     };
 
     fetchRecommendations();
-  }, [profile?.skills]);
+  }, [profile?.skills, profile?.equipment]);
 
   if (loading || !user) return null;
 
@@ -49,8 +49,8 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
         transition={{ duration: 0.4 }}
         className={condensed ? 'mb-6' : 'mb-8'}
       >
-        <div className="bg-surface-container-low border border-outline-variant/30 rounded-[24px] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-sm">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col items-start justify-between gap-4 rounded-[24px] border border-outline-variant/30 bg-surface-container-low p-4 shadow-sm sm:p-6 md:flex-row md:items-center">
+          <div className="flex items-start gap-4">
             <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
               <Sparkles size={24} />
             </div>
@@ -61,7 +61,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
           </div>
           <Link
             href="/profile"
-            className="shrink-0 px-6 py-3 bg-primary text-on-primary rounded-xl font-bold text-sm hover:bg-primary/90 transition-all active:scale-95 flex items-center gap-2"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-bold text-on-primary transition-all hover:bg-primary/90 active:scale-95 md:w-auto"
           >
             Add Skills
             <ArrowRight size={16} />
@@ -80,7 +80,7 @@ export default function SkillMatchBanner({ condensed = false }: SkillMatchBanner
       transition={{ duration: 0.4 }}
       className={condensed ? 'mb-6' : 'mb-8'}
     >
-      <div className="premium-glass-strong rounded-[24px] p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      <div className="premium-glass-strong flex flex-col items-start justify-between gap-4 rounded-[24px] p-4 sm:p-6 md:flex-row md:items-center">
         <div className="flex items-start gap-4">
           <div className="w-12 h-12 rounded-2xl flex items-center justify-center shrink-0" style={{ background: 'rgba(59,107,74,0.12)' }}>
             <Sparkles size={18} className="text-primary" />
