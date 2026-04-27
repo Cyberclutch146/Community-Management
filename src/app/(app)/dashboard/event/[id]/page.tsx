@@ -26,6 +26,8 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   const [loading, setLoading] = useState(true);
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<'volunteers' | 'goods'>('volunteers');
+  const [smsNumber, setSmsNumber] = useState('');
+  const [sendingSms, setSendingSms] = useState(false);
 
   useEffect(() => {
     if (!user) {
@@ -90,13 +92,63 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
     }
   };
 
-  const handleEmailAll = async () => {
-    const emails = volunteers.map(v => v.userEmail).filter(Boolean);
-    if (emails.length === 0) {
-      toast.info('No email addresses available to contact.');
+    const handleSendSms = async () => {
+    if (!smsNumber.trim()) {
+      toast.error('Please enter a phone number.');
       return;
     }
+
+    if (!event) {
+      toast.error('Event not loaded.');
+      return;
+    }
+
+    setSendingSms(true);
+
+    try {
+      const res = await fetch('/api/sms', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          to: smsNumber,
+          message: `Hi! You are invited to join "${event.title}" on ReliefConnect. Location: ${event.location}. Please open the platform to volunteer or support this event.`,
+        }),
+      });
+
+      let data: any = {};
+
+      try {
+        data = await res.json();
+      } catch {
+        data = {};
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to send SMS.');
+      }
+
+      toast.success('SMS sent successfully.');
+      setSmsNumber('');
+    } catch (error) {
+      console.error('Failed to send SMS:', error);
+      toast.error('Failed to send SMS.');
+    } finally {
+      setSendingSms(false);
+    }
+  };
+
+  const handleEmailAll = async () => {
+    const emails = volunteers
+      .map(v => v.userEmail)
+      .filter((email): email is string => Boolean(email));
     
+    if (emails.length === 0) {
+      toast.info('No volunteer emails to send.');
+      return;
+    }
+
     const subject = encodeURIComponent(`Update regarding ${event?.title || 'Community Event'}`);
     const mailtoLink = `mailto:?bcc=${emails.join(',')}&subject=${subject}`;
     
@@ -153,23 +205,25 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
   if (!event) return null;
 
+  const eventLat = event.lat ?? 0;
+  const eventLng = event.lng ?? 0;
   const currentVols = event.needs?.volunteers?.current || 0;
   const goalVols = event.needs?.volunteers?.goal || 1;
   const progress = Math.min(100, Math.round((currentVols / goalVols) * 100));
 
   const intersectingAlerts = alerts.filter((alert: SentinelAlert) => {
-    if (!event.lat || !event.lng) return false;
+    if (!eventLat || !eventLng) return false;
     
     if (alert.severity === 'Extreme' && alert.polygon && alert.polygon.length > 2) {
-      if (isPointInPolygon({ lat: event.lat, lng: event.lng }, alert.polygon)) {
+      if (isPointInPolygon({ lat: eventLat, lng: eventLng }, alert.polygon)) {
         return true;
       }
     }
     
     if (alert.coordinates?.lat && alert.coordinates?.lng) {
       const distance = getDistanceMiles(
-        event.lat, 
-        event.lng, 
+        eventLat, 
+        eventLng, 
         alert.coordinates.lat, 
         alert.coordinates.lng
       );
@@ -235,6 +289,23 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
             <Mail size={16} />
             Email All
           </button>
+          <div className="flex items-center gap-2">
+            <input
+              value={smsNumber}
+              onChange={(e) => setSmsNumber(e.target.value)}
+              placeholder="+91XXXXXXXXXX"
+              className="min-w-[190px] rounded-full border px-4 py-2.5 text-sm bg-surface-bright outline-none focus:ring-2 focus:ring-primary"
+            />
+
+            <button
+              onClick={handleSendSms}
+              disabled={sendingSms}
+              className="premium-button-muted text-sm gap-2 disabled:opacity-60"
+            >
+              <Send size={16} />
+              {sendingSms ? 'Sending...' : 'Send SMS'}
+            </button>
+          </div>
           
           <button 
             onClick={handleExportCSV}
