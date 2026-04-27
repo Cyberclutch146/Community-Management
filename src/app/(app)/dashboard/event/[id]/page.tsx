@@ -3,9 +3,9 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL, getEventGoodsPledges } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
-import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, Info, QrCode } from 'lucide-react';
+import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, QrCode, Package } from 'lucide-react';
 import { toast } from 'sonner';
 import PromotionModal from '@/components/PromotionModal';
 import { SentinelAlert } from '@/types/sentinel';
@@ -22,8 +22,10 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
   const [event, setEvent] = useState<CommunityEvent | null>(null);
   const [volunteers, setVolunteers] = useState<EventVolunteer[]>([]);
   const [alerts, setAlerts] = useState<SentinelAlert[]>([]);
+  const [goodsPledges, setGoodsPledges] = useState<Awaited<ReturnType<typeof getEventGoodsPledges>>>([]);
   const [loading, setLoading] = useState(true);
   const [isPromotionModalOpen, setIsPromotionModalOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState<'volunteers' | 'goods'>('volunteers');
 
   useEffect(() => {
     if (!user) {
@@ -33,10 +35,11 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
 
     const loadData = async () => {
       try {
-        const [eventData, volunteerData, alertsData] = await Promise.all([
+        const [eventData, volunteerData, alertsData, pledgesData] = await Promise.all([
           getEventById(eventId),
           getEventVolunteers(eventId),
-          fetch('/api/sentinel').then(r => r.json()).catch(() => [])
+          fetch('/api/sentinel').then(r => r.json()).catch(() => []),
+          getEventGoodsPledges(eventId)
         ]);
 
         if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
@@ -48,6 +51,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         setEvent(eventData);
         setVolunteers(volunteerData);
         setAlerts(alertsData);
+        setGoodsPledges(pledgesData);
       } catch (err) {
         console.error('Failed to load event data:', err);
         toast.error('Could not load event data.');
@@ -342,81 +346,154 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           </div>
         </div>
 
-        {/* Right Column: Volunteer List */}
+        {/* Right Column: Tabbed Roster */}
         <div className="md:col-span-3">
           <div className="premium-glass-strong overflow-hidden">
-            <div className="p-6 flex justify-between items-center" style={{ borderBottom: '1px solid var(--glass-border)' }}>
-              <h3 className="font-serif text-xl font-bold text-on-surface">Volunteer Roster</h3>
-              <span
-                className="px-3 py-1 rounded-full text-sm font-semibold"
-                style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
-              >
-                {volunteers.length} Signed Up
-              </span>
+            {/* Tab Header */}
+            <div className="p-6 flex items-center justify-between" style={{ borderBottom: '1px solid var(--glass-border)' }}>
+              <div className="flex gap-1 p-1 rounded-xl" style={{ background: 'var(--color-surface-variant-base)' }}>
+                <button
+                  onClick={() => setActiveTab('volunteers')}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                    activeTab === 'volunteers'
+                      ? 'bg-surface-bright text-on-surface shadow-sm'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  <Users size={15} />
+                  Volunteers
+                  <span className="px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(59,107,74,0.15)', color: 'var(--color-primary-base)' }}>
+                    {volunteers.length}
+                  </span>
+                </button>
+                {event.needs?.goods && event.needs.goods.length > 0 && (
+                  <button
+                    onClick={() => setActiveTab('goods')}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all ${
+                      activeTab === 'goods'
+                        ? 'bg-surface-bright text-on-surface shadow-sm'
+                        : 'text-on-surface-variant hover:text-on-surface'
+                    }`}
+                  >
+                    <Package size={15} />
+                    Goods Pledges
+                    <span className="px-1.5 py-0.5 rounded-full text-xs" style={{ background: 'rgba(59,107,74,0.15)', color: 'var(--color-primary-base)' }}>
+                      {goodsPledges.length}
+                    </span>
+                  </button>
+                )}
+              </div>
             </div>
-            
-            {volunteers.length === 0 ? (
-              <div className="p-12 text-center text-on-surface-variant">
-                <Users size={48} className="mx-auto mb-4 opacity-20" />
-                <p>No volunteers have signed up yet.</p>
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full text-left border-collapse">
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--glass-border)' }} className="text-sm text-on-surface-variant">
-                      <th className="px-6 py-4 font-medium">Volunteer Name</th>
-                      <th className="px-6 py-4 font-medium">Signed Up</th>
-                      <th className="px-6 py-4 font-medium text-center">Attended</th>
-                      <th className="px-6 py-4 font-medium text-right">Actions</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {volunteers.map(vol => (
-                      <tr key={vol.id} className="hover:bg-surface-container/30 transition-colors" style={{ borderBottom: '1px solid var(--glass-border)' }}>
-                        <td className="px-6 py-4">
-                          <div className="font-medium text-on-surface">{vol.userName}</div>
-                          <div className="text-xs text-on-surface-variant font-mono">{vol.userId}</div>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-on-surface-variant">
-                          {vol.signedUpAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
-                        </td>
-                        <td className="px-6 py-4 text-center">
-                          <button
-                            onClick={() => handleToggleAttendance(vol.id, vol.attended)}
-                            className={`p-2 rounded-lg transition-all inline-block ${vol.attended ? 'hover:bg-primary/10' : 'hover:bg-surface-container/50'}`}
-                            style={{ color: vol.attended ? 'var(--color-primary-base)' : 'var(--color-outline-base)' }}
-                            title={vol.attended ? 'Mark as Not Attended' : 'Mark as Attended'}
-                          >
-                            {vol.attended ? <CheckCircle size={20} /> : <Circle size={20} />}
-                          </button>
-                        </td>
-                        <td className="px-6 py-4 text-right">
-                          {vol.userEmail ? (
-                            <a 
-                              href={`mailto:${vol.userEmail}`}
-                              className="p-2 rounded-lg transition-all inline-block hover:bg-primary/10"
-                              style={{ color: 'var(--color-primary-base)' }}
-                              title="Contact Volunteer"
-                            >
-                              <Mail size={18} />
-                            </a>
-                          ) : (
-                            <button 
-                              onClick={() => toast.info('No email provided for this volunteer.')}
-                              className="p-2 rounded-lg transition-colors inline-block cursor-not-allowed"
-                              style={{ color: 'var(--color-outline-base)' }}
-                              title="No Email Available"
-                            >
-                              <Mail size={18} />
-                            </button>
-                          )}
-                        </td>
+
+            {/* Volunteers Tab */}
+            {activeTab === 'volunteers' && (
+              volunteers.length === 0 ? (
+                <div className="p-12 text-center text-on-surface-variant">
+                  <Users size={48} className="mx-auto mb-4 opacity-20" />
+                  <p>No volunteers have signed up yet.</p>
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr style={{ borderBottom: '1px solid var(--glass-border)' }} className="text-sm text-on-surface-variant">
+                        <th className="px-6 py-4 font-medium">Volunteer Name</th>
+                        <th className="px-6 py-4 font-medium">Signed Up</th>
+                        <th className="px-6 py-4 font-medium text-center">Attended</th>
+                        <th className="px-6 py-4 font-medium text-right">Actions</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+                    </thead>
+                    <tbody>
+                      {volunteers.map(vol => (
+                        <tr key={vol.id} className="hover:bg-surface-container/30 transition-colors" style={{ borderBottom: '1px solid var(--glass-border)' }}>
+                          <td className="px-6 py-4">
+                            <div className="font-medium text-on-surface">{vol.userName}</div>
+                            <div className="text-xs text-on-surface-variant font-mono">{vol.userId}</div>
+                          </td>
+                          <td className="px-6 py-4 text-sm text-on-surface-variant">
+                            {vol.signedUpAt?.toDate?.()?.toLocaleDateString() || 'N/A'}
+                          </td>
+                          <td className="px-6 py-4 text-center">
+                            <button
+                              onClick={() => handleToggleAttendance(vol.id, vol.attended)}
+                              className={`p-2 rounded-lg transition-all inline-block ${vol.attended ? 'hover:bg-primary/10' : 'hover:bg-surface-container/50'}`}
+                              style={{ color: vol.attended ? 'var(--color-primary-base)' : 'var(--color-outline-base)' }}
+                              title={vol.attended ? 'Mark as Not Attended' : 'Mark as Attended'}
+                            >
+                              {vol.attended ? <CheckCircle size={20} /> : <Circle size={20} />}
+                            </button>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                            {vol.userEmail ? (
+                              <a 
+                                href={`mailto:${vol.userEmail}`}
+                                className="p-2 rounded-lg transition-all inline-block hover:bg-primary/10"
+                                style={{ color: 'var(--color-primary-base)' }}
+                                title="Contact Volunteer"
+                              >
+                                <Mail size={18} />
+                              </a>
+                            ) : (
+                              <button 
+                                onClick={() => toast.info('No email provided for this volunteer.')}
+                                className="p-2 rounded-lg transition-colors inline-block cursor-not-allowed"
+                                style={{ color: 'var(--color-outline-base)' }}
+                                title="No Email Available"
+                              >
+                                <Mail size={18} />
+                              </button>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )
+            )}
+
+            {/* Goods Pledges Tab */}
+            {activeTab === 'goods' && (
+              goodsPledges.length === 0 ? (
+                <div className="p-12 text-center text-on-surface-variant">
+                  <Package size={48} className="mx-auto mb-4 opacity-20" />
+                  <p>No one has pledged goods yet.</p>
+                </div>
+              ) : (
+                <div className="divide-y" style={{ borderColor: 'var(--glass-border)' }}>
+                  {goodsPledges.map(pledge => (
+                    <div key={pledge.id} className="px-6 py-4 hover:bg-surface-container/30 transition-colors">
+                      <div className="flex items-start justify-between gap-4">
+                        <div>
+                          <p className="font-semibold text-on-surface">{pledge.userName}</p>
+                          <p className="text-xs text-on-surface-variant mt-0.5">
+                            {pledge.pledgedAt?.toDate?.()?.toLocaleDateString() || 'Date unknown'}
+                          </p>
+                        </div>
+                        <div className="flex flex-wrap gap-1.5 justify-end max-w-[60%]">
+                          {pledge.items?.map((item: string) => (
+                            <span
+                              key={item}
+                              className="px-2.5 py-1 text-xs font-semibold rounded-full"
+                              style={{ background: 'rgba(59,107,74,0.1)', color: 'var(--color-primary-base)' }}
+                            >
+                              {item}
+                            </span>
+                          ))}
+                          {pledge.otherItems && (
+                            <span
+                              className="px-2.5 py-1 text-xs font-semibold rounded-full"
+                              style={{ background: 'rgba(212,168,82,0.12)', color: 'var(--color-warm-amber)' }}
+                            >
+                              + {pledge.otherItems}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )
             )}
           </div>
         </div>

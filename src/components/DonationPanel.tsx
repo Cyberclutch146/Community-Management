@@ -3,9 +3,10 @@
 import { EventNeeds } from '@/types';
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/context/AuthContext';
-import { updateDonation, addVolunteerSignup } from '@/services/eventService';
+import { updateDonation, addVolunteerSignup, getUserPledge } from '@/services/eventService';
 import { toast } from 'sonner';
 import { VolunteerModal } from './VolunteerModal';
+import { GoodsPledgeModal } from './GoodsPledgeModal';
 
 declare global {
   interface Window {
@@ -38,6 +39,8 @@ export function DonationPanel({
   const [pledged, setPledged] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isVolunteerModalOpen, setIsVolunteerModalOpen] = useState(false);
+  const [isGoodsPledgeModalOpen, setIsGoodsPledgeModalOpen] = useState(false);
+  const [goodsPledged, setGoodsPledged] = useState(false);
   const [donationAmount, setDonationAmount] = useState(50);
   const [activeTab, setActiveTab] = useState<'funds' | 'volunteers' | 'goods'>(
     needs.funds ? 'funds' : needs.volunteers ? 'volunteers' : 'goods'
@@ -55,6 +58,14 @@ export function DonationPanel({
       }
     };
   }, []);
+
+  // Check if the user already pledged goods for this event
+  useEffect(() => {
+    if (!user) return;
+    getUserPledge(eventId, user.uid).then((pledge) => {
+      if (pledge) setGoodsPledged(true);
+    });
+  }, [user, eventId]);
 
   const handleDonate = async () => {
     if (!user) { toast.info('Please sign in to donate'); return; }
@@ -247,17 +258,20 @@ export function DonationPanel({
                 <li key={idx}>{item}</li>
               ))}
             </ul>
-            {!pledged ? (
+            {!goodsPledged ? (
               <button 
-                onClick={() => setPledged(true)}
+                onClick={() => {
+                  if (!user) { toast.info('Please sign in to contribute'); return; }
+                  setIsGoodsPledgeModalOpen(true);
+                }}
                 className="w-full border-2 border-primary text-primary py-3 rounded-xl font-bold hover:bg-primary/5 transition-colors active:scale-[0.98]"
               >
                 I Can Bring Something
               </button>
             ) : (
-              <div className="bg-surface-variant text-on-surface-variant p-4 rounded-xl flex items-center justify-center gap-2 font-semibold border border-outline-variant/50">
-                <span className="material-symbols-outlined">inventory_2</span>
-                Drop-off info sent
+              <div className="bg-primary-fixed/20 text-primary p-4 rounded-xl flex items-center justify-center gap-2 font-semibold border border-primary/30">
+                <span className="material-symbols-outlined">check_circle</span>
+                Thank you for pledging!
               </div>
             )}
           </div>
@@ -273,6 +287,18 @@ export function DonationPanel({
         eventLocation={eventLocation}
         eventTime={eventTime}
         enrolledCount={enrolledCount}
+      />
+
+      <GoodsPledgeModal
+        isOpen={isGoodsPledgeModalOpen}
+        onClose={() => setIsGoodsPledgeModalOpen(false)}
+        eventId={eventId}
+        eventTitle={eventTitle}
+        goodsList={needs.goods || []}
+        onPledgeComplete={() => {
+          setGoodsPledged(true);
+          onActionComplete?.();
+        }}
       />
     </>
   );

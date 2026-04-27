@@ -82,3 +82,13 @@ export interface ChatMessage {
   text: string;
   createdAt: Timestamp | null;
 }
+
+// ─── Goods Pledge ───────────────────────────────────────
+export interface GoodsPledge {
+  id: string;
+  userId: string;
+  userName: string;
+  items: string[];        // items selected from the organizer's list
+  otherItems: string;     // custom items typed by the user
+  pledgedAt: Timestamp | null;
+}

@@ -283,3 +283,43 @@ export const backfillEventCoordinates = async (): Promise<{ total: number, updat
   
   return { total: snapshot.docs.length, updated, failed };
 };
+
+// ─── Goods Pledges ──────────────────────────────────────
+export const pledgeGoods = async (
+  eventId: string,
+  userId: string,
+  userName: string,
+  items: string[],
+  otherItems: string
+): Promise<void> => {
+  const pledgeRef = doc(db, `${EVENTS_COLLECTION}/${eventId}/goodsPledges`, userId);
+  await setDoc(pledgeRef, {
+    userId,
+    userName,
+    items,
+    otherItems,
+    pledgedAt: new Date(),
+  });
+};
+
+export const getUserPledge = async (eventId: string, userId: string) => {
+  const pledgeRef = doc(db, `${EVENTS_COLLECTION}/${eventId}/goodsPledges`, userId);
+  const snap = await getDoc(pledgeRef);
+  if (snap.exists()) {
+    return { id: snap.id, ...snap.data() };
+  }
+  return null;
+};
+
+export const getEventGoodsPledges = async (eventId: string) => {
+  const pledgesRef = collection(db, `${EVENTS_COLLECTION}/${eventId}/goodsPledges`);
+  const snapshot = await getDocs(query(pledgesRef, orderBy('pledgedAt', 'desc')));
+  return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })) as Array<{
+    id: string;
+    userId: string;
+    userName: string;
+    items: string[];
+    otherItems: string;
+    pledgedAt: any;
+  }>;
+};
