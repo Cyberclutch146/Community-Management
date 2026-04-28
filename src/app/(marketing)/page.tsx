@@ -10,8 +10,8 @@ import { useAuth } from '@/context/AuthContext';
 
 export default function LandingPage() {
   const { user, loading } = useAuth();
-  const primaryHref = user ? '/feed' : '/register';
-  const primaryLabel = user ? 'Go to Dashboard' : 'Join Us';
+  const primaryHref = user ? '/home' : '/register';
+  const primaryLabel = user ? 'Home' : 'Join Us';
 
   return (
     <div className="min-h-screen bg-background text-on-background font-body relative overflow-x-hidden selection:bg-primary/20">
@@ -216,7 +216,7 @@ export default function LandingPage() {
           </div>
           <div className="flex flex-col gap-4 lg:w-max lg:ml-auto">
             <Link href={primaryHref} className="inline-flex items-center justify-center gap-2 px-12 py-5 bg-on-primary text-primary font-medium text-[13px] tracking-wider uppercase hover:bg-background transition-colors">
-              {user ? 'Go to Dashboard' : 'Apply to Volunteer'}
+              {user ? 'Just Home' : 'Apply to Volunteer'}
               <ArrowRight size={14} />
             </Link>
             {!user && !loading && (
