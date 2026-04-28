@@ -50,7 +50,7 @@ export default function RegisterPage() {
         totalDonated: 0,
         profileComplete: false
       });
-      router.push('/feed');
+      router.replace('/home');
     } catch (err: any) {
       setError(err.message || 'Failed to register');
     } finally {
@@ -67,7 +67,7 @@ export default function RegisterPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      router.push('/feed');
+      router.replace('/home');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in with Google');
     } finally {

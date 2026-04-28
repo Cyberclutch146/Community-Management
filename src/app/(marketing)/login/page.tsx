@@ -28,7 +28,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push('/feed');
+      router.replace('/home');
     } catch (err: any) {
       setError(err.message || 'Failed to login');
     } finally {
@@ -41,7 +41,7 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await loginWithGoogle();
-      router.push('/feed');
+      router.replace('/home');
     } catch (err: any) {
       setError(err.message || 'Failed to sign in with Google');
     } finally {
