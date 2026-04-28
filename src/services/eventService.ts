@@ -4,7 +4,14 @@ import { CommunityEvent, CommunityEventCreate } from '@/types';
 import { createNotification } from './notificationService';
 
 const EVENTS_COLLECTION = 'events';
-export const ADMIN_EMAIL = 'ece2024033@rcciit.org.in';
+export const ADMIN_EMAILS = [
+  'ece2024033@rcciit.org.in',
+  'blazingswagata@gmail.com',
+  'sagotogdg@gmail.com',
+  'dasanuvab38@gmail.com',
+  'debadree.sekhar.das@gmail.com',
+  'dhritimansiva2@gmail.com',
+];
 
 // ─── Paginated fetch ────────────────────────────────────
 export interface PaginatedEvents {

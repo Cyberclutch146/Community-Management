@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, ADMIN_EMAIL } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, ADMIN_EMAILS } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
 import { ArrowLeft, Users, CheckCircle, QrCode } from 'lucide-react';
 import { toast } from 'sonner';
@@ -36,7 +36,7 @@ export default function ScanPage({ params }: { params: Promise<{ id: string }> }
           getEventVolunteers(eventId),
         ]);
 
-        if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
+        if (eventData?.organizerId !== user.uid && !ADMIN_EMAILS.includes(user.email || '')) {
           toast.error('You do not have permission to access this page.');
           router.push('/dashboard');
           return;

@@ -7,7 +7,7 @@ import { VolunteerLeaderboard } from '@/components/VolunteerLeaderboard';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState, useEffect, use, useCallback } from 'react';
-import { getEventById, deleteEvent, ADMIN_EMAIL } from '@/services/eventService';
+import { getEventById, deleteEvent, ADMIN_EMAILS } from '@/services/eventService';
 import { useAuth } from '@/context/AuthContext';
 import { toast } from 'sonner';
 import { Trash2, AlertTriangle, Info, Send } from 'lucide-react';
@@ -128,7 +128,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
     }
   };
 
-  const isAdmin = user?.email === ADMIN_EMAIL;
+  const isAdmin = ADMIN_EMAILS.includes(user?.email || '');
 
   if (loading) {
     return (

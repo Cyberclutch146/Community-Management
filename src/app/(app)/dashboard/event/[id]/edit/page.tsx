@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, updateEvent, ADMIN_EMAIL } from '@/services/eventService';
+import { getEventById, updateEvent, ADMIN_EMAILS } from '@/services/eventService';
 import { uploadImage } from '@/services/storageService';
 import { toast } from 'sonner';
 import LocationPickerWrapper from '@/components/LocationPickerWrapper';
@@ -47,7 +47,7 @@ export default function EditEventPage({ params }: { params: Promise<{ id: string
           return;
         }
 
-        if (eventData.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
+        if (eventData.organizerId !== user.uid && !ADMIN_EMAILS.includes(user.email || '')) {
           toast.error('You do not have permission to edit this event.');
           router.push('/dashboard');
           return;
