@@ -148,7 +148,6 @@ export async function ragRetrieveEvents(userMessage: string, userContext?: any):
     return allEvents;
   }
 
-<<<<<<< HEAD
   const rankedIds = keywordSearch(userMessage, allEvents, userContext);
   if (rankedIds.length === 0) return allEvents.slice(0, 5);
 
