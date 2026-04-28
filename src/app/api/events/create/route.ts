@@ -24,8 +24,12 @@ const geocodeLocation = async (address: string): Promise<{lat: number, lng: numb
 export async function POST(req: NextRequest) {
   try {
     if (!adminDb) {
+      const { initError } = require("@/lib/firebase-admin");
       return NextResponse.json(
-        { error: "Server configuration error: Firebase Admin not initialized." },
+        { 
+          error: "Server configuration error: Firebase Admin not initialized.",
+          details: initError || "Unknown initialization failure."
+        },
         { status: 500 }
       );
     }
