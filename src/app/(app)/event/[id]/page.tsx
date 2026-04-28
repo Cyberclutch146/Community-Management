@@ -374,27 +374,6 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
             </div>
 
             {/* SMS Invite */}
-            <div className="flex flex-wrap items-center gap-3 mb-10 premium-glass p-4 rounded-[20px]">
-              <input
-                value={smsNumber}
-                onChange={(e) => setSmsNumber(e.target.value)}
-                placeholder="+91XXXXXXXXXX"
-                className="flex-1 min-w-[220px] rounded-full border px-4 py-2 bg-white text-sm outline-none focus:ring-2 focus:ring-primary"
-              />
-
-              <button
-                onClick={handleSendSms}
-                disabled={sendingSms}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white transition-all hover:-translate-y-0.5 active:scale-95 disabled:opacity-60"
-                style={{
-                  background: 'var(--color-primary-base)',
-                  boxShadow: '0 3px 12px rgba(59,107,74,0.25)',
-                }}
-              >
-                <Send size={16} />
-                {sendingSms ? 'Sending...' : 'Send SMS'}
-              </button>
-            </div>
           </div>
 
           {event.needs?.funds && (
