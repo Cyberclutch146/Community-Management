@@ -137,7 +137,10 @@ export function VolunteerModal({
         }),
       });
 
-      if (!response.ok) throw new Error("Failed to send verification email");
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        throw new Error(errorData?.error || errorData?.details || "Failed to send verification email");
+      }
 
       setOtpSent(true);
       toast.success("Verification Code Sent!", {
