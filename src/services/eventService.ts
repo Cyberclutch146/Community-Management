@@ -9,8 +9,8 @@ export const ADMIN_EMAILS = [
   'blazingswagata@gmail.com',
   'sagotogdg@gmail.com',
   'dasanuvab38@gmail.com',
-  'debadree.sekhar.das@gmail.com'
-  'dhritimansiva2@gmail.com'
+  'debadree.sekhar.das@gmail.com',
+  'dhritimansiva2@gmail.com',
 ];
 
 // ─── Paginated fetch ────────────────────────────────────
