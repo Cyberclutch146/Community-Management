@@ -73,7 +73,7 @@ export default function LoginPage() {
             We're glad you're here.
           </p>
           <p className="text-on-surface-variant text-[15px] mb-12 max-w-[380px]">
-            Continue your journey of impact with Kindred Relief Network.
+            Continue your journey of impact with NexusAid.
           </p>
 
           <form onSubmit={handleLogin} className="flex flex-col">

@@ -8,7 +8,7 @@ import AppAccessGate from '@/components/AppAccessGate';
 
 export const metadata: Metadata = {
   title: 'Home - Outreach & Relief',
-  description: 'Kindred Relief Network - Local Response Team',
+  description: 'NexusAid - Local Response Team',
 };
 
 export default function AppLayout({

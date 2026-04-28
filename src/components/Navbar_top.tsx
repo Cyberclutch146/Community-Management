@@ -242,7 +242,7 @@ export default function NavbarTop() {
             scrolled ? 'text-[17px]' : 'text-[22px]'
           }`}
         >
-          <span className="text-gradient-earth">ReliefConnect</span>
+          <span className="text-gradient-earth">NexusAid</span>
         </button>
 
         {/* Nav Links */}

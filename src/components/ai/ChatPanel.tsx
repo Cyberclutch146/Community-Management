@@ -15,7 +15,7 @@ export function ChatPanel({ onClose }: Props) {
       id: crypto.randomUUID(),
       role: "assistant",
       content:
-        "Hi — I’m Kindred AI. I can help with volunteering, donations, event discovery, and platform questions.",
+        "Hi — I’m NexusAid AI. I can help with volunteering, donations, event discovery, and platform questions.",
     },
   ]);
 
@@ -73,7 +73,7 @@ export function ChatPanel({ onClose }: Props) {
     <div className="w-[360px] rounded-2xl border border-neutral-200 bg-white shadow-2xl">
       <div className="flex items-center justify-between border-b px-4 py-3">
         <div>
-          <h3 className="font-semibold text-neutral-900">Ask Kindred AI</h3>
+          <h3 className="font-semibold text-neutral-900">Ask NexusAid AI</h3>
           <p className="text-xs text-neutral-500">Chat for quick help</p>
         </div>
         <button onClick={onClose} className="text-sm text-neutral-500 hover:text-black">

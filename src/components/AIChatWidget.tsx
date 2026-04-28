@@ -57,8 +57,8 @@ export default function AIChatWidget() {
     // Add a greeting if opening for the first time
     if (!isOpen && messages.length === 0) {
       const greeting = user && profile
-        ? `Hi ${profile.displayName?.split(' ')[0] || 'there'}! 👋 I'm the Kindred Relief Network AI assistant. I can help you find events, sign you up to volunteer, and navigate the platform. What would you like to do?`
-        : 'Hi there! 👋 I\'m the Kindred Relief Network AI assistant. How can I help you today?';
+        ? `Hi ${profile.displayName?.split(' ')[0] || 'there'}! 👋 I'm the NexusAid AI assistant. I can help you find events, sign you up to volunteer, and navigate the platform. What would you like to do?`
+        : 'Hi there! 👋 I\'m the NexusAid AI assistant. How can I help you today?';
       setMessages([
         { role: 'assistant', content: greeting }
       ]);
@@ -198,7 +198,7 @@ export default function AIChatWidget() {
                   <Bot size={18} />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-sm">Kindred AI Assistant</h3>
+                  <h3 className="font-semibold text-sm">NexusAid AI Assistant</h3>
                   <div className="flex items-center gap-1 text-on-primary/70 text-[10px]">
                     <Sparkles size={10} />
                     <span>Can search, sign up & navigate</span>

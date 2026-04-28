@@ -84,7 +84,7 @@ export default function RegisterPage() {
           <Link href="/" className="mb-8 inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.12em] uppercase text-on-surface-variant transition-colors hover:text-primary">
             ← Back to homepage
           </Link>
-          <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3 text-on-surface">Join Kindred.</h1>
+          <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3 text-on-surface">Join NexusAid.</h1>
           <p className="text-on-surface-variant text-[15px] mb-10 max-w-[380px]">
             Create your volunteer account and start making an impact in your community.
           </p>
@@ -150,7 +150,7 @@ export default function RegisterPage() {
               type="submit" 
               disabled={loading}
             >
-              {loading ? 'Creating Account...' : 'Join Kindred'}
+              {loading ? 'Creating Account...' : 'Join NexusAid'}
             </button>
 
             <div className="flex items-center gap-3 my-6 text-outline text-[12px] tracking-[0.1em] uppercase before:flex-1 before:h-px before:bg-outline-variant/30 after:flex-1 after:h-px after:bg-outline-variant/30">

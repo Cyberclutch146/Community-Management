@@ -1,11 +1,11 @@
-# Kindred Relief Network (KRN) 🤝
+# NexusAid 🤝
 
 [![Next.js](https://img.shields.io/badge/Next.js-15+-black?style=for-the-badge&logo=next.js)](https://nextjs.org/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-4.0-38B2AC?style=for-the-badge&logo=tailwind-css)](https://tailwindcss.com/)
 [![Firebase](https://img.shields.io/badge/Firebase-Auth%20%26%20Firestore-FFCA28?style=for-the-badge&logo=firebase)](https://firebase.google.com/)
 [![Gemini AI](https://img.shields.io/badge/Gemini_AI-1.5_Flash-4285F4?style=for-the-badge&logo=google-gemini)](https://ai.google.dev/)
 
-**Kindred Relief Network** is a comprehensive, professional, community-centric platform engineered to streamline disaster relief, volunteer coordination, and mutual aid. It combines real-time situational awareness with intelligent matchmaking to empower communities when they need it most. Designed with a focus on speed, compassion, and automation, KRN empowers local communities and NGOs to organize efficiently during critical times.
+**NexusAid** is a comprehensive, professional, community-centric platform engineered to streamline disaster relief, volunteer coordination, and mutual aid. It combines real-time situational awareness with intelligent matchmaking to empower communities when they need it most. Designed with a focus on speed, compassion, and automation, NexusAid empowers local communities and NGOs to organize efficiently during critical times.
 
 ---
 
@@ -182,4 +182,4 @@ npm run dev
 
 ---
 
-Built with ❤️ by the Kindred Relief Team to foster community resilience and rapid response.
+Built with ❤️ by the NexusAid Team to foster community resilience and rapid response.

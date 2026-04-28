@@ -46,7 +46,7 @@ export function SideNav() {
           <span className="material-symbols-outlined" style={{fontVariationSettings: "'FILL' 1"}}>energy_savings_leaf</span>
         </div>
         <div>
-          <h1 className="font-headline text-lg font-bold tracking-tight text-gradient-earth">Kindred Relief</h1>
+          <h1 className="font-headline text-lg font-bold tracking-tight text-gradient-earth">NexusAid</h1>
           <p className="font-body text-xs text-on-surface-variant">Local Response Team</p>
         </div>
       </Link>

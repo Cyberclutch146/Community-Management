@@ -38,7 +38,7 @@ export default function LandingPage() {
                   className="text-[30px] font-semibold tracking-tight text-on-background"
                   style={{ fontFamily: 'var(--font-elms-sans), "Segoe UI", sans-serif' }}
                 >
-                  Juva Saathi Platform
+                  NexusAid Platform
                 </p>
               </div>
             </Link>
@@ -54,7 +54,7 @@ export default function LandingPage() {
             <em className="italic text-primary">grown through care.</em>
           </h1>
           <p className="text-on-surface-variant text-base md:text-lg font-light leading-relaxed max-w-md mb-14">
-            Empowering our neighbors through dedicated relief efforts and sustainable community support. Join Kindred Relief Network in making a difference today.
+            Empowering our neighbors through dedicated relief efforts and sustainable community support. Join NexusAid in making a difference today.
           </p>
           <div className="flex flex-wrap items-center gap-6">
             <Link href={primaryHref} className="inline-flex items-center gap-3 px-8 py-4 bg-on-background text-background font-medium text-[13px] tracking-widest uppercase hover:bg-primary hover:text-on-primary transition-all duration-300 transform hover:-translate-y-1 shadow-[0_16px_34px_rgba(42,45,43,0.12)]">

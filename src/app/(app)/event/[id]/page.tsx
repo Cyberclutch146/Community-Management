@@ -108,7 +108,8 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
         },
         body: JSON.stringify({
           to: smsNumber,
-          message: `Hi! You are invited to join "${event.title}" on ReliefConnect. Location: ${event.location}. Please open the platform to volunteer or support this event.`,
+          message: `Hi! You are invited to join "${event.title}" on NexusAid. Location: ${event.location}. Please open the platform to volunteer or support this event.`,
+          url: window.location.href     
         }),
       });
 
@@ -335,7 +336,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
 
               <a
                 href={`https://wa.me/?text=${encodeURIComponent(
-                  `🌿 Check out "${event.title}" on Kindred Relief Network!\n\n${event.description?.slice(
+                  `🌿 Check out "${event.title}" on NexusAid!\n\n${event.description?.slice(
                     0,
                     120
                   )}...\n\n📍 ${event.location}\n\n👉 ${
@@ -356,7 +357,7 @@ export default function EventDetails({ params }: { params: Promise<{ id: string 
 
               <a
                 href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(
-                  `🌿 Check out "${event.title}" — a community initiative at ${event.location}! #KindredRelief #Community`
+                  `🌿 Check out "${event.title}" — a community initiative at ${event.location}! #NexusAid #Community`
                 )}&url=${encodeURIComponent(
                   typeof window !== 'undefined' ? window.location.href : ''
                 )}`}

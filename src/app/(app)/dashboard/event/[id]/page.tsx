@@ -113,7 +113,8 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
         },
         body: JSON.stringify({
           to: smsNumber,
-          message: `Hi! You are invited to join "${event.title}" on ReliefConnect. Location: ${event.location}. Please open the platform to volunteer or support this event.`,
+          message: `Hi! You are invited to join "${event.title}" on NexusAid. Location: ${event.location}. Please open the platform to volunteer or support this event.`,
+          url: window.location.href,
         }),
       });
 

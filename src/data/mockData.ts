@@ -110,7 +110,7 @@ export const mockEvents: Event[] = [
   {
     id: 'e5',
     title: 'Community Mental Health Workshop',
-    organizer: 'Kindred Minds',
+    organizer: 'NexusAid',
     location: 'Community Center',
     distance: '2.1 mi away',
     description: 'A free workshop on managing stress and supporting neighbors during difficult times. No image provided, should show fallback logo.',

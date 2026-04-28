@@ -1,6 +1,6 @@
-# Kindred Relief Network (KRN) - Project Status & Roadmap
+# NexusAid - Project Status & Roadmap
 
-This document outlines the current state of the Kindred Relief Network project, tracking completed milestones and remaining high-priority tasks.
+This document outlines the current state of the NexusAid project, tracking completed milestones and remaining high-priority tasks.
 
 ## ✅ Completed Milestones
 

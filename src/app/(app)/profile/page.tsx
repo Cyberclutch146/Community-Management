@@ -149,7 +149,7 @@ export default function ProfilePage() {
             </div>
             <div className="text-center sm:text-left flex-1 mt-2 sm:mt-0">
               <h2 className="text-lg font-bold text-on-surface mb-1">Profile Photo</h2>
-              <p className="text-sm text-on-surface-variant mb-4 max-w-sm">A clear, friendly photo helps build trust within the Kindred Relief community. Max size 5MB.</p>
+              <p className="text-sm text-on-surface-variant mb-4 max-w-sm">A clear, friendly photo helps build trust within the NexusAid community. Max size 5MB.</p>
               <div className="flex flex-wrap gap-3 justify-center sm:justify-start">
                 <label
                   className="px-4 py-2 rounded-lg text-sm font-semibold cursor-pointer transition-all hover:-translate-y-0.5"

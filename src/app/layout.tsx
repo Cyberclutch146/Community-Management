@@ -23,7 +23,7 @@ const elmsSans = Elms_Sans({
 });
 
 export const metadata: Metadata = {
-  title: 'Kindred Relief Network - Outreach & Relief',
+  title: 'NexusAid - Outreach & Relief',
   description: 'Rooted in community, grown through care.',
 };
 

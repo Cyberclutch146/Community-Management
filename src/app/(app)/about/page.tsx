@@ -211,7 +211,7 @@ export default function AboutPage() {
             </h1>
 
             <p className="mt-4 max-w-3xl text-lg md:text-xl text-on-surface-variant leading-relaxed">
-              Kindred Relief Network helps communities organize support, surface urgent needs, and respond with more clarity when time matters most.
+              NexusAid helps communities organize support, surface urgent needs, and respond with more clarity when time matters most.
             </p>
 
             <div className="mt-6 flex flex-wrap gap-3">
