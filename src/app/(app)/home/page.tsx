@@ -11,7 +11,7 @@ import MapWrapper from '@/components/MapWrapper'
 import SkillMatchBanner from '@/components/SkillMatchBanner'
 import { EventCard } from '@/components/EventCard'
 import { getRecommendedEvents } from '@/services/recommendationService'
-
+import { getUserProfile } from '@/services/userService'
 export default function HomePage() {
   const router = useRouter()
   const { profile } = useAuth()
@@ -19,6 +19,7 @@ export default function HomePage() {
   const [events, setEvents] = useState<CommunityEvent[]>([])
   const [alerts, setAlerts] = useState<SentinelAlert[]>([])
   const [loading, setLoading] = useState(true)
+  const [organizerEmail, setOrganizerEmail] = useState<string | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -41,10 +42,30 @@ export default function HomePage() {
   // Pick a featured event: prefer the first 'high' urgency active event, else the newest
   const featured = events.find(e => e.urgency === 'high' && e.status === 'active') ?? events[0] ?? null
 
+  useEffect(() => {
+    if (featured?.organizerId) {
+      getUserProfile(featured.organizerId)
+        .then(profile => {
+          if (profile?.email) {
+            setOrganizerEmail(profile.email)
+          }
+        })
+        .catch(err => console.error("Failed to fetch organizer profile:", err))
+    }
+  }, [featured?.organizerId])
+
   const recommendedEvents = getRecommendedEvents(profile?.skills ?? [], events, 4, profile?.equipment ?? [])
     .map(({ event }) => event)
     .filter(event => event.id !== featured?.id)
     .slice(0, 3)
+
+  const handleContactOrganizer = (eventTitle: string) => {
+    if (organizerEmail) {
+      window.location.href = `mailto:${organizerEmail}?subject=Regarding Event: ${encodeURIComponent(eventTitle)}`;
+    } else {
+      alert("Organizer contact information is currently unavailable.");
+    }
+  };
 
   // Helper: format a Firestore Timestamp/Date for display
   const formatDate = (ts: CommunityEvent['createdAt']) => {
@@ -203,11 +224,13 @@ export default function HomePage() {
             </div>
 
             <button
+              onClick={() => handleContactOrganizer(featured!.title)}
               className="w-9 h-9 flex items-center justify-center rounded-xl text-on-primary transition-all duration-200 hover:-translate-y-0.5 active:scale-95"
               style={{
                 background: 'linear-gradient(135deg, var(--color-primary-base), var(--color-moss))',
                 boxShadow: '0 2px 8px rgba(59,107,74,0.2)',
               }}
+              title="Contact Organizer"
             >
               <Mail size={16} />
             </button>
