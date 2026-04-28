@@ -87,7 +87,7 @@ export async function semanticSearch(searchQuery: string): Promise<{
     return { results: [], isAIPowered: false };
   }
 
-  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT || process.env.GEMINI_API_KEY;
 
   // If no API key, fall back to keyword search
   if (!apiKey) {
@@ -147,9 +147,11 @@ Example response: ["id1", "id2", "id3"]`;
 export async function ragRetrieveEvents(userMessage: string, userContext?: any): Promise<any[]> {
   const allEvents = await fetchSearchableEvents();
 
-  if (allEvents.length === 0) return [];
+  if (allEvents.length <= 15) {
+    return allEvents;
+  }
 
-  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT || process.env.GEMINI_API_KEY;
 
   const getFallback = () => {
     const rankedIds = keywordSearch(userMessage, allEvents, userContext);

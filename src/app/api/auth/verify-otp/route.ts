@@ -10,7 +10,14 @@ export async function POST(req: NextRequest) {
     }
 
     if (!adminDb) {
-      return NextResponse.json({ error: "Server configuration error." }, { status: 500 });
+      const { initError } = require("@/lib/firebase-admin");
+      return NextResponse.json(
+        { 
+          error: "Server configuration error: Firebase Admin not initialized.",
+          details: initError || "Unknown initialization failure."
+        },
+        { status: 500 }
+      );
     }
 
     const verificationRef = adminDb.collection("verifications").doc(email);

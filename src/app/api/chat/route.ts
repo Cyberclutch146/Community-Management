@@ -24,7 +24,7 @@ export async function POST(req: Request) {
       );
     }
 
-    const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+    const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT || process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
       return NextResponse.json(
