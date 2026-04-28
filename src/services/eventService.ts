@@ -108,7 +108,7 @@ export const createEvent = async (data: CommunityEventCreate): Promise<string> =
     const result = await response.json();
 
     if (!response.ok) {
-      throw new Error(result.error || 'Failed to create event');
+      throw new Error(`${result.error || 'Failed to create event'}${result.details ? ` | Details: ${result.details}` : ''}`);
     }
 
     return result.eventId;

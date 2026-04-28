@@ -9,7 +9,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Title is required for AI generation" }, { status: 400 });
     }
 
-    const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+    const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT || process.env.GEMINI_API_KEY;
     
     if (!apiKey) {
       return NextResponse.json({ error: "AI API key is missing from environment variables" }, { status: 500 });
