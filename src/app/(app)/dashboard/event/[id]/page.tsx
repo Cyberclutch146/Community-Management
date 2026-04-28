@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
-import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAIL, getEventGoodsPledges } from '@/services/eventService';
+import { getEventById, getEventVolunteers, updateVolunteerStatus, EventVolunteer, deleteEvent, ADMIN_EMAILS, getEventGoodsPledges } from '@/services/eventService';
 import { CommunityEvent } from '@/types';
 import { ArrowLeft, Users, Download, Calendar, Mail, CheckCircle, Circle, Trash2, Send, Pencil, AlertTriangle, QrCode, Package } from 'lucide-react';
 import { toast } from 'sonner';
@@ -44,7 +44,7 @@ export default function OrganizerEventPage({ params }: { params: Promise<{ id: s
           getEventGoodsPledges(eventId)
         ]);
 
-        if (eventData?.organizerId !== user.uid && user.email !== ADMIN_EMAIL) {
+        if (eventData?.organizerId !== user.uid && !ADMIN_EMAILS.includes(user.email || '')) {
           toast.error('You do not have permission to view this event.');
           router.push('/dashboard');
           return;
