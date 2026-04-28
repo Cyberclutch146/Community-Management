@@ -65,6 +65,9 @@ export default function LoginPage() {
 
         {/* Right Side (Form) */}
         <div className="flex flex-col justify-start p-12 md:p-16 lg:p-24">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.12em] uppercase text-on-surface-variant transition-colors hover:text-primary">
+            ← Back to homepage
+          </Link>
           <h1 className="font-serif text-5xl font-light leading-tight mb-3 text-on-surface">Welcome back.</h1>
           <p className="font-serif text-[34px] italic text-primary mb-6">
             We're glad you're here.

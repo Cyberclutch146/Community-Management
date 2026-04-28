@@ -237,7 +237,7 @@ export default function NavbarTop() {
       }`}>
         {/* Logo */}
         <button
-          onClick={() => router.push('/home')}
+          onClick={() => router.push('/')}
           className={`font-semibold ${lora.className} text-on-surface tracking-tight transition-all duration-300 hover:opacity-80 ${
             scrolled ? 'text-[17px]' : 'text-[22px]'
           }`}

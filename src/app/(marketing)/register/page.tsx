@@ -81,6 +81,9 @@ export default function RegisterPage() {
         
         {/* Left Side */}
         <div className="flex flex-col justify-start p-10 md:p-14 lg:p-20">
+          <Link href="/" className="mb-8 inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.12em] uppercase text-on-surface-variant transition-colors hover:text-primary">
+            ← Back to homepage
+          </Link>
           <h1 className="font-serif text-4xl md:text-5xl font-light leading-tight mb-3 text-on-surface">Join Kindred.</h1>
           <p className="text-on-surface-variant text-[15px] mb-10 max-w-[380px]">
             Create your volunteer account and start making an impact in your community.
