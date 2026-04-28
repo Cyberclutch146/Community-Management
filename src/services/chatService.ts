@@ -1,5 +1,5 @@
 import { db } from '@/lib/firebase';
-import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
+import { addDoc, collection, onSnapshot, orderBy, query, serverTimestamp } from 'firebase/firestore';
 import { ChatMessage } from '@/types';
 
 const EVENTS_COLLECTION = 'events';
@@ -18,15 +18,14 @@ export const subscribeToMessages = (eventId: string, callback: (messages: ChatMe
 };
 
 export const sendMessage = async (eventId: string, userId: string, userName: string, text: string): Promise<void> => {
-  const response = await fetch('/api/chat/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ eventId, userId, userName, text }),
-  });
+  const messagesRef = collection(db, `${EVENTS_COLLECTION}/${eventId}/messages`);
 
-  if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error || 'Failed to send message');
-  }
+  await addDoc(messagesRef, {
+    eventId,
+    userId,
+    userName,
+    text,
+    createdAt: serverTimestamp(),
+  });
 };
 

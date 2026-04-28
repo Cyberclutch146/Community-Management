@@ -215,10 +215,10 @@ export default function NavbarTop() {
 
   return (
     <div
-      className={`fixed inset-x-0 z-50 transition-all duration-500 ease-out ${
+      className={`fixed inset-x-0 z-50 transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         scrolled
-          ? 'top-3 mx-4 rounded-[24px]'
-          : 'top-0'
+          ? 'top-3 mx-4 rounded-[24px] lg:inset-x-auto lg:left-1/2 lg:mx-0 lg:w-[min(calc(100vw-2rem),1200px)] lg:-translate-x-1/2'
+          : 'top-0 lg:inset-x-auto lg:left-1/2 lg:w-full lg:-translate-x-1/2'
       }`}
       style={{
         background: scrolled
@@ -232,7 +232,7 @@ export default function NavbarTop() {
           : '0 1px 3px rgba(42, 45, 43, 0.04)',
       }}
     >
-      <div className={`mx-auto flex items-center justify-between max-w-7xl transition-all duration-500 ${
+      <div className={`mx-auto flex items-center justify-between max-w-7xl transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         scrolled ? 'px-5 py-2' : 'px-10 py-3.5'
       }`}>
         {/* Logo */}

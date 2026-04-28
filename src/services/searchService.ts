@@ -1,5 +1,6 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import { adminDb } from "@/lib/firebase-admin";
+import { db } from "@/lib/firebase";
+import { collection, getDocs, orderBy, query } from "firebase/firestore";
 
 interface SearchableEvent {
   id: string;
@@ -15,12 +16,8 @@ interface SearchableEvent {
 
 // ─── Fetch all events for search ────────────────────────
 async function fetchSearchableEvents(): Promise<SearchableEvent[]> {
-  if (!adminDb) {
-    console.warn("adminDb is not initialized. Returning empty events list.");
-    return [];
-  }
-  
-  const snapshot = await adminDb.collection("events").orderBy("createdAt", "desc").get();
+  const eventsRef = collection(db, "events");
+  const snapshot = await getDocs(query(eventsRef, orderBy("createdAt", "desc")));
   
   return snapshot.docs.map((doc) => {
     const data = doc.data();
@@ -149,69 +146,11 @@ export async function ragRetrieveEvents(userMessage: string, userContext?: any):
 
   if (allEvents.length === 0) return [];
 
-  const apiKey = process.env.GEMINI_API_KEY_AI_CHAT_BOT;
+  const rankedIds = keywordSearch(userMessage, allEvents, userContext);
+  if (rankedIds.length === 0) return allEvents.slice(0, 5);
 
-  const getFallback = () => {
-    const rankedIds = keywordSearch(userMessage, allEvents, userContext);
-    if (rankedIds.length === 0) return allEvents.slice(0, 5);
-    return rankedIds.slice(0, 5).map(id => allEvents.find(e => e.id === id)).filter(Boolean);
-  };
-
-  // If no API key, fall back to keyword search
-  if (!apiKey) {
-    return getFallback();
-  }
-
-  try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-    const eventSummaries = allEvents
-      .map(
-        (e) =>
-          `ID: ${e.id} | Title: "${e.title}" | Category: ${e.category} | Location: ${e.location} | Urgency: ${e.urgency} | Description: ${e.description.slice(0, 150)}`
-      )
-      .join("\n");
-
-    const prompt = `You are a Retrieval-Augmented Generation (RAG) system for a community volunteering app.
-Given the User's Message, the User's Context, and a list of Available Events, return ONLY a JSON array of up to 5 event IDs that are MOST relevant.
-
-Rank the events based on:
-1. Semantic relevance to the user's message.
-2. Matching the user's skills and equipment.
-3. Matching the user's location/travel radius (if applicable based on location names).
-
-User's Context:
-Skills: ${userContext?.skills?.join(", ") || "None specified"}
-Equipment: ${userContext?.equipment?.join(", ") || "None specified"}
-Travel Radius: ${userContext?.travelRadius ? `${userContext.travelRadius}km` : "Not specified"}
-
-User Message: "${userMessage}"
-
-Available Events:
-${eventSummaries}
-
-Respond with ONLY a JSON array of event IDs (strings). If no events match well, return an empty array [].
-Example: ["id1", "id2", "id3"]`;
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text().trim();
-
-    const jsonMatch = text.match(/\[[\s\S]*?\]/);
-    if (jsonMatch) {
-      const ids = JSON.parse(jsonMatch[0]) as string[];
-      const topEvents = ids
-        .map(id => allEvents.find(e => e.id === id))
-        .filter(Boolean);
-      
-      if (topEvents.length > 0) {
-        return topEvents.slice(0, 5);
-      }
-    }
-
-    return getFallback();
-  } catch (error) {
-    console.error("RAG retrieval failed, falling back to keyword search:", error);
-    return getFallback();
-  }
+  return rankedIds
+    .slice(0, 5)
+    .map((id) => allEvents.find((e) => e.id === id))
+    .filter(Boolean);
 }

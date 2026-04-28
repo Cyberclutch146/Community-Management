@@ -4,6 +4,43 @@ import { ragRetrieveEvents } from "@/services/searchService";
 import { AI_FUNCTION_DECLARATIONS, executeFunction } from "@/services/aiActions";
 import { getAllSentinelAlerts } from "@/services/sentinelService";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+function isRetryableModelError(error: unknown) {
+  const message = error instanceof Error ? error.message : String(error || "");
+  const normalized = message.toLowerCase();
+
+  return (
+    normalized.includes("429") ||
+    normalized.includes("quota") ||
+    normalized.includes("rate limit") ||
+    normalized.includes("resource exhausted") ||
+    normalized.includes("exhausted") ||
+    normalized.includes("503") ||
+    normalized.includes("overloaded") ||
+    normalized.includes("unavailable")
+  );
+}
+
+async function sendMessageWithRetry(chat: any, payload: string | any[]) {
+  let lastError: unknown = null;
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      return await chat.sendMessage(payload);
+    } catch (error) {
+      lastError = error;
+      if (!isRetryableModelError(error) || attempt === 2) {
+        throw error;
+      }
+
+      await sleep(600 * (attempt + 1));
+    }
+  }
+
+  throw lastError;
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();
@@ -53,7 +90,7 @@ export async function POST(req: Request) {
             `$${e.goalAmount} (Raised: $${e.donatedAmount || 0})`
           );
         const needs = needsStr.length > 0 ? needsStr.join(", ") : "N/A";
-        return `- ${e.title} (${e.category}) at ${e.location}. Need: ${needs}. Description: ${e.description}`;
+        return `- ${e.title} (${e.category}) at ${e.location}. Need: ${needs}. Description: ${String(e.description || "").slice(0, 160)}`;
       })
       .join("\n");
 
@@ -74,7 +111,7 @@ export async function POST(req: Request) {
       : "\nThe user is not logged in.";
 
     const sentinelContext = sentinelAlerts.length > 0 
-      ? `\nCURRENT SENTINEL SAFETY ALERTS IN EFFECT:\n` + sentinelAlerts.map((a: any) => `- ${a.severity} ${a.type}: ${a.title} (${a.description})`).join("\n") + `\nAlways warn users about these active safety alerts when relevant to events.`
+      ? `\nCURRENT SENTINEL SAFETY ALERTS IN EFFECT:\n` + sentinelAlerts.slice(0, 3).map((a: any) => `- ${a.severity} ${a.type}: ${a.title} (${String(a.description || "").slice(0, 120)})`).join("\n") + `\nAlways warn users about these active safety alerts when relevant to events.`
       : "";
 
     const systemInstruction = `You are the Kindred Relief Network AI Assistant. 
@@ -101,7 +138,7 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
     const genAI = new GoogleGenerativeAI(apiKey);
 
     // Format history for Gemini chat
-    let chatHistory = messages.slice(0, -1);
+    let chatHistory = messages.slice(-9, -1);
     while (chatHistory.length > 0 && chatHistory[0].role !== "user") {
       chatHistory.shift();
     }
@@ -115,8 +152,8 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
 
     // Try models with function calling support
     const modelsToTry = [
-      "gemini-1.5-flash",
-      "gemini-2.0-flash",
+      "gemini-2.5-flash-lite",
+      "gemini-2.5-flash",
       "gemini-2.0-flash-lite",
     ];
 
@@ -133,7 +170,7 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
         });
 
         const chat = model.startChat({ history });
-        let result = await chat.sendMessage(latestMessage);
+        let result = await sendMessageWithRetry(chat, latestMessage);
         let response = result.response;
 
         // Handle function calling loop (max 3 iterations to prevent infinite loops)
@@ -174,7 +211,7 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
           }
 
           // Send the function result back to Gemini
-          result = await chat.sendMessage([
+          result = await sendMessageWithRetry(chat, [
             {
               functionResponse: {
                 name: name,
@@ -226,13 +263,22 @@ IMPORTANT CONTEXT: The user was just asked to confirm signing up for the event t
       errorMessage.toLowerCase().includes("quota") || 
       errorMessage.toLowerCase().includes("rate limit") ||
       errorMessage.toLowerCase().includes("exhausted");
+    const isTemporaryCapacityIssue =
+      errorMessage.includes("503") ||
+      errorMessage.toLowerCase().includes("overloaded") ||
+      errorMessage.toLowerCase().includes("unavailable");
 
     return NextResponse.json(
       {
         success: false,
-        error: isRateLimit ? "Rate limits hit. Please try again in a few minutes." : (errorMessage || "Something went wrong while generating a response."),
+        error:
+          isRateLimit
+            ? "The AI service is being throttled right now. Please try again in a minute."
+            : isTemporaryCapacityIssue
+              ? "The AI service is temporarily busy. Please try again in a moment."
+              : (errorMessage || "Something went wrong while generating a response."),
       },
-      { status: isRateLimit ? 429 : 500 }
+      { status: isRateLimit ? 429 : isTemporaryCapacityIssue ? 503 : 500 }
     );
   }
 }
