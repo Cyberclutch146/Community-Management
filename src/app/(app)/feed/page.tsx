@@ -84,6 +84,9 @@ function FeedContent() {
   const [isAIPowered, setIsAIPowered] = useState(false);
   const [searchLoading, setSearchLoading] = useState(false);
   const searchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const searchCacheRef = useRef<Map<string, { results: string[]; isAIPowered: boolean }>>(new Map());
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const rateLimitExpiresRef = useRef<number>(0);
 
   // Sync from URL when it changes (e.g. user searches from navbar)
   useEffect(() => {
@@ -184,11 +187,37 @@ function FeedContent() {
 
   // Semantic search effect with debounce
   const performSemanticSearch = useCallback(async (query: string) => {
-    if (!query.trim()) {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
       setSemanticResults(null);
       setIsAIPowered(false);
       setSearchLoading(false);
       return;
+    }
+
+    // Check if we are temporarily rate limited
+    if (Date.now() < rateLimitExpiresRef.current) {
+      setSemanticResults(null);
+      setIsAIPowered(false);
+      setSearchLoading(false);
+      return;
+    }
+
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    abortControllerRef.current = new AbortController();
+
+    // Check cache
+    if (searchCacheRef.current.has(trimmedQuery)) {
+      const cachedData = searchCacheRef.current.get(trimmedQuery);
+      if (cachedData) {
+        setSemanticResults(cachedData.results);
+        setIsAIPowered(cachedData.isAIPowered);
+        setSearchLoading(false);
+        return;
+      }
     }
 
     setSearchLoading(true);
@@ -196,24 +225,42 @@ function FeedContent() {
       const response = await fetch('/api/search', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ query: query.trim() }),
+        body: JSON.stringify({ query: trimmedQuery }),
+        signal: abortControllerRef.current.signal,
       });
 
       const data = await response.json();
-      if (data.success) {
+      
+      if (response.status === 429) {
+        // Disable AI search for 1 minute
+        rateLimitExpiresRef.current = Date.now() + 60000;
+        setSemanticResults(null);
+        setIsAIPowered(false);
+      } else if (data.success) {
         setSemanticResults(data.results);
         setIsAIPowered(data.isAIPowered);
+        // Cache result
+        searchCacheRef.current.set(trimmedQuery, {
+          results: data.results,
+          isAIPowered: data.isAIPowered,
+        });
       } else {
         // Fallback: clear semantic results and use client-side filtering
         setSemanticResults(null);
         setIsAIPowered(false);
       }
     } catch (error) {
+      if ((error as any).name === 'AbortError') {
+        // Request was aborted, do not clear loading or update state
+        return;
+      }
       console.error('Semantic search failed:', error);
       setSemanticResults(null);
       setIsAIPowered(false);
     } finally {
-      setSearchLoading(false);
+      if (abortControllerRef.current && !abortControllerRef.current.signal.aborted) {
+        setSearchLoading(false);
+      }
     }
   }, []);
 
@@ -226,7 +273,7 @@ function FeedContent() {
     if (searchQuery.trim()) {
       searchTimeoutRef.current = setTimeout(() => {
         performSemanticSearch(searchQuery);
-      }, 500);
+      }, 800);
     } else {
       const frame = window.requestAnimationFrame(() => {
         setSemanticResults(null);
